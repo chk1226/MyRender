@@ -14,7 +14,10 @@ namespace MyRender
         [STAThread]
         static void Main()
         {
-            new MainWindow().Run(60);
+            using (var game = new MainWindow())
+            {
+                game.Run(60);
+            }
         }
     }
 }
