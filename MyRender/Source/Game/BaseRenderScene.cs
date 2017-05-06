@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MyRender.MyEngine;
+﻿using MyRender.MyEngine;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using MyRender.Debug;
+using OpenTK.Graphics;
 
 namespace MyRender.Game
 {
@@ -15,21 +12,36 @@ namespace MyRender.Game
         {
             base.OnStart();
 
-            Node node;
-            node = new Node();
-            AddChild(node);
-            AddChild(new Node());
-            node.AddChild(new Node());
-            node.AddChild(new Node());
-            node.AddChild(new Node());
-
         }
 
 
         public override void OnUpdate(FrameEventArgs e)
         {
             base.OnUpdate(e);
-            //Log.Print("BaseRenderScene-OnUpdate");
+
+
         }
+
+        public override void OnRender(FrameEventArgs e)
+        {
+            base.OnRender(e);
+
+            //GL.Begin(PrimitiveType.Quads);
+
+            //GL.Color4(Color4.White);                            //色名で指定
+            //GL.Vertex3(-1.0f, 1.0f, 4.0f);
+            //GL.Color4(Color4.Blue);  //配列で指定
+            //GL.Vertex3(-1.0f, -1.0f, 4.0f);
+            //GL.Color4(Color4.Red);                  //4つの引数にfloat型で指定
+            //GL.Vertex3(1.0f, -1.0f, 4.0f);
+            //GL.Color4(Color4.Yellow);  //byte型で指定
+            //GL.Vertex3(1.0f, 1.0f, 4.0f);
+
+            //GL.End();
+
+
+        }
+
+
     }
 }

@@ -33,8 +33,6 @@ namespace MyRender.MyEngine
         //public event Action<FrameEventArgs> OnRender;
         public event Action<FrameEventArgs> OnUpdate;
 
-        //private 
-
         public void RunWithScene(Scene scene)
         {
             if(scene != null)
@@ -60,11 +58,14 @@ namespace MyRender.MyEngine
                 return;
             }
 
+            _renderList.Add(MainScene);
             recursiveTraverseTree(MainScene.Children);
 
-            //foreach(var bb in _renderList)
+            // for debug
+            //Log.Print("***doTraverseTree****");
+            //foreach (var i in _renderList)
             //{
-            //    Log.Print(bb.regTest.ToString());
+            //    Log.Print(i.testid.ToString());
             //}
         }
 
@@ -76,7 +77,7 @@ namespace MyRender.MyEngine
             {
                 // add root to list
                 _renderList.Add(pair.Value);
-                //left to right
+                // left to right traverse
                 if(pair.Value.Children.Count == 0)
                 {
                     continue;
@@ -89,8 +90,38 @@ namespace MyRender.MyEngine
 
         private void sortSceneGraph()
         {
+            _renderList.Sort(delegate(Node x, Node y)
+            {
+                float x_z = x.ModelViewPosition.Z;
+                float y_z = y.ModelViewPosition.Z;
+                
+                if(x_z > y_z)
+                {
+                    return -1;
+                }
+                else if(x_z < y_z)
+                {
+                    return 1;
+                }
 
+                return 0;
+            });
 
+            // for debug
+            //Log.Print("***sortSceneGraph****");
+            //foreach (var i in _renderList)
+            //{
+            //    Log.Print(i.testid.ToString());
+            //}
+        }
+
+        private void doRender(FrameEventArgs e)
+        {
+            foreach(var node in _renderList)
+            {
+                node.OnRender(e);
+                node.OnRenderFinsh(e);
+            }
         }
 
         public void OnWindowResize()
@@ -106,21 +137,11 @@ namespace MyRender.MyEngine
             doTraverseTree();
             sortSceneGraph();
 
+            GL.MatrixMode(MatrixMode.Modelview);
             GL.ClearColor(Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            //GL.Begin(PrimitiveType.Quads);
-
-            //GL.Color4(Color4.White);                            //色名で指定
-            //GL.Vertex3(-1.0f, 1.0f, 4.0f);
-            //GL.Color4(Color4.Blue);  //配列で指定
-            //GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            //GL.Color4(Color4.Red);                  //4つの引数にfloat型で指定
-            //GL.Vertex3(1.0f, -1.0f, 4.0f);
-            //GL.Color4(Color4.Yellow);  //byte型で指定
-            //GL.Vertex3(1.0f, 1.0f, 4.0f);
-
-            //GL.End();
+            doRender(e);
         }
 
     }
