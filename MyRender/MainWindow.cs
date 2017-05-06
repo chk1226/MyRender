@@ -10,10 +10,24 @@ namespace MyRender
     class MainWindow : GameWindow
     {
 
-        public Camera camera;
-        private Vector2 preMousePos;
+        static private MainWindow _instance;
+        static public MainWindow Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = new MainWindow();
+                }
 
-        public MainWindow() : base(1280,
+                return _instance;
+            }
+        }
+
+        //public Camera camera;
+        //private Vector2 preMousePos;
+
+        private MainWindow() : base(1280,
             720,
             OpenTK.Graphics.GraphicsMode.Default,
             "openGL",
@@ -26,33 +40,24 @@ namespace MyRender
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-
-            camera.UpdateViewport(ClientRectangle);
+            GameDirect.Instance.OnWindowResize();
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            camera = new Camera(new Vector3(0, 0, 20),
-                                new Vector3(0, 0, 0),
-                                new Vector3(0, 1, 0),
-                                45,
-                                1,
-                                1000,
-                                ClientRectangle);
-
-            camera.Apply();
+            GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
 
 
             // HACK
-            Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
-            {
-                var eye = camera.eye;
-                eye.Z += _e.Delta;
-                camera.UpdateEye(eye);
-                //Log.Print("WHEEL" + _e.Delta.ToString());
-            };
+            //Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
+            //{
+            //    var eye = camera.eye;
+            //    eye.Z += _e.Delta;
+            //    camera.UpdateEye(eye);
+            //    //Log.Print("WHEEL" + _e.Delta.ToString());
+            //};
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -60,6 +65,9 @@ namespace MyRender
             base.OnUpdateFrame(e);
             handleKeyboard();
             handleMouse();
+
+            GameDirect.Instance.OnUpdateFrame(e);
+
         }
 
         private void handleKeyboard()
@@ -95,26 +103,23 @@ namespace MyRender
             
             if(Mouse[OpenTK.Input.MouseButton.Right])
             {
-                if(preMousePos.X + preMousePos.Y == 0)
-                {
-                    preMousePos.X = Mouse.X;
-                    preMousePos.Y = Mouse.Y;
-                }
-                else
-                {
-                    var dX = Mouse.X - preMousePos.X;
-                    var dY = Mouse.Y - preMousePos.Y;
+                //if(preMousePos.X + preMousePos.Y == 0)
+                //{
+                //    preMousePos.X = Mouse.X;
+                //    preMousePos.Y = Mouse.Y;
+                //}
+                //else
+                //{
+                //    var dX = Mouse.X - preMousePos.X;
+                //    var dY = Mouse.Y - preMousePos.Y;
 
-                    var m = new Matrix4();
-                    
-                        
-                    camera.Rotation(new Quaternion(MathHelper.DegreesToRadians(dY), MathHelper.DegreesToRadians(dX), 0));
+                //    camera.Rotation(new Quaternion(MathHelper.DegreesToRadians(dY), MathHelper.DegreesToRadians(dX), 0));
 
-                    preMousePos.X = Mouse.X;
-                    preMousePos.Y = Mouse.Y;
+                //    preMousePos.X = Mouse.X;
+                //    preMousePos.Y = Mouse.Y;
 
-                    Log.Print(dX.ToString() + " " + dY.ToString());
-                }
+                //    Log.Print(dX.ToString() + " " + dY.ToString());
+                //}
             }
 
 
@@ -124,27 +129,8 @@ namespace MyRender
         {
             Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0}";
 
-
-            GL.ClearColor(Color4.Black);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            GL.Begin(PrimitiveType.Quads);
-
-            GL.Color4(Color4.White);                            //色名で指定
-            GL.Vertex3(-1.0f, 1.0f, 4.0f);
-            GL.Color4(Color4.Blue);  //配列で指定
-            GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            GL.Color4(Color4.Red);                  //4つの引数にfloat型で指定
-            GL.Vertex3(1.0f, -1.0f, 4.0f);
-            GL.Color4(Color4.Yellow);  //byte型で指定
-            GL.Vertex3(1.0f, 1.0f, 4.0f);
-
-            GL.End();
-
-
+            GameDirect.Instance.OnRenderFrame(e);
             SwapBuffers();
-            //Log.Print("OnRenderFrame");
-
         }
 
     }
