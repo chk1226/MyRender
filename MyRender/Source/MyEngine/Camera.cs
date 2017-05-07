@@ -114,7 +114,7 @@ namespace MyRender.MyEngine
             base.Rotation(q);
 
             eye = q * eye;
-            Log.Print(q.ToString());
+            //Log.Print(q.ToString());
             ViewMatrix = Matrix4.LookAt(eye, focus, vUp);
             
         }

@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 
@@ -8,8 +9,8 @@ namespace MyRender.MyEngine
     class Node
     {
         // FOR DEUB
-        public static int testflowid = 0;
-        public int testid = 0;
+        //public static int testflowid = 0;
+        //public int testid = 0;
 
         private string _guid = Guid.NewGuid().ToString();
 
@@ -59,13 +60,19 @@ namespace MyRender.MyEngine
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
         public Matrix4 WorldModelMatrix = Matrix4.Identity;
         //public Quaternion localRoation;
+        private Material _materialData;
+        public Material MaterialData
+        {
+            get { return _materialData; }
+            set { _materialData = value; }
+        }
 
         public Node()
         {
             //localRoation = Quaternion.Identity;
             OnStart();
 
-            testid = testflowid++;
+            //testid = testflowid++;
         }
         
 
@@ -76,7 +83,7 @@ namespace MyRender.MyEngine
             if (child.Parent != null)
             {
                 child.Parent._children.Remove(child._guid);
-                GameDirect.Instance.OnUpdate -= child.OnUpdate;
+                UnregisterCallback(child);
 
             }
 
@@ -84,7 +91,7 @@ namespace MyRender.MyEngine
             child.WorldModelMatrix = WorldModelMatrix * LocalModelMatrix;
             _children.Add(child._guid, child);
 
-            GameDirect.Instance.OnUpdate += child.OnUpdate;
+            RegisterCallback(child);
         }
 
         public void SetParent(Node target)
@@ -94,15 +101,13 @@ namespace MyRender.MyEngine
             if (Parent != null)
             {
                 Parent._children.Remove(_guid);
-                GameDirect.Instance.OnUpdate -= this.OnUpdate;
-
+                UnregisterCallback(this);
             }
 
             Parent = target;
             Parent._children.Add(_guid, this);
             this.WorldModelMatrix = Parent.WorldModelMatrix * Parent.LocalModelMatrix;
-            GameDirect.Instance.OnUpdate += this.OnUpdate;
-
+            RegisterCallback(this);
         }
 
 
@@ -112,8 +117,9 @@ namespace MyRender.MyEngine
         public virtual void OnUpdate(FrameEventArgs e) { }
         public virtual void OnRender(FrameEventArgs e)
         {
+            GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
-            var vm = WorldModelMatrix * LocalModelMatrix;
+            var vm = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix;
             GL.LoadMatrix(ref vm);
 
         }
@@ -123,6 +129,11 @@ namespace MyRender.MyEngine
             GL.PopMatrix();
         }
 
+        public virtual void OnMouseDown(MouseButtonEventArgs e) { }
+        //public virtual void OnMouseUp(object sender, MouseButtonEventArgs e) { }
+        public virtual void OnMouseMove(MouseMoveEventArgs e) { }
+        //public virtual void OnMouseWheel(object sender, MouseWheelEventArgs e) { }
+        
 
         private void effectChildWorldModelMatrix(Matrix4 effect)
         {
@@ -132,6 +143,24 @@ namespace MyRender.MyEngine
                 child.WorldModelMatrix = effect * child.WorldModelMatrix;
                 child.effectChildWorldModelMatrix(effect);
             }
+        }
+
+        public void RegisterCallback(Node node)
+        {
+            GameDirect.Instance.OnUpdate += node.OnUpdate;
+            GameDirect.Instance.OnMouseDown += node.OnMouseDown;
+            //MainWindow.Instance.MouseUp += node.OnMouseUp;
+            GameDirect.Instance.OnMouseMove += node.OnMouseMove;
+            //MainWindow.Instance.MouseWheel += node.OnMouseWheel;
+        }
+
+        public void UnregisterCallback(Node node)
+        {
+            GameDirect.Instance.OnUpdate -= node.OnUpdate;
+            GameDirect.Instance.OnMouseDown -= node.OnMouseDown;
+            //MainWindow.Instance.MouseUp -= node.OnMouseUp;
+            GameDirect.Instance.OnMouseMove -= node.OnMouseMove;
+            //MainWindow.Instance.MouseWheel -= node.OnMouseWheel;
         }
 
     }

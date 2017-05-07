@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using MyRender.Debug;
 using MyRender.MyEngine;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace MyRender
 {
@@ -24,8 +25,12 @@ namespace MyRender
             }
         }
 
+        private MouseMoveEventArgs _mouseMoveData;
+        public MouseMoveEventArgs MouseMoveData {
+            get { return _mouseMoveData; }
+            private set { _mouseMoveData = value; }
+        }
         //public Camera camera;
-        //private Vector2 preMousePos;
 
         private MainWindow() : base(1280,
             720,
@@ -46,10 +51,9 @@ namespace MyRender
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
+            GameDirect.Instance.Initial();
             GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
-
-
+            
             // HACK
             //Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
             //{
@@ -58,6 +62,12 @@ namespace MyRender
             //    camera.UpdateEye(eye);
             //    //Log.Print("WHEEL" + _e.Delta.ToString());
             //};
+        }
+
+        protected override void OnUnload(EventArgs e)
+        {
+            base.OnUnload(e);
+            GameDirect.Instance.OnRelease();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -78,22 +88,6 @@ namespace MyRender
             {
                 Exit();
             }
-            //else if(keyState.IsKeyDown(OpenTK.Input.Key.A))
-            //{
-            //    camera.Rotation(new Quaternion(MathHelper.DegreesToRadians(-1), 0 , 0));
-            //}
-            //else if (keyState.IsKeyDown(OpenTK.Input.Key.D))
-            //{
-            //    camera.Rotation(new Quaternion(MathHelper.DegreesToRadians(1), 0, 0));
-            //}
-            //else if (keyState.IsKeyDown(OpenTK.Input.Key.W))
-            //{
-            //    camera.Rotation(new Quaternion(0, MathHelper.DegreesToRadians(1), 0));
-            //}
-            //else if (keyState.IsKeyDown(OpenTK.Input.Key.S))
-            //{
-            //    camera.Rotation(new Quaternion(0, MathHelper.DegreesToRadians(-1), 0));
-            //}
 
         }
 
@@ -103,26 +97,22 @@ namespace MyRender
             
             if(Mouse[OpenTK.Input.MouseButton.Right])
             {
-                //if(preMousePos.X + preMousePos.Y == 0)
-                //{
-                //    preMousePos.X = Mouse.X;
-                //    preMousePos.Y = Mouse.Y;
-                //}
-                //else
-                //{
-                //    var dX = Mouse.X - preMousePos.X;
-                //    var dY = Mouse.Y - preMousePos.Y;
-
-                //    camera.Rotation(new Quaternion(MathHelper.DegreesToRadians(dY), MathHelper.DegreesToRadians(dX), 0));
-
-                //    preMousePos.X = Mouse.X;
-                //    preMousePos.Y = Mouse.Y;
-
-                //    Log.Print(dX.ToString() + " " + dY.ToString());
-                //}
+                var state = Mouse.GetState();
+                GameDirect.Instance.OnMouseMove(MouseMoveData);
             }
 
+        }
 
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+            GameDirect.Instance.OnMouseDown(e);
+        }
+
+        protected override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            base.OnMouseMove(e);
+            MouseMoveData = e;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

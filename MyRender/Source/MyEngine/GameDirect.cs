@@ -4,6 +4,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using MyRender.Debug;
+using OpenTK.Input;
 
 namespace MyRender.MyEngine
 {
@@ -28,17 +29,35 @@ namespace MyRender.MyEngine
             private set { _mainScene = value; }
         }
 
-        private List<Node> _renderList = new List<Node>(100); 
+        private List<Node> _renderList = new List<Node>(100);
+        private int _vbo = 0;
+        public int VBO {
+            get { return _vbo; }
+            private set { _vbo = value; }
+        }
 
         //public event Action<FrameEventArgs> OnRender;
         public event Action<FrameEventArgs> OnUpdate;
+        public Action<MouseButtonEventArgs> OnMouseDown;
+        public Action<MouseMoveEventArgs> OnMouseMove;
+
+        public void Initial()
+        {
+            VBO = GL.GenBuffer();
+        }
+
+        public void OnRelease()
+        {
+            GL.DeleteBuffer(VBO);
+        }
 
         public void RunWithScene(Scene scene)
         {
             if(scene != null)
             {
                 MainScene = scene;
-                OnUpdate += MainScene.OnUpdate;
+                MainScene.RegisterCallback(MainScene);
+
             }
         }
 
@@ -137,8 +156,7 @@ namespace MyRender.MyEngine
             doTraverseTree();
             sortSceneGraph();
 
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.ClearColor(Color4.Black);
+            GL.ClearColor(Color4.Gray);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             doRender(e);

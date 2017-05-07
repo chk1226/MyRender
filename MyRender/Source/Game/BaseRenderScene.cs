@@ -3,15 +3,22 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using MyRender.Debug;
 using OpenTK.Graphics;
+using OpenTK.Input;
+using System;
 
 namespace MyRender.Game
 {
     class BaseRenderScene : Scene
     {
+        public Cube testCube;
+        private Vector2 _regMousePos = Vector2.Zero;
+        private float _offsetCameraR = 1.0f;
+
         public override void OnStart()
         {
             base.OnStart();
-
+            testCube = new Cube();
+            AddChild(testCube);
         }
 
 
@@ -40,6 +47,42 @@ namespace MyRender.Game
             //GL.End();
 
 
+        }
+
+        public override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if (e.Mouse.RightButton == ButtonState.Pressed)
+            {
+                _regMousePos.X = (float)e.Mouse.X;// - MainWindow.Instance.Width / 2;
+                _regMousePos.Y = (float)e.Mouse.Y;// - MainWindow.Instance.Height / 2;
+
+                Log.Print("OnMouseDown");
+
+            }
+
+        }
+
+        public override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (e.Mouse.RightButton == ButtonState.Pressed) 
+            {
+                var dX = e.X - _regMousePos.X;
+                var dY = e.Y - _regMousePos.Y;
+                Log.Print(e.X .ToString() + "    " + _regMousePos.X.ToString());
+
+
+                MainCamera.Rotation(new Quaternion(0, MathHelper.DegreesToRadians(dX), MathHelper.DegreesToRadians(dY)));
+
+                _regMousePos.X = e.X;
+                _regMousePos.Y = e.Y;
+
+                Log.Print("OnMouseMove");
+
+            }
         }
 
 
