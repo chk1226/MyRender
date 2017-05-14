@@ -67,6 +67,13 @@ namespace MyRender.MyEngine
             set { _materialData = value; }
         }
 
+        private Model _modelDaata;
+        public Model ModelData
+        {
+            get { return _modelDaata; }
+            set { _modelDaata = value; }
+        }
+
         public Node()
         {
             //localRoation = Quaternion.Identity;
@@ -115,6 +122,7 @@ namespace MyRender.MyEngine
 
         public virtual void OnStart() { }
         public virtual void OnUpdate(FrameEventArgs e) { }
+        public virtual void OnRelease() { }
         public virtual void OnRender(FrameEventArgs e)
         {
             GL.MatrixMode(MatrixMode.Modelview);

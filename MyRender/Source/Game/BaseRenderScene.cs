@@ -12,7 +12,6 @@ namespace MyRender.Game
     {
         public Cube testCube;
         private Vector2 _regMousePos = Vector2.Zero;
-        private float _offsetCameraR = 1.0f;
 
         public override void OnStart()
         {
@@ -33,18 +32,21 @@ namespace MyRender.Game
         {
             base.OnRender(e);
 
+            //GL.BindTexture(TextureTarget.Texture2D, Resource.Instance.GetTextureID(Resource.IBricks));
             //GL.Begin(PrimitiveType.Quads);
 
             //GL.Color4(Color4.White);                            //色名で指定
+            //GL.TexCoord2(0, 0);
             //GL.Vertex3(-1.0f, 1.0f, 4.0f);
-            //GL.Color4(Color4.Blue);  //配列で指定
+            //GL.TexCoord2(0, 1);
             //GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            //GL.Color4(Color4.Red);                  //4つの引数にfloat型で指定
+            //GL.TexCoord2(1, 1);
             //GL.Vertex3(1.0f, -1.0f, 4.0f);
-            //GL.Color4(Color4.Yellow);  //byte型で指定
+            //GL.TexCoord2(1, 0);
             //GL.Vertex3(1.0f, 1.0f, 4.0f);
 
             //GL.End();
+            //GL.BindTexture(TextureTarget.Texture2D, 0);
 
 
         }
@@ -58,7 +60,7 @@ namespace MyRender.Game
                 _regMousePos.X = (float)e.Mouse.X;// - MainWindow.Instance.Width / 2;
                 _regMousePos.Y = (float)e.Mouse.Y;// - MainWindow.Instance.Height / 2;
 
-                Log.Print("OnMouseDown");
+                //Log.Print("OnMouseDown");
 
             }
 
@@ -72,7 +74,7 @@ namespace MyRender.Game
             {
                 var dX = e.X - _regMousePos.X;
                 var dY = e.Y - _regMousePos.Y;
-                Log.Print(e.X .ToString() + "    " + _regMousePos.X.ToString());
+                //Log.Print(e.X .ToString() + "    " + _regMousePos.X.ToString());
 
 
                 MainCamera.Rotation(new Quaternion(0, MathHelper.DegreesToRadians(dX), MathHelper.DegreesToRadians(dY)));
@@ -80,7 +82,7 @@ namespace MyRender.Game
                 _regMousePos.X = e.X;
                 _regMousePos.Y = e.Y;
 
-                Log.Print("OnMouseMove");
+                //Log.Print("OnMouseMove");
 
             }
         }

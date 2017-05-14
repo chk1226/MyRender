@@ -30,7 +30,6 @@ namespace MyRender
             get { return _mouseMoveData; }
             private set { _mouseMoveData = value; }
         }
-        //public Camera camera;
 
         private MainWindow() : base(1280,
             720,

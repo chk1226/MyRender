@@ -2,58 +2,121 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using System.Runtime.InteropServices;
 
 namespace MyRender.MyEngine
 {
     class Cube : Node
     {
+        private readonly string cubeGUID = "cube";
+
         public override void OnStart()
         {
             base.OnStart();
 
-            MaterialData = new Material();
-
-            MaterialData.Vertices = new[]
+            ModelData = Resource.Instance.GetModel(cubeGUID);
+            if (ModelData == null)
             {
-                //new Vector3(-1.0f, -1.0f,  1.0f),
-                //new Vector3( 1.0f, -1.0f,  1.0f),
-                //new Vector3( 1.0f,  1.0f,  1.0f),
-                //new Vector3(-1.0f,  1.0f,  1.0f),
-                //new Vector3(-1.0f, -1.0f, -1.0f),
-                //new Vector3( 1.0f, -1.0f, -1.0f),
-                //new Vector3( 1.0f,  1.0f, -1.0f),
-                //new Vector3(-1.0f,  1.0f, -1.0f)
+                ModelData = new Model();
+                ModelData.guid = cubeGUID;
 
+                ModelData.Vertices = new[]
+                {
+                    // front face
+                    new Vector3(-1.0f, -1.0f,  1.0f),
+                    new Vector3( 1.0f, -1.0f,  1.0f),
+                    new Vector3( 1.0f,  1.0f,  1.0f),
+                    new Vector3(-1.0f,  1.0f,  1.0f),
+                    // back face
+                    new Vector3( -1.0f, -1.0f, -1.0f),
+                    new Vector3( 1.0f, -1.0f, -1.0f),
+                    new Vector3( 1.0f, 1.0f, -1.0f),
+                    new Vector3( -1.0f, 1.0f, -1.0f),
+                    // top face
+                    new Vector3( -1.0f, 1.0f, 1.0f),
+                    new Vector3( 1.0f, 1.0f, 1.0f),
+                    new Vector3( 1.0f, 1.0f, -1.0f),
+                    new Vector3( -1.0f, 1.0f, -1.0f),
+                    // bottom face
+                    new Vector3( -1.0f, -1.0f, 1.0f),
+                    new Vector3( 1.0f, -1.0f, 1.0f),
+                    new Vector3( 1.0f, -1.0f, -1.0f),
+                    new Vector3( -1.0f, -1.0f, -1.0f),
+                    // right face
+                    new Vector3(1.0f, -1.0f, 1.0f),
+                    new Vector3( 1.0f, -1.0f, -1.0f),
+                    new Vector3( 1.0f,  1.0f, -1.0f),
+                    new Vector3(1.0f,  1.0f, 1.0f),
+                    // left face
+                    new Vector3(-1.0f, -1.0f, 1.0f),
+                    new Vector3( -1.0f, -1.0f, -1.0f),
+                    new Vector3( -1.0f,  1.0f, -1.0f),
+                    new Vector3(-1.0f,  1.0f, 1.0f)
+                };
 
-                new Vector3(-1.0f, 1.0f, 4.0f),
-                new Vector3(-1.0f, -1.0f, 4.0f),
-                new Vector3(1.0f, -1.0f, 4.0f),
-        };
+                //ModelData.Normals = new[]
+                //{
+                //    new Vector3(-1.0f, -1.0f,  1.0f),
+                //    new Vector3( 1.0f, -1.0f,  1.0f),
+                //    new Vector3( 1.0f,  1.0f,  1.0f),
+                //    new Vector3(-1.0f,  1.0f,  1.0f),
+                //    new Vector3(-1.0f, -1.0f, -1.0f),
+                //    new Vector3( 1.0f, -1.0f, -1.0f),
+                //    new Vector3( 1.0f,  1.0f, -1.0f),
+                //    new Vector3(-1.0f,  1.0f, -1.0f),
+                //};
 
-            MaterialData.Normals = new[]
-            {
-                new Vector3(-1.0f, -1.0f,  1.0f),
-                new Vector3( 1.0f, -1.0f,  1.0f),
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3(-1.0f,  1.0f,  1.0f),
-                new Vector3(-1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3(-1.0f,  1.0f, -1.0f),
-            };
+                ModelData.Texcoords = new[]
+                {
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
 
-            MaterialData.Texcoords = new[]
-            {
-                new Vector2( 0.0f, 0.0f),
-                new Vector2( 0.0f, 1.0f),
-                new Vector2( 1.0f, 1.0f),
-                new Vector2( 1.0f, 0.0f),
-                new Vector2( 1.0f, 1.0f),
-                new Vector2( 1.0f, 0.0f),
-                new Vector2( 0.0f, 0.0f),
-                new Vector2( 0.0f, 1.0f),
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
 
-            };
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
+
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
+
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
+
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 1.0f, 1.0f),
+                    new Vector2( 1.0f, 0.0f),
+                };
+
+                // gen vertex buffer
+                ModelData.VBO = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
+                int size = ModelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Vertices, BufferUsageHint.StaticDraw);
+
+                // gen texture cood buffer
+                ModelData.TBO = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
+                size = ModelData.Texcoords.Length * Marshal.SizeOf(default(Vector2));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Texcoords, BufferUsageHint.StaticDraw);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+                Resource.Instance.AddModel(ModelData);
+            } 
+
+            MaterialData = Resource.Instance.CreateBricksM();
         }
 
         public override void OnRender(FrameEventArgs e)
@@ -62,25 +125,24 @@ namespace MyRender.MyEngine
 
             GL.Color4(Color4.White);  //byte型で指定
 
+            // bind vertex buffer 
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
             GL.EnableClientState(ArrayCap.VertexArray);
-            //GL.EnableClientState(ArrayCap.NormalArray);
-            //GL.EnableClientState(ArrayCap.TextureCoordArray);
+            GL.VertexPointer(3, VertexPointerType.Float, Vector3.SizeInBytes, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, GameDirect.Instance.VBO);
-            int size = MaterialData.Vertices.Length * System.Runtime.InteropServices.Marshal.SizeOf(default(Vector3));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, MaterialData.Vertices, BufferUsageHint.StaticDraw);
+            // bind texture buffer
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
+            GL.EnableClientState(ArrayCap.TextureCoordArray);
+            GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
 
-            GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-            //GL.NormalPointer<Vector3>(NormalPointerType.Float, 0, MaterialData.Normals);
-            //GL.TexCoordPointer<Vector2>(2, TexCoordPointerType.Float, 0, MaterialData.Texcoords);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-
+            GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
+            GL.DrawArrays(PrimitiveType.Quads, 0, ModelData.Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);
-            //GL.DisableClientState(ArrayCap.NormalArray);
-            //GL.DisableClientState(ArrayCap.TextureCoordArray);
+            GL.DisableClientState(ArrayCap.TextureCoordArray);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
 
         }

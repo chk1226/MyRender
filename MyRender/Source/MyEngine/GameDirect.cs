@@ -30,11 +30,6 @@ namespace MyRender.MyEngine
         }
 
         private List<Node> _renderList = new List<Node>(100);
-        private int _vbo = 0;
-        public int VBO {
-            get { return _vbo; }
-            private set { _vbo = value; }
-        }
 
         //public event Action<FrameEventArgs> OnRender;
         public event Action<FrameEventArgs> OnUpdate;
@@ -43,12 +38,17 @@ namespace MyRender.MyEngine
 
         public void Initial()
         {
-            VBO = GL.GenBuffer();
+
+            GL.Enable(EnableCap.Texture2D);
+            //GL.Enable(EnableCap.DepthTest);
+            //GL.Enable(EnableCap.CullFace);
+
         }
 
         public void OnRelease()
         {
-            GL.DeleteBuffer(VBO);
+
+            Resource.Instance.OnRelease();
         }
 
         public void RunWithScene(Scene scene)
