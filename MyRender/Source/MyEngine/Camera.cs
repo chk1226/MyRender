@@ -27,16 +27,18 @@ namespace MyRender.MyEngine
 
             // Setup a perspective view
             _projectMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar);
+            _projectMatrix.Transpose();
             this.fovy = fovy;
             this.zNear = zNear;
             this.zFar = zFar;
 
             // Setup a view matrix
-            this._viewMatrix = Matrix4.LookAt(eye, focus, vUp);
+            _viewMatrix = Matrix4.LookAt(eye, focus, vUp);
+            _viewMatrix.Transpose();
             this.eye = eye;
             this.focus = focus;
             this.vUp = vUp;
-
+            
             ProjectMode = ProjectType.Perspective;
         }
 
@@ -66,7 +68,8 @@ namespace MyRender.MyEngine
             private set {
                 _projectMatrix = value;
                 GL.MatrixMode(MatrixMode.Projection);
-                GL.LoadMatrix(ref this._projectMatrix);
+                var t = Matrix4.Transpose(this._projectMatrix);
+                GL.LoadMatrix(ref t);
             }
         }
 
@@ -77,7 +80,8 @@ namespace MyRender.MyEngine
             set {
                 _viewMatrix = value;
                 GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadMatrix(ref this._viewMatrix);
+                var t = Matrix4.Transpose(this._viewMatrix);
+                GL.LoadMatrix(ref t);
             }
         }
 
@@ -106,7 +110,7 @@ namespace MyRender.MyEngine
             }
 
             //Setup a perspective view
-            ProjectMatix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar);
+            ProjectMatix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar));
         }
 
         public override void Rotation(Quaternion q)
@@ -115,14 +119,14 @@ namespace MyRender.MyEngine
 
             eye = q * eye;
             //Log.Print(q.ToString());
-            ViewMatrix = Matrix4.LookAt(eye, focus, vUp);
+            ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
             
         }
 
         public void UpdateEye(Vector3 pos)
         {
             eye = pos;
-            ViewMatrix = Matrix4.LookAt(eye, focus, vUp);
+            ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
         }
 
 

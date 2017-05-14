@@ -36,7 +36,9 @@ namespace MyRender.MyEngine
             set {
                 var delta = value - _localPosition;
                 _localPosition = value;
-                effectChildWorldModelMatrix(Matrix4.CreateTranslation(delta));
+                var trans = Matrix4.Transpose(Matrix4.CreateTranslation(delta));
+                LocalModelMatrix = LocalModelMatrix * trans;
+                effectChildWorldModelMatrix(trans);
             }
         }
 
@@ -49,8 +51,7 @@ namespace MyRender.MyEngine
                     return Vector3.Zero;
                 }
 
-                var p = new Vector4(LocalPosition);
-                p.W = 1;
+                var p = new Vector4(0, 0, 0, 1);
                 p = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix * p;
 
                 return p.Xyz;
@@ -80,8 +81,7 @@ namespace MyRender.MyEngine
             OnStart();
 
             //testid = testflowid++;
-        }
-        
+        } 
 
         public void AddChild(Node child)
         {
@@ -128,8 +128,8 @@ namespace MyRender.MyEngine
             GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
             var vm = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix;
+            vm.Transpose();
             GL.LoadMatrix(ref vm);
-
         }
 
         public virtual void OnRenderFinsh(FrameEventArgs e)
@@ -148,7 +148,7 @@ namespace MyRender.MyEngine
             foreach (var pair in Children)
             {
                 var child = pair.Value;
-                child.WorldModelMatrix = effect * child.WorldModelMatrix;
+                child.WorldModelMatrix = child.WorldModelMatrix * effect;
                 child.effectChildWorldModelMatrix(effect);
             }
         }

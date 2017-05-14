@@ -116,11 +116,11 @@ namespace MyRender.MyEngine
                 
                 if(x_z > y_z)
                 {
-                    return -1;
+                    return 1;
                 }
                 else if(x_z < y_z)
                 {
-                    return 1;
+                    return -1;
                 }
 
                 return 0;

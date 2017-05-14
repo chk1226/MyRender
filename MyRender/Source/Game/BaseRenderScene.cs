@@ -18,6 +18,12 @@ namespace MyRender.Game
             base.OnStart();
             testCube = new Cube();
             AddChild(testCube);
+            testCube.LocalPosition = new Vector3(0, 0, -5);
+
+            testCube = new Cube();
+            AddChild(testCube);
+            testCube.LocalPosition = new Vector3(5, 0, -5);
+
         }
 
 
