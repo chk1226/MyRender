@@ -8,6 +8,7 @@ namespace MyRender.MyEngine
 {
     partial class Resource
     {
+        public static readonly string SBlinPhong = @"Source\Shader\BlinPhong.glsl";
         public static readonly string IBricks = @"Asset\Image\bricks_red.jpg";
         public static readonly string MBricksGUID = "Bricks";
 

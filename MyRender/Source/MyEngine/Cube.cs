@@ -124,6 +124,7 @@ namespace MyRender.MyEngine
             base.OnRender(e);
 
             GL.Color4(Color4.White);  //byte型で指定
+            //GL.UseProgram(Resource.Instance.GetShader("...."));
 
             // bind vertex buffer 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
@@ -144,6 +145,7 @@ namespace MyRender.MyEngine
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
+            //GL.UseProgram(0);
 
         }
 
