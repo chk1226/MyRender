@@ -119,7 +119,13 @@ namespace MyRender.MyEngine
 
 
         public virtual void Rotation(Quaternion q) { }
-
+        public virtual void SetUpShader()
+        {
+            if(MaterialData != null && MaterialData.ShaderProgram != 0)
+            {
+                GL.UseProgram(MaterialData.ShaderProgram);
+            }
+        }
         public virtual void OnStart() { }
         public virtual void OnUpdate(FrameEventArgs e) { }
         public virtual void OnRelease() { }
@@ -130,10 +136,15 @@ namespace MyRender.MyEngine
             var vm = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix;
             vm.Transpose();
             GL.LoadMatrix(ref vm);
+            SetUpShader();
         }
 
         public virtual void OnRenderFinsh(FrameEventArgs e)
         {
+            if (MaterialData != null && MaterialData.ShaderProgram != 0)
+            {
+                GL.UseProgram(0);
+            }
             GL.PopMatrix();
         }
 

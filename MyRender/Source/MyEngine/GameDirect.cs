@@ -77,7 +77,7 @@ namespace MyRender.MyEngine
                 return;
             }
 
-            _renderList.Add(MainScene);
+            //_renderList.Add(MainScene);
             recursiveTraverseTree(MainScene.Children);
 
             // for debug
@@ -94,6 +94,12 @@ namespace MyRender.MyEngine
 
             foreach (var pair in node)
             {
+                // if model data is empty, continue
+                if(pair.Value.ModelData == null)
+                {
+                    continue;
+                }
+
                 // add root to list
                 _renderList.Add(pair.Value);
                 // left to right traverse

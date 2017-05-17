@@ -23,6 +23,7 @@ namespace MyRender.MyEngine
                 m.guid = MBricksGUID;
                 m.TextureFileName = IBricks;
                 m.TextureID = GetTextureID(m.TextureFileName);
+                m.ShaderProgram = GetShader(SBlinPhong);
                 AddMaterial(m);
             }
 

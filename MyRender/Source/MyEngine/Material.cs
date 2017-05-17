@@ -6,6 +6,7 @@ namespace MyRender.MyEngine
     {
         public string guid;
         public string TextureFileName;
-        public int TextureID;
+        public int TextureID = 0;
+        public int ShaderProgram = 0;
     }
 }

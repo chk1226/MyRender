@@ -16,13 +16,17 @@ namespace MyRender.Game
         public override void OnStart()
         {
             base.OnStart();
+
+            var light = new Light();
+            AddChild(light);
+            
             testCube = new Cube();
             AddChild(testCube);
-            testCube.LocalPosition = new Vector3(0, 0, -5);
+            testCube.LocalPosition = new Vector3(0, 0, 0);
 
             testCube = new Cube();
             AddChild(testCube);
-            testCube.LocalPosition = new Vector3(5, 0, -5);
+            testCube.LocalPosition = new Vector3(2, 0, 0);
 
         }
 
