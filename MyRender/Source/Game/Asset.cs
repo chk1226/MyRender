@@ -9,7 +9,11 @@ namespace MyRender.MyEngine
     partial class Resource
     {
         public static readonly string SBlinPhong = @"Source\Shader\BlinPhong.glsl";
-        public static readonly string IBricks = @"Asset\Image\bricks_red.jpg";
+        public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
+
+        public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
+        public static readonly string IBricksNormal = @"Asset\Image\DiagonalHerringbone-NormalMap.bmp";
+
         public static readonly string MBricksGUID = "Bricks";
 
         public Material CreateBricksM()
@@ -22,8 +26,12 @@ namespace MyRender.MyEngine
                 m = new Material();
                 m.guid = MBricksGUID;
                 m.TextureFileName = IBricks;
+                m.NormalTextureFileName = IBricksNormal;
                 m.TextureID = GetTextureID(m.TextureFileName);
-                m.ShaderProgram = GetShader(SBlinPhong);
+                m.NormalTextureID = GetTextureID(m.NormalTextureFileName);
+                //m.ShaderProgram = GetShader(SBlinPhong);
+                m.ShaderProgram = GetShader(SNormalmap);
+
                 AddMaterial(m);
             }
 

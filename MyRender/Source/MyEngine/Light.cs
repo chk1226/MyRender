@@ -14,7 +14,7 @@ namespace MyRender.MyEngine
             base.OnStart();
 
             Ambient = new Vector4(0.2f, 0.2f, 0.2f, 1.0f);
-            Specular = new Vector4(0.4f, 0.4f, 0.4f, 1.0f);
+            Specular = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             Diffuse = new Vector4(0.4f, 0.4f, 0.4f, 1.0f);
             LocalPosition = new Vector3(0, 1000, 0);
             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, 64);
