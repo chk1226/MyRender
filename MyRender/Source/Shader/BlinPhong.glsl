@@ -41,6 +41,7 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v)
 void main(void)
 {
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
+	// parallel light
 	vec3 dirL = normalize( gl_LightSource[0].position.xyz);	
 
 	gl_FragColor = BlinnPhong(color, dirL, normalize(normalE), normalize(-posE.xyz));

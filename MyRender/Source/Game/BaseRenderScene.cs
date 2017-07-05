@@ -42,22 +42,6 @@ namespace MyRender.Game
         {
             base.OnRender(e);
 
-            //GL.BindTexture(TextureTarget.Texture2D, Resource.Instance.GetTextureID(Resource.IBricks));
-            //GL.Begin(PrimitiveType.Quads);
-
-            //GL.Color4(Color4.White);                            //色名で指定
-            //GL.TexCoord2(0, 0);
-            //GL.Vertex3(-1.0f, 1.0f, 4.0f);
-            //GL.TexCoord2(0, 1);
-            //GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            //GL.TexCoord2(1, 1);
-            //GL.Vertex3(1.0f, -1.0f, 4.0f);
-            //GL.TexCoord2(1, 0);
-            //GL.Vertex3(1.0f, 1.0f, 4.0f);
-
-            //GL.End();
-            //GL.BindTexture(TextureTarget.Texture2D, 0);
-
 
         }
 

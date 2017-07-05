@@ -158,7 +158,7 @@ namespace MyRender.MyEngine
                 GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
                 GL.Uniform1(variable, 0);
 
-                GL.BindTexture(TextureTarget.Texture2D, 0);
+                //GL.BindTexture(TextureTarget.Texture2D, 0);
                 
                 //variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "light_pos");
                 //var pos = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * new Vector4(0, 1000, 0, 0);
@@ -188,7 +188,7 @@ namespace MyRender.MyEngine
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
 
-            GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
+            //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
             GL.DrawArrays(PrimitiveType.Quads, 0, ModelData.Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);
@@ -199,6 +199,7 @@ namespace MyRender.MyEngine
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
         }
+
 
     }
 }
