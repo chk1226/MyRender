@@ -13,8 +13,13 @@ namespace MyRender.MyEngine
 
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
         public static readonly string IBricksNormal = @"Asset\Image\DiagonalHerringbone-NormalMap.bmp";
+        public static readonly string IRider = @"Asset\model\Hunter.png";
+
+        public static readonly string MRider = @"..\..\Asset\model\Rider.DAE";
+
 
         public static readonly string MBricksGUID = "Bricks";
+        public static readonly string MRiderGUID = "Rider";
 
         public Material CreateBricksM()
         {
@@ -37,5 +42,23 @@ namespace MyRender.MyEngine
 
             return m;
         }
+
+        public Material CreateDaeM()
+        {
+            var m = GetMaterial(MRiderGUID);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = MRiderGUID;
+                m.TextureFileName = IRider;
+                m.TextureID = GetTextureID(m.TextureFileName);
+                m.ShaderProgram = GetShader(SBlinPhong);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
     }
 }

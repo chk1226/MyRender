@@ -117,8 +117,11 @@ namespace MyRender.MyEngine
             try {
                 using (Bitmap bmp = new Bitmap(_currentPath + file_name))
                 {
-                    bmp.RotateFlip(RotateFlipType.Rotate90FlipY);
-                    bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
+                    //bmp.RotateFlip(RotateFlipType.Rotate90FlipY);
+                    //bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
+                    
+                    //png画像の反転を直す
+                    bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
                     BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
                                                     ImageLockMode.ReadOnly,
                                                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);

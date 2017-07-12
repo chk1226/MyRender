@@ -14,14 +14,16 @@ namespace MyRender.MyEngine
         {
             base.OnStart();
 
-            ModelData = Resource.Instance.GetModel(cubeGUID);
-            if (ModelData == null)
-            {
-                ModelData = new Model();
-                ModelData.guid = cubeGUID;
-                ModelData.DrawType = PrimitiveType.Quads;
+            ModelList = new Model[1];
 
-                ModelData.Vertices = new[]
+            var modelData = Resource.Instance.GetModel(cubeGUID);
+            if (modelData == null)
+            {
+                modelData = new Model();
+                modelData.guid = cubeGUID;
+                modelData.DrawType = PrimitiveType.Quads;
+
+                modelData.Vertices = new[]
                 {
                     // front face
                     new Vector3(-1.0f, -1.0f,  1.0f),
@@ -55,7 +57,7 @@ namespace MyRender.MyEngine
                     new Vector3(-1.0f,  1.0f, 1.0f)
                 };
 
-                ModelData.Normals = new[]
+                modelData.Normals = new[]
                 {
                     new Vector3( 0.0f, 0.0f, 1.0f),
                     new Vector3( 0.0f, 0.0f, 1.0f),
@@ -88,7 +90,7 @@ namespace MyRender.MyEngine
                     new Vector3( -1.0f, 0.0f, 0.0f),
                 };
 
-                ModelData.Texcoords = new[]
+                modelData.Texcoords = new[]
                 {
                     new Vector2( 0.0f, 0.0f),
                     new Vector2( 0.0f, 1.0f),
@@ -121,35 +123,37 @@ namespace MyRender.MyEngine
                     new Vector2( 1.0f, 0.0f),
                 };
 
-                ModelData.ComputeTangentBasis();
+                // because normal map 
+                modelData.ComputeTangentBasis();
 
                 // gen vertex buffer
-                ModelData.VBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
-                int size = ModelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Vertices, BufferUsageHint.StaticDraw);
+                modelData.VBO = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.VBO);
+                int size = modelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Vertices, BufferUsageHint.StaticDraw);
 
                 // gen texture cood buffer
-                ModelData.TBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
-                size = ModelData.Texcoords.Length * Marshal.SizeOf(default(Vector2));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Texcoords, BufferUsageHint.StaticDraw);
+                modelData.TBO = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TBO);
+                size = modelData.Texcoords.Length * Marshal.SizeOf(default(Vector2));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Texcoords, BufferUsageHint.StaticDraw);
 
                 // gen texture cood buffer
-                ModelData.NBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.NBO);
-                size = ModelData.Normals.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Normals, BufferUsageHint.StaticDraw);
+                modelData.NBO = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.NBO);
+                size = modelData.Normals.Length * Marshal.SizeOf(default(Vector3));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Normals, BufferUsageHint.StaticDraw);
 
                 // gen tangent buffer 
-                ModelData.TangentBuffer = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TangentBuffer);
-                size = ModelData.Tangent.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, ModelData.Tangent, BufferUsageHint.StaticDraw);
+                modelData.TangentBuffer = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TangentBuffer);
+                size = modelData.Tangent.Length * Marshal.SizeOf(default(Vector3));
+                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Tangent, BufferUsageHint.StaticDraw);
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
-                Resource.Instance.AddModel(ModelData);
+                Resource.Instance.AddModel(modelData);
+                ModelList[0] = modelData;
             } 
 
             MaterialData = Resource.Instance.CreateBricksM();
@@ -188,29 +192,29 @@ namespace MyRender.MyEngine
             GL.Color4(Color4.White);  //byte型で指定
 
             // bind vertex buffer 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
 
             // bind normal buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.NBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].NBO);
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.NormalPointer(NormalPointerType.Float, 0, 0);
 
             // bind texture coord buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TBO);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
 
             // tangent buffer
             var tangent = GL.GetAttribLocation(MaterialData.ShaderProgram, "tangent");
             GL.EnableVertexAttribArray(tangent);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TangentBuffer);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TangentBuffer);
             GL.VertexAttribPointer(tangent, 3, VertexAttribPointerType.Float, false, 0, 0);
 
 
             //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
-            GL.DrawArrays(ModelData.DrawType, 0, ModelData.Vertices.Length);
+            GL.DrawArrays(ModelList[0].DrawType, 0, ModelList[0].Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.NormalArray);

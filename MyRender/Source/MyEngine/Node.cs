@@ -67,13 +67,9 @@ namespace MyRender.MyEngine
             get { return _materialData; }
             set { _materialData = value; }
         }
+        
+        public Model[] ModelList;
 
-        private Model _modelDaata;
-        public Model ModelData
-        {
-            get { return _modelDaata; }
-            set { _modelDaata = value; }
-        }
 
         public Node()
         {
@@ -151,8 +147,8 @@ namespace MyRender.MyEngine
         public virtual void OnMouseDown(MouseButtonEventArgs e) { }
         //public virtual void OnMouseUp(object sender, MouseButtonEventArgs e) { }
         public virtual void OnMouseMove(MouseMoveEventArgs e) { }
-        //public virtual void OnMouseWheel(object sender, MouseWheelEventArgs e) { }
-        
+        public virtual void OnMouseWheel(MouseWheelEventArgs e) { }
+
 
         private void effectChildWorldModelMatrix(Matrix4 effect)
         {
@@ -168,18 +164,16 @@ namespace MyRender.MyEngine
         {
             GameDirect.Instance.OnUpdate += node.OnUpdate;
             GameDirect.Instance.OnMouseDown += node.OnMouseDown;
-            //MainWindow.Instance.MouseUp += node.OnMouseUp;
             GameDirect.Instance.OnMouseMove += node.OnMouseMove;
-            //MainWindow.Instance.MouseWheel += node.OnMouseWheel;
+            GameDirect.Instance.OnMouseWheel += node.OnMouseWheel;
         }
 
         public void UnregisterCallback(Node node)
         {
             GameDirect.Instance.OnUpdate -= node.OnUpdate;
             GameDirect.Instance.OnMouseDown -= node.OnMouseDown;
-            //MainWindow.Instance.MouseUp -= node.OnMouseUp;
             GameDirect.Instance.OnMouseMove -= node.OnMouseMove;
-            //MainWindow.Instance.MouseWheel -= node.OnMouseWheel;
+            GameDirect.Instance.OnMouseWheel -= node.OnMouseWheel;
         }
 
     }

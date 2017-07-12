@@ -35,6 +35,7 @@ namespace MyRender.MyEngine
         public event Action<FrameEventArgs> OnUpdate;
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseMoveEventArgs> OnMouseMove;
+        public Action<MouseWheelEventArgs> OnMouseWheel;
 
         public void Initial()
         {
@@ -95,7 +96,8 @@ namespace MyRender.MyEngine
             foreach (var pair in node)
             {
                 // if model data is empty, continue
-                if(pair.Value.ModelData == null)
+                if(pair.Value.ModelList == null || 
+                    pair.Value.ModelList.Length == 0)
                 {
                     continue;
                 }

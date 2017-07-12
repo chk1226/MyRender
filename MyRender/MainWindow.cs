@@ -52,15 +52,13 @@ namespace MyRender
             base.OnLoad(e);
             GameDirect.Instance.Initial();
             GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
-            
+
             // HACK
-            //Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
-            //{
-            //    var eye = camera.eye;
-            //    eye.Z += _e.Delta;
-            //    camera.UpdateEye(eye);
-            //    //Log.Print("WHEEL" + _e.Delta.ToString());
-            //};
+            Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
+            {
+
+                GameDirect.Instance.OnMouseWheel(_e);
+            };
         }
 
         protected override void OnUnload(EventArgs e)

@@ -12,6 +12,9 @@ namespace MyRender.Game
     {
         public Cube testCube;
         private Vector2 _regMousePos = Vector2.Zero;
+        private float max_camerz = 100;
+        private float min_camerz = 10;
+
 
         public override void OnStart()
         {
@@ -24,9 +27,15 @@ namespace MyRender.Game
             AddChild(testCube);
             testCube.LocalPosition = new Vector3(0, 0, 0);
 
-            testCube = new Cube();
-            AddChild(testCube);
-            testCube.LocalPosition = new Vector3(2, 0, 0);
+            //testCube = new Cube();
+            //AddChild(testCube);
+            //testCube.LocalPosition = new Vector3(2, 0, 0);
+
+            var dae = new DaeModel();
+            dae.Loader(Resource.MRider);
+            AddChild(dae);
+            dae.LocalPosition = new Vector3(0, 0, 0);
+
 
         }
 
@@ -81,6 +90,38 @@ namespace MyRender.Game
             }
         }
 
+        public override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+            var eye = MainCamera.eye;
+            eye.Z += e.Delta;
+
+            if (Math.Abs(eye.Z) >= max_camerz)
+            {
+                if (eye.Z < 0.0f)
+                {
+                    eye.Z = -max_camerz;
+                }
+                else
+                {
+                    eye.Z =  max_camerz;
+                }
+            }
+            else if (Math.Abs(eye.Z) <= min_camerz)
+            {
+                if(eye.Z < 0.0f)
+                {
+                    eye.Z = -min_camerz;
+                }
+                else
+                {
+                    eye.Z = min_camerz;
+                }
+            }
+
+            MainCamera.UpdateEye(eye);
+
+        }
 
     }
 }
