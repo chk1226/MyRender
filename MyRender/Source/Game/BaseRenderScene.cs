@@ -80,7 +80,7 @@ namespace MyRender.Game
                 //Log.Print(e.X .ToString() + "    " + _regMousePos.X.ToString());
 
 
-                MainCamera.Rotation(new Quaternion(0, MathHelper.DegreesToRadians(dX), MathHelper.DegreesToRadians(dY)));
+                MainCamera.RotationScreen(dX, dY);
 
                 _regMousePos.X = e.X;
                 _regMousePos.Y = e.Y;
@@ -93,33 +93,8 @@ namespace MyRender.Game
         public override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
-            var eye = MainCamera.eye;
-            eye.Z += e.Delta;
 
-            if (Math.Abs(eye.Z) >= max_camerz)
-            {
-                if (eye.Z < 0.0f)
-                {
-                    eye.Z = -max_camerz;
-                }
-                else
-                {
-                    eye.Z =  max_camerz;
-                }
-            }
-            else if (Math.Abs(eye.Z) <= min_camerz)
-            {
-                if(eye.Z < 0.0f)
-                {
-                    eye.Z = -min_camerz;
-                }
-                else
-                {
-                    eye.Z = min_camerz;
-                }
-            }
-
-            MainCamera.UpdateEye(eye);
+            MainCamera.ZoomInOut(e.Delta, min_camerz, max_camerz);
 
         }
 

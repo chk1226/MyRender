@@ -1,6 +1,7 @@
 ﻿using MyRender.Debug;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
 
 namespace MyRender.MyEngine
@@ -14,7 +15,7 @@ namespace MyRender.MyEngine
     class Camera : Node
     {
         // Perspective camera
-        public Camera(Vector3 eye, Vector3 focus, Vector3 vUp, float fovy, float zNear, float zFar, Rectangle viewport)
+        public Camera(Vector3 eye_rotation, Vector3 focus, Vector3 vUp, float fovy, float zNear, float zFar, Rectangle viewport)
         {
             this._viewport = viewport;
 
@@ -26,18 +27,19 @@ namespace MyRender.MyEngine
             }
 
             // Setup a perspective view
-            _projectMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar);
-            _projectMatrix.Transpose();
             this.fovy = fovy;
             this.zNear = zNear;
             this.zFar = zFar;
+            _projectMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar);
+            _projectMatrix.Transpose();
 
             // Setup a view matrix
-            _viewMatrix = Matrix4.LookAt(eye, focus, vUp);
-            _viewMatrix.Transpose();
-            this.eye = eye;
+            this.eye_rotation = eye_rotation;
+            this.eye = eyePosCalculate(focus, eye_rotation);
             this.focus = focus;
             this.vUp = vUp;
+            _viewMatrix = Matrix4.LookAt(eye, focus, vUp);
+            _viewMatrix.Transpose();
             
             ProjectMode = ProjectType.Perspective;
         }
@@ -60,6 +62,7 @@ namespace MyRender.MyEngine
         public Vector3 eye { get; private set; }
         public Vector3 focus { get; private set; }
         public Vector3 vUp { get; private set; }
+        private Vector3 eye_rotation;
 
         private Matrix4 _projectMatrix;
         public Matrix4 ProjectMatix
@@ -113,20 +116,46 @@ namespace MyRender.MyEngine
             ProjectMatix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar));
         }
 
-        public override void Rotation(Quaternion q)
+        public void RotationScreen(float a_x, float a_y)
         {
-            base.Rotation(q);
 
-            eye = q * eye;
-            //Log.Print(q.ToString());
+            eye_rotation.X += (float)a_x;
+            eye_rotation.Y += (float)a_y;
+
+            if (eye_rotation.Y <= 5.0f) eye_rotation.Y = 5.0f;
+            else if (eye_rotation.Y >= 175.0f) eye_rotation.Y = 175.0f;
+
+            eye = eyePosCalculate(focus, eye_rotation);
             ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
             
         }
 
-        public void UpdateEye(Vector3 pos)
+        public void ZoomInOut(float delta_z, float min, float max)
         {
-            eye = pos;
+            
+            eye_rotation.Z += delta_z;
+
+            if (eye_rotation.Z >= max) eye_rotation.Z = max;
+            if (eye_rotation.Z <= min) eye_rotation.Z = min;
+
+
+            eye = eyePosCalculate(focus, eye_rotation);
             ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
+
+        }
+
+        //public void UpdateEye(Vector3 pos)
+        //{
+        //    eye = pos;
+        //    ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
+        //}
+
+        // 1 parameter: focus, 2 parameter: eye_rotation
+        private Vector3 eyePosCalculate(Vector3 f, Vector3 p)
+        {
+            return new Vector3(f.X + p.Z * (float)Math.Sin(p.Y * Algorithm.Radin) * (float)Math.Cos(p.X * Algorithm.Radin),
+                               f.Y + p.Z * (float)Math.Cos(p.Y * Algorithm.Radin),
+                               f.Z + p.Z * (float)Math.Sin(p.Y * Algorithm.Radin) * (float)Math.Sin(p.X * Algorithm.Radin));
         }
 
 

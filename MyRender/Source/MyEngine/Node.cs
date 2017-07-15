@@ -114,7 +114,7 @@ namespace MyRender.MyEngine
         }
 
 
-        public virtual void Rotation(Quaternion q) { }
+        //public virtual void Rotation(Quaternion q) { }
         public virtual void SetUpShader()
         {
             if(MaterialData != null && MaterialData.ShaderProgram != 0)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyRender.Source.MyEngine
+namespace MyRender.MyEngine
 {
     class Algorithm
     {
@@ -13,5 +13,8 @@ namespace MyRender.Source.MyEngine
         {
             get { return _random; }
         }
+
+        private static float radin = (float)Math.PI / 180.0f;
+        public static float Radin { get { return radin; } }
     }
 }
