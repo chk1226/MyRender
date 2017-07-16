@@ -9,6 +9,7 @@ namespace MyRender.MyEngine
     {
         public PrimitiveType DrawType;
         public string guid;
+        public string id;
         public Vector3[] Vertices;
         public Vector3[] Normals;
         public Vector2[] Texcoords;

@@ -17,6 +17,7 @@ uniform sampler2D TEX_COLOR;
 
 varying vec4 posE;	
 varying vec3 normalE;
+uniform mat4 VIEW_MAT;
 
 
 //parallel light
@@ -42,7 +43,7 @@ void main(void)
 {
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
 	// parallel light
-	vec3 dirL = normalize( gl_LightSource[0].position.xyz);	
+	vec3 dirL = normalize( VIEW_MAT * gl_LightSource[0].position).xyz;	
 
 	gl_FragColor = BlinnPhong(color, dirL, normalize(normalE), normalize(-posE.xyz));
 

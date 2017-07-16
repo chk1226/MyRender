@@ -9,6 +9,7 @@ namespace MyRender.MyEngine
     class Cube : Node
     {
         private readonly string cubeGUID = "cube";
+        private readonly string setShader = "NormalMapping";
 
         public override void OnStart()
         {
@@ -153,41 +154,44 @@ namespace MyRender.MyEngine
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
                 Resource.Instance.AddModel(modelData);
-                ModelList[0] = modelData;
             } 
+            ModelList[0] = modelData;
 
             MaterialData = Resource.Instance.CreateBricksM();
-        }
 
-        public override void SetUpShader()
-        {
-            base.SetUpShader();
-
-            if (MaterialData != null && MaterialData.ShaderProgram != 0)
+            //set shader action
+            SetUpShaderAction.Add(setShader, delegate()
             {
-                var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
-                GL.ActiveTexture(TextureUnit.Texture0);
-                GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
-                GL.Uniform1(variable, 0);
 
-                variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
-                GL.ActiveTexture(TextureUnit.Texture1);
-                GL.BindTexture(TextureTarget.Texture2D, MaterialData.NormalTextureID);
-                GL.Uniform1(variable, 1);
+                if (MaterialData.ShaderProgram != 0)
+                {
+                    GL.UseProgram(MaterialData.ShaderProgram);
 
+                    var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Color]);
+                    GL.Uniform1(variable, 0);
 
-                //GL.BindTexture(TextureTarget.Texture2D, 0);
+                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
+                    GL.Uniform1(variable, 1);
 
-                //variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "light_pos");
-                //var pos = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * new Vector4(0, 1000, 0, 0);
-                //GL.Uniform3(variable, pos.Xyz);
+                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "VIEW_MAT");
+                    var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
+                    GL.UniformMatrix4(variable, true, ref view_mat);
+                }
 
-            }
+            });
+
         }
 
         public override void OnRender(FrameEventArgs e)
         {
             base.OnRender(e);
+
+            if (MaterialData == null) return;
+            if (SetUpShaderAction.ContainsKey(setShader)) SetUpShaderAction[setShader]();
 
             GL.Color4(Color4.White);  //byte型で指定
 

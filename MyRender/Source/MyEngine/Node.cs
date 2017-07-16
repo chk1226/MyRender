@@ -74,7 +74,8 @@ namespace MyRender.MyEngine
         }
         
         public Model[] ModelList;
-
+        public delegate void Action();
+        protected Dictionary<string, Action> SetUpShaderAction = new Dictionary<string, Action>();
 
         public Node()
         {
@@ -126,13 +127,6 @@ namespace MyRender.MyEngine
             effectChildWorldModelMatrix(r);
         }
 
-        public virtual void SetUpShader()
-        {
-            if(MaterialData != null && MaterialData.ShaderProgram != 0)
-            {
-                GL.UseProgram(MaterialData.ShaderProgram);
-            }
-        }
         public virtual void OnStart() { }
         public virtual void OnUpdate(FrameEventArgs e) { }
         public virtual void OnRelease() { }
@@ -143,7 +137,6 @@ namespace MyRender.MyEngine
             var vm = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix;
             vm.Transpose();
             GL.LoadMatrix(ref vm);
-            SetUpShader();
         }
 
         public virtual void OnRenderFinsh(FrameEventArgs e)
