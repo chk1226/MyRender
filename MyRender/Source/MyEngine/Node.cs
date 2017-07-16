@@ -37,7 +37,7 @@ namespace MyRender.MyEngine
                 var delta = value - _localPosition;
                 _localPosition = value;
                 var trans = Matrix4.Transpose(Matrix4.CreateTranslation(delta));
-                LocalModelMatrix = LocalModelMatrix * trans;
+                LocalModelMatrix = trans * LocalModelMatrix;
                 effectChildWorldModelMatrix(trans);
             }
         }
@@ -60,7 +60,12 @@ namespace MyRender.MyEngine
         //public Vector3 Position;
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
         public Matrix4 WorldModelMatrix = Matrix4.Identity;
-        //public Quaternion localRoation;
+        //private Vector3 _localRoation;
+        //public Vector3 LocalRotaion
+        //{
+        //    get { return _localRoation; }
+        //    private set { _localRoation = value; }
+        //}
         private Material _materialData;
         public Material MaterialData
         {
@@ -114,7 +119,13 @@ namespace MyRender.MyEngine
         }
 
 
-        //public virtual void Rotation(Quaternion q) { }
+        public void RotationX(float delta_x)
+        {
+            var r = Matrix4.CreateRotationX(delta_x*Algorithm.Radin);
+            LocalModelMatrix = r * LocalModelMatrix;
+            effectChildWorldModelMatrix(r);
+        }
+
         public virtual void SetUpShader()
         {
             if(MaterialData != null && MaterialData.ShaderProgram != 0)
@@ -155,7 +166,7 @@ namespace MyRender.MyEngine
             foreach (var pair in Children)
             {
                 var child = pair.Value;
-                child.WorldModelMatrix = child.WorldModelMatrix * effect;
+                child.WorldModelMatrix = effect * child.WorldModelMatrix;
                 child.effectChildWorldModelMatrix(effect);
             }
         }
