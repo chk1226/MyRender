@@ -36,7 +36,6 @@ namespace MyRender.Game
             dae.LocalPosition = new Vector3(0, 0, 0);
             AddChild(dae);
 
-
         }
 
 

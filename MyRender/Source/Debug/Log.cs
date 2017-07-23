@@ -12,5 +12,10 @@ namespace MyRender.Debug
         {
             Console.WriteLine(str);
         }
+
+        public static void Assert(string str)
+        {
+            System.Diagnostics.Debug.Assert(true, str);
+        }
     }
 }

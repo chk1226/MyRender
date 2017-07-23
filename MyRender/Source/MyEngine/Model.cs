@@ -14,12 +14,18 @@ namespace MyRender.MyEngine
         public Vector3[] Normals;
         public Vector2[] Texcoords;
         public Vector3[] Tangent;
-        //public int[] Element;
+        public Vector4[] JointsIndex;    // joint index
+        public Vector4[] Weights;
         public int VBO = 0; // vertex array
         public int EBO = 0; // elementes array
         public int TBO = 0; // texture coord
         public int NBO = 0; // normal array
-        public int TangentBuffer = 0; 
+        public int TangentBuffer = 0;
+        public int JointBuffer = 0;
+        public int WeightBuffer = 0;
+
+        //public string[] JointHash;
+        public AnimationModel Animation;
 
         public void Release()
         {
@@ -28,7 +34,8 @@ namespace MyRender.MyEngine
             if (TBO != 0) GL.DeleteBuffer(TBO);
             if (NBO != 0) GL.DeleteBuffer(NBO);
             if (TangentBuffer != 0) GL.DeleteBuffer(TangentBuffer);
-
+            if (JointBuffer != 0) GL.DeleteBuffer(JointBuffer);
+            if (WeightBuffer != 0) GL.DeleteBuffer(WeightBuffer);
         }
 
         public void ComputeTangentBasis()

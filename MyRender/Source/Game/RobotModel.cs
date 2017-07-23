@@ -15,7 +15,7 @@ namespace MyRender.Game
 
             MaterialData = Resource.Instance.CreateRobotM();
 
-            RotationX(90);
+            Rotation(1, 0, 0, -90);
 
             foreach (var model in ModelList)
             {

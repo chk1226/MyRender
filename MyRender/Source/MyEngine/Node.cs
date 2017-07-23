@@ -120,11 +120,13 @@ namespace MyRender.MyEngine
         }
 
 
-        public void RotationX(float delta_x)
+        public void Rotation(float x, float y, float z, float w)
         {
-            var r = Matrix4.CreateRotationX(delta_x*Algorithm.Radin);
-            LocalModelMatrix = r * LocalModelMatrix;
-            effectChildWorldModelMatrix(r);
+            var q = Matrix4.CreateFromQuaternion(Algorithm.CreateFromAxisAngle(x, y, z, w * Algorithm.Radin));
+            q.Transpose();
+
+            LocalModelMatrix = q * LocalModelMatrix;
+            effectChildWorldModelMatrix(q);
         }
 
         public virtual void OnStart() { }
