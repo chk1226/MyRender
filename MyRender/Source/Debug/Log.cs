@@ -15,7 +15,7 @@ namespace MyRender.Debug
 
         public static void Assert(string str)
         {
-            System.Diagnostics.Debug.Assert(true, str);
+            System.Diagnostics.Debug.Assert(false, str);
         }
     }
 }

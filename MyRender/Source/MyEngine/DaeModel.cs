@@ -19,11 +19,12 @@ namespace MyRender.MyEngine
         //    public int[] EffectiveJointCount;
 
         //}
-        public AnimationModel Animation;
+        protected AnimationModel Animation;
 
         protected class MeshSkinData
         {
             public VertexSkinData[] VertexData;
+            public string[] Joints;
         }
 
         protected struct VertexSkinData
@@ -56,19 +57,25 @@ namespace MyRender.MyEngine
             if (dae.Library_Animations != null &&
                 dae.Library_Visual_Scene != null)
             {
-                skeletonLoader(dae.Library_Visual_Scene);
+                skeletonLoader(dae.Library_Visual_Scene, meshSkinData);
                 //animationLoader(dae.Library_Animations);
             }
 
             return true;
         }
 
-        private void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s)
+        private void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s, MeshSkinData[] meshSkin)
         {
             var result = loadJointData(l_s.Visual_Scene[0].Node[1]);
             result.CalcInverseBindTransform(Matrix4.Identity);
             Animation = new AnimationModel();
             Animation.JointHierarchy.Add(result);
+
+            // create joint table
+            foreach(var mesh in meshSkin)
+            {
+                Animation.CreateHashJoint(mesh.Joints);
+            }
         }
 
         private Joint loadJointData(Grendgine_Collada_Node data)
@@ -156,7 +163,7 @@ namespace MyRender.MyEngine
                 var skin = l_c.Controller[i].Skin;
 
                 // joint
-                var jointsList = skin.Source[0].Name_Array.Value();
+                mesh.Joints = skin.Source[0].Name_Array.Value();
                 // weight
                 var weightList = skin.Source[2].Float_Array.Value();
                 // effective joint count, vecor <=> joint|weight
@@ -165,8 +172,7 @@ namespace MyRender.MyEngine
                 var effectiveValue = skin.Vertex_Weights.V.Value();
 
                 mesh.VertexData = new VertexSkinData[skin.Vertex_Weights.Count];
-                //model.JointsIndex = new Vector4[skin.Vertex_Weights.Count];
-                //model.Weights = new Vector4[skin.Vertex_Weights.Count];
+        
                 int index = 0;
                 int stride = 2;
 
@@ -203,8 +209,6 @@ namespace MyRender.MyEngine
 
                     index += stride * effectNum;
 
-                    //model.JointsIndex[j] = new Vector4(joint[0], joint[1], joint[2], joint[3]);
-                    //model.Weights[j] = new Vector4(weight[0], weight[1], weight[2], weight[3]);
                     mesh.VertexData[j].Jointsindex = new Vector4(joint[0], joint[1], joint[2], joint[3]);
                     mesh.VertexData[j].Weights = new Vector4(weight[0], weight[1], weight[2], weight[3]);
 
@@ -405,6 +409,21 @@ namespace MyRender.MyEngine
                 GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TangentBuffer);
                 size = modelData.Tangent.Length * Marshal.SizeOf(default(Vector3));
                 GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Tangent, BufferUsageHint.StaticDraw);
+
+                if(meshSkinData != null)
+                {
+                    // gen jointIndices
+                    modelData.JointBuffer = GL.GenBuffer();
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.JointBuffer);
+                    size = modelData.JointsIndex.Length * Marshal.SizeOf(default(Vector4));
+                    GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.JointsIndex, BufferUsageHint.StaticDraw);
+
+                    // gen weight
+                    modelData.WeightBuffer = GL.GenBuffer();
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.WeightBuffer);
+                    size = modelData.Weights.Length * Marshal.SizeOf(default(Vector4));
+                    GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Weights, BufferUsageHint.StaticDraw);
+                }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 

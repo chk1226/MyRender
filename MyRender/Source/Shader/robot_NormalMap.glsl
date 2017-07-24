@@ -4,6 +4,11 @@ varying vec3 normalE;
 varying vec3 t;
 
 attribute vec3 tangent;
+attribute vec4 jointIndices;
+attribute vec4 weight;
+
+uniform mat4 jointTransforms[];
+
 
 void main(void)
 {
@@ -71,7 +76,7 @@ void main(void)
     eye_tbn.y = dot(-posE.xyz, b); 
     eye_tbn.z = dot(-posE.xyz, normalE); 
 
-	float shininess = texture2D(TEX_GLOW, gl_TexCoord[0].st).x * 255;
+	float shininess = texture2D(TEX_SPECULAR, gl_TexCoord[0].st).x * 255;
 	vec4 result = BlinnPhong(color, normalize(dirL_tbn), normal_map, normalize(eye_tbn), shininess);
 	result.xyz += texture2D(TEX_GLOW, gl_TexCoord[0].st).xyz;
 

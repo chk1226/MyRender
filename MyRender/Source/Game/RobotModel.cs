@@ -29,13 +29,14 @@ namespace MyRender.Game
                         int normal_id;
                         int glow_id;
                         int specular_id;
+                        int layer = 2;
                         if (model.id.Contains("02"))
                         {
                             color_id = MaterialData.TextureArray[Material.TextureType.Color_02];
                             normal_id = MaterialData.TextureArray[Material.TextureType.Normal_02];
                             glow_id = MaterialData.TextureArray[Material.TextureType.Glow2];
                             specular_id = MaterialData.TextureArray[Material.TextureType.Specular2];
-
+                            layer = 0;
                         }
                         else //01
                         {
@@ -43,7 +44,7 @@ namespace MyRender.Game
                             normal_id = MaterialData.TextureArray[Material.TextureType.Normal];
                             glow_id = MaterialData.TextureArray[Material.TextureType.Glow];
                             specular_id = MaterialData.TextureArray[Material.TextureType.Specular];
-
+                            layer = 1;
                         }
 
                         var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
@@ -69,12 +70,27 @@ namespace MyRender.Game
                         variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "VIEW_MAT");
                         var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
                         GL.UniformMatrix4(variable, true, ref view_mat);
+
+                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "jointTransforms");
+                        var jointTransform = Animation.HashJointToArray((uint)layer);
+                        GL.UniformMatrix4(variable, jointTransform.Length, false, jointTransform);
                     }
                 });
 
             }
 
             return true;
+        }
+
+        public override void OnUpdate(FrameEventArgs e)
+        {
+            base.OnUpdate(e);
+
+            if(Animation != null)
+            {
+                Animation.animator.Update();
+            }
+
         }
 
         public override void OnRender(FrameEventArgs e)
@@ -105,10 +121,21 @@ namespace MyRender.Game
                 // tangent buffer
                 var tangent = GL.GetAttribLocation(MaterialData.ShaderProgram, "tangent");
                 GL.EnableVertexAttribArray(tangent);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TangentBuffer);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, model.TangentBuffer);
                 GL.VertexAttribPointer(tangent, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-
+                // joint indices buffer
+                var jointIndices = GL.GetAttribLocation(MaterialData.ShaderProgram, "jointIndices");
+                GL.EnableVertexAttribArray(jointIndices);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, model.JointBuffer);
+                GL.VertexAttribPointer(jointIndices, 4, VertexAttribPointerType.Float, false, 0, 0);
+                
+                // weight buffer
+                var weight = GL.GetAttribLocation(MaterialData.ShaderProgram, "weight");
+                GL.EnableVertexAttribArray(weight);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, model.WeightBuffer);
+                GL.VertexAttribPointer(weight, 4, VertexAttribPointerType.Float, false, 0, 0);
+                
                 //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
                 GL.DrawArrays(model.DrawType, 0, model.Vertices.Length);
 
@@ -117,6 +144,9 @@ namespace MyRender.Game
                 GL.DisableClientState(ArrayCap.TextureCoordArray);
 
                 GL.DisableVertexAttribArray(tangent);
+                GL.DisableVertexAttribArray(jointIndices);
+                GL.DisableVertexAttribArray(weight);
+
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
