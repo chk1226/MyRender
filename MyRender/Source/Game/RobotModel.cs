@@ -71,13 +71,19 @@ namespace MyRender.Game
                         var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
                         GL.UniformMatrix4(variable, true, ref view_mat);
 
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "jointTransforms");
-                        var jointTransform = Animation.HashJointToArray((uint)layer);
-                        GL.UniformMatrix4(variable, jointTransform.Length, false, jointTransform);
+                        var joints = Animation.HashJoint[layer];
+                        for(int i = 0; i < joints.Length; i++)
+                        {
+                            variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "jointTransforms[" + i.ToString() + "]");
+                            GL.UniformMatrix4(variable, true, ref joints[i].animatedTransform);
+                        }
+
                     }
                 });
 
             }
+
+            Animation.animator.DoAnimation(Animation.AnimationData);
 
             return true;
         }
@@ -88,7 +94,7 @@ namespace MyRender.Game
 
             if(Animation != null)
             {
-                Animation.animator.Update();
+                Animation.animator.Update((float)e.Time);
             }
 
         }

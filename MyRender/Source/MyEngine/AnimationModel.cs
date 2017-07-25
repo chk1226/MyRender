@@ -11,44 +11,16 @@ namespace MyRender.MyEngine
         public Animator animator;
 
         private List<Joint[]> hashJoint = new List<Joint[]>();
-        private float[] animation_mat;
+        public List<Joint[]> HashJoint
+        {
+            get { return hashJoint; }
+        }
+
+        public Animation AnimationData;
 
         public AnimationModel()
         {
             animator = new Animator(this);
-        }
-
-        public float[] HashJointToArray(uint layer)
-        {
-            if(layer >= hashJoint.Count)
-            {
-                return null;
-            }
-
-            var joints = hashJoint[(int)layer];
-            int stride = 16;
-
-            if(animation_mat == null)
-            {
-                animation_mat = new float[joints.Length * stride];
-            }
-
-            for(int i = 0; i < joints.Length; i++)
-            {
-                if (joints[i] == null)
-                {
-                    var mat= Matrix4.Identity;
-                    Algorithm.Matrix4ToArray(ref mat, animation_mat, i * stride);
-                }
-                else
-                {
-                    var mat = joints[i].animatedTransform;
-                    mat.Transpose();
-                    Algorithm.Matrix4ToArray(ref mat, animation_mat, i * stride);
-                }
-            }
-
-            return animation_mat;
         }
 
         public void CreateHashJoint(string[] jointSid)
@@ -65,7 +37,11 @@ namespace MyRender.MyEngine
         {
             foreach(var joint in JointHierarchy)
             {
-                return findJoint(sid, joint);
+                var result = findJoint(sid, joint);
+                if(result != null)
+                {
+                    return result;
+                }
             }
 
             return null;

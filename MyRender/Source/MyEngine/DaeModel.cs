@@ -11,14 +11,7 @@ namespace MyRender.MyEngine
 {
     class DaeModel : Node
     {
-        //protected class SkinLoaderData
-        //{
-        //    public string ControllerID;
-        //    public string[] JointsList;
-        //    public float[] WeightList;
-        //    public int[] EffectiveJointCount;
 
-        //}
         protected AnimationModel Animation;
 
         protected class MeshSkinData
@@ -58,7 +51,7 @@ namespace MyRender.MyEngine
                 dae.Library_Visual_Scene != null)
             {
                 skeletonLoader(dae.Library_Visual_Scene, meshSkinData);
-                //animationLoader(dae.Library_Animations);
+                animationLoader(dae.Library_Animations);
             }
 
             return true;
@@ -66,10 +59,18 @@ namespace MyRender.MyEngine
 
         private void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s, MeshSkinData[] meshSkin)
         {
-            var result = loadJointData(l_s.Visual_Scene[0].Node[1]);
-            result.CalcInverseBindTransform(Matrix4.Identity);
             Animation = new AnimationModel();
-            Animation.JointHierarchy.Add(result);
+
+            foreach(var jointNode in l_s.Visual_Scene[0].Node)
+            {
+                if (jointNode.Type != Grendgine_Collada_Node_Type.JOINT)
+                    continue;
+
+                var result = loadJointData(jointNode);
+                result.CalcInverseBindTransform(Matrix4.Identity);
+                Animation.JointHierarchy.Add(result);
+
+            }
 
             // create joint table
             foreach(var mesh in meshSkin)
@@ -102,6 +103,16 @@ namespace MyRender.MyEngine
             {
                 if (data.Rotate != null)
                 {
+                    // scale
+                    var scale = Matrix4.Identity;
+                    if (data.Scale != null)
+                    {
+                        var scaleValue = data.Scale[0].Value();
+                        scale = Matrix4.CreateScale(scaleValue[0], scaleValue[1], scaleValue[2]);
+                        scale.Transpose();
+                    }
+
+
                     for (int i = data.Rotate.Length - 1; i >= 0; i--)
                     {
                         var value = data.Rotate[i].Value();
@@ -109,19 +120,20 @@ namespace MyRender.MyEngine
                         var mat = Matrix4.CreateFromQuaternion(q);
                         mat.Transpose();
 
+                        if(i == data.Rotate.Length - 1 &&
+                            data.Rotate[i].sID != "ScaleAxis" &&
+                            scale != null)
+                        {
+                            localBind = scale * localBind; 
+                        }
+
                         localBind = mat * localBind;
 
-                        if(data.Rotate[i].sID == "ScaleAxis")
+                        if(i == data.Rotate.Length - 1 && 
+                            data.Rotate[i].sID == "ScaleAxis" &&
+                            scale != null )
                         {
-                            // scale
-                            if(data.Scale != null)
-                            {
-                                var scaleValue = data.Scale[0].Value();
-                                mat = Matrix4.CreateScale(scaleValue[0], scaleValue[1], scaleValue[2]);
-                                mat.Transpose();
-
-                                localBind = mat * localBind;
-                            }
+                            localBind = scale * localBind;
 
                         }
                     }
@@ -245,7 +257,6 @@ namespace MyRender.MyEngine
                 }
 
                 Matrix4 mat = Matrix4.Identity;
-                Vector3 scale = Vector3.One;
                 var floatArray = output.Float_Array.Value();
                 var output_stride = output.Technique_Common.Accessor.Stride;
 
@@ -258,16 +269,15 @@ namespace MyRender.MyEngine
                         mat.Row1 = new Vector4(floatArray[index * output_stride + 4], floatArray[index * output_stride + 5], floatArray[index * output_stride + 6], floatArray[index * output_stride + 7]);
                         mat.Row2 = new Vector4(floatArray[index * output_stride + 8], floatArray[index * output_stride + 9], floatArray[index * output_stride + 10], floatArray[index * output_stride + 11]);
                         mat.Row3 = new Vector4(floatArray[index * output_stride + 12], floatArray[index * output_stride + 13], floatArray[index * output_stride + 14], floatArray[index * output_stride + 15]);
-                        // TODO do Transpose?
                         mat.Transpose();
-                        scale = Vector3.One;
                     }
                     else if (output_stride == 3)
                     {
+                        Vector3 scale = Vector3.One;
                         scale.X = floatArray[index * output_stride];
                         scale.Y = floatArray[index * output_stride + 1];
                         scale.Z = floatArray[index * output_stride + 2];
-                        mat = Matrix4.Identity;
+                        mat = Matrix4.CreateScale(scale.X, scale.Y, scale.Z);
                     }
                     else
                     {
@@ -276,8 +286,7 @@ namespace MyRender.MyEngine
 
                     var jointTransform = new JointTransform();
                     jointTransform.position = new Vector3(mat.M31, mat.M32, mat.M33);
-                    jointTransform.rotation = Quaternion.FromMatrix(new Matrix3(mat));
-                    jointTransform.scale = scale;
+                    jointTransform.ActionValue = Quaternion.FromMatrix(new Matrix3(mat));
 
                     keyframe[index].pose.Add(jointName, jointTransform);
                 }
@@ -286,6 +295,8 @@ namespace MyRender.MyEngine
             var animation = new Animation();
             animation.length = during;
             animation.keyFrames = keyframe;
+
+            Animation.AnimationData = animation;
         }
 
         private void geometriesLoader(Grendgine_Collada_Library_Geometries l_g, string path, MeshSkinData[] meshSkinData)

@@ -23,9 +23,7 @@ namespace MyRender.MyEngine
         public int TangentBuffer = 0;
         public int JointBuffer = 0;
         public int WeightBuffer = 0;
-
-        //public string[] JointHash;
-        public AnimationModel Animation;
+        
 
         public void Release()
         {

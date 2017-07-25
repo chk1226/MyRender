@@ -7,20 +7,37 @@ attribute vec3 tangent;
 attribute vec4 jointIndices;
 attribute vec4 weight;
 
-uniform mat4 jointTransforms[];
+uniform mat4 jointTransforms[92];
 
 
 void main(void)
 {
-	posE = gl_ModelViewMatrix * gl_Vertex;
-    normalE = gl_NormalMatrix * gl_Normal;
+	vec4 totalLocalPos = vec4(0.0);
+	vec4 totalNormal = vec4(0.0);
+
+	mat4 jt;
+	vec4 posePosition;
+	vec4 worldNormal;
+	for(int i = 0; i < 4; i++)
+	{
+		jt = jointTransforms[int(jointIndices[i])];
+		posePosition = jt * gl_Vertex;
+		totalLocalPos += posePosition * weight[i];
+		
+		worldNormal = jt * vec4(gl_Normal, 0);
+		totalNormal += worldNormal * weight[i];
+	}
+
+	posE = gl_ModelViewMatrix * totalLocalPos;
+    normalE = gl_NormalMatrix * totalNormal.xyz;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 
 	t = normalize(tangent);
 	t = normalize(gl_NormalMatrix * t);
 	t = normalize(t-dot(normalE,t)*normalE);	
 
-	gl_Position = ftransform();
+	gl_Position = gl_ModelViewProjectionMatrix * totalLocalPos;
+
 }
 
 @fragment shader
