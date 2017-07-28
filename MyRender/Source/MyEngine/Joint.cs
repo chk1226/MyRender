@@ -13,19 +13,20 @@ namespace MyRender.MyEngine
         public string name;
         public List<Joint> children = new List<Joint>();
 
-        public Matrix4 animatedTransform;
-        public Matrix4 localBindTransform;
-        public Matrix4 inverseBindTransform;
+        public Matrix4 animatedTransform = Matrix4.Identity;
+        public Matrix4 localBindTransform = Matrix4.Identity;
+        public Matrix4 inverseBindTransform = Matrix4.Identity;
 
-        public void CalcInverseBindTransform(Matrix4 parentBindTransform)
-        {
-            var bindTransform = localBindTransform * parentBindTransform;
-            inverseBindTransform = Matrix4.Invert(bindTransform);
-            foreach ( var child in children)
-            {
-                child.CalcInverseBindTransform(bindTransform);
-            }
-        }
+        //public void CalcInverseBindTransform(Matrix4 parentBindTransform)
+        //{
+        //    var bindTransform = parentBindTransform * localBindTransform;
+        //    inverseBindTransform = Matrix4.Invert(bindTransform);
+            
+        //    foreach ( var child in children)
+        //    {
+        //        child.CalcInverseBindTransform(bindTransform);
+        //    }
+        //}
 
     }
 

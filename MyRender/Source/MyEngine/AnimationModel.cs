@@ -23,12 +23,13 @@ namespace MyRender.MyEngine
             animator = new Animator(this);
         }
 
-        public void CreateHashJoint(string[] jointSid)
+        public void CreateHashJoint(string[] jointSid, Matrix4[] invBind)
         {
             var hash = new Joint[jointSid.Length];
             for (int i = 0; i < jointSid.Length; i++)
             {
                 hash[i] = searchJoint(jointSid[i]);
+                hash[i].inverseBindTransform = invBind[i];
             }
             hashJoint.Add(hash);
         }

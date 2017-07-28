@@ -42,9 +42,13 @@ namespace MyRender.MyEngine
             {
                 currentLocalTransform = currentPos[joint.name];
             }
+            else
+            {
+                currentLocalTransform = joint.localBindTransform;
+                Log.Assert("[applyPoseToJoints]");
+            }
 
-            //var currentLocalTransform = currentPos[joint.name];
-            currentLocalTransform = currentLocalTransform * parentTransform;
+            currentLocalTransform = parentTransform * currentLocalTransform;
 
             foreach (var child in joint.children)
             {

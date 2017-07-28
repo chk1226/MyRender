@@ -5,27 +5,23 @@ namespace MyRender.MyEngine
     class JointTransform
     {
         // Quaternion no has position information, so need position variable
-        public Vector3 position;
-        public Quaternion ActionValue;
+        //public Vector3 position;
+        //public Quaternion ActionValue;
+
+        public Matrix4 Action = Matrix4.Identity;
 
         public Matrix4 GetLocalTransform()
         {
-
-            var mat = Matrix4.CreateFromQuaternion(ActionValue);
-            mat.M31 = position.X;
-            mat.M32 = position.Y;
-            mat.M33 = position.Z;
-
-            //var mat = Matrix4.CreateTranslation(position.X, position.Y, position.Z) * Matrix4.CreateFromQuaternion(ActionValue);
-
-            return mat;
+            return Action;
         }
 
-        public static JointTransform Interpolate(JointTransform fram, JointTransform to, float progression)
+        public static JointTransform Interpolate(JointTransform from, JointTransform to, float progression)
         {
             var newJoint = new JointTransform();
-            newJoint.position = Vector3.Lerp(fram.position, to.position, progression);
-            newJoint.ActionValue = Quaternion.Slerp(fram.ActionValue, to.ActionValue, progression);
+            //newJoint.position = Vector3.Lerp(from.position, to.position, progression);
+            //newJoint.ActionValue = Quaternion.Slerp(from.ActionValue, to.ActionValue, progression);
+
+            newJoint.Action = to.Action * progression + from.Action * (1.0f - progression);
 
             return newJoint;
         }
