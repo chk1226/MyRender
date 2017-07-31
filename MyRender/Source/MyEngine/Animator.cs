@@ -38,14 +38,13 @@ namespace MyRender.MyEngine
         private void applyPoseToJoints(Joint joint, Dictionary<string, Matrix4> currentPos, Matrix4 parentTransform)
         {
             Matrix4 currentLocalTransform = Matrix4.Identity;
-            if (currentPos.ContainsKey(joint.name))
+            if (currentPos.ContainsKey(joint.id))
             {
-                currentLocalTransform = currentPos[joint.name];
+                currentLocalTransform = currentPos[joint.id];
             }
             else
             {
                 currentLocalTransform = joint.localBindTransform;
-                Log.Assert("[applyPoseToJoints]");
             }
 
             currentLocalTransform = parentTransform * currentLocalTransform;
@@ -55,12 +54,15 @@ namespace MyRender.MyEngine
                 applyPoseToJoints(child, currentPos, currentLocalTransform);
             }
 
+
             joint.animatedTransform = currentLocalTransform * joint.inverseBindTransform;
+
+
         }
 
         private void increaseAnimationTime(float deltaTime)
         {
-            animationTime += 0;
+            animationTime += deltaTime;
             if(animationTime > currentAnimation.length)
             {
                 animationTime %= currentAnimation.length;

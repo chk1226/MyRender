@@ -18,6 +18,7 @@ namespace MyRender.MyEngine
         {
             public VertexSkinData[] VertexData;
             public string[] Joints;
+            public Matrix4[] InversBind;
         }
 
         protected struct VertexSkinData
@@ -57,34 +58,17 @@ namespace MyRender.MyEngine
             return true;
         }
 
-        private void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s, MeshSkinData[] meshSkin)
+        virtual protected void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s, MeshSkinData[] meshSkin)
         {
             Animation = new AnimationModel();
-
-            foreach(var jointNode in l_s.Visual_Scene[0].Node)
-            {
-                if (jointNode.Type != Grendgine_Collada_Node_Type.JOINT)
-                    continue;
-
-                var result = loadJointData(jointNode);
-                result.CalcInverseBindTransform(Matrix4.Identity);
-                Animation.JointHierarchy.Add(result);
-
-            }
-
-            // create joint table
-            foreach(var mesh in meshSkin)
-            {
-                Animation.CreateHashJoint(mesh.Joints);
-            }
         }
 
-        private Joint loadJointData(Grendgine_Collada_Node data)
+        protected Joint loadJointData(Grendgine_Collada_Node data)
         {
             Joint joint = new Joint();
 
             joint.sid = data.sID;
-            joint.name = data.ID;
+            joint.id = data.ID;
 
             var localBind = Matrix4.Identity;
             //matrix
@@ -96,8 +80,8 @@ namespace MyRender.MyEngine
                 mat.Row1 = new Vector4(value[4], value[5], value[6], value[7]);
                 mat.Row2 = new Vector4(value[8], value[9], value[10], value[11]);
                 mat.Row3 = new Vector4(value[12], value[13], value[14], value[15]);
-                mat.Transpose();
                 localBind = mat * localBind;
+                
             }
             else
             {
@@ -109,41 +93,43 @@ namespace MyRender.MyEngine
                     {
                         var scaleValue = data.Scale[0].Value();
                         scale = Matrix4.CreateScale(scaleValue[0], scaleValue[1], scaleValue[2]);
-                        scale.Transpose();
                     }
-
 
                     for (int i = data.Rotate.Length - 1; i >= 0; i--)
                     {
                         var value = data.Rotate[i].Value();
-                        var q = Algorithm.CreateFromAxisAngle(value[0], value[1], value[2], value[3] * Algorithm.Radin);
+                        var wValue = value[3];
+                        var q = Algorithm.CreateFromAxisAngle(value[0], value[1], value[2], wValue * Algorithm.Radin);
                         var mat = Matrix4.CreateFromQuaternion(q);
                         mat.Transpose();
 
-                        if(i == data.Rotate.Length - 1 &&
-                            data.Rotate[i].sID != "ScaleAxis" &&
-                            scale != null)
+
+                        if (i == data.Rotate.Length - 1 &&
+                            data.Rotate[data.Rotate.Length - 1].sID == "RotX")
                         {
-                            localBind = scale * localBind; 
+                            localBind = scale * localBind;
                         }
-
-                        localBind = mat * localBind;
-
-                        if(i == data.Rotate.Length - 1 && 
-                            data.Rotate[i].sID == "ScaleAxis" &&
-                            scale != null )
+                        else if (i == data.Rotate.Length - 2 &&
+                            data.Rotate[i].sID == "ScaleAxisR")
                         {
                             localBind = scale * localBind;
 
                         }
+
+                        localBind = mat * localBind;
+                         
+
                     }
+
                 }
 
                 if (data.Translate != null)
                 {
+
                     var value = data.Translate[0].Value();
                     var mat = Matrix4.CreateTranslation(value[0], value[1], value[2]);
                     mat.Transpose();
+
                     localBind = mat * localBind;
                 }
 
@@ -176,6 +162,19 @@ namespace MyRender.MyEngine
 
                 // joint
                 mesh.Joints = skin.Source[0].Name_Array.Value();
+                // get inverse bind
+                int invStride = 16;
+                var inverseArray = skin.Source[1].Float_Array;
+                var iArrayValue = inverseArray.Value();
+                mesh.InversBind = new Matrix4[inverseArray.Count / invStride];
+                for(int j = 0; j < inverseArray.Count / invStride; j++)
+                {
+                    mesh.InversBind[j].Row0 = new Vector4(iArrayValue[j * invStride], iArrayValue[j * invStride + 1], iArrayValue[j * invStride + 2], iArrayValue[j * invStride + 3]);
+                    mesh.InversBind[j].Row1 = new Vector4(iArrayValue[j * invStride + 4], iArrayValue[j * invStride + 5], iArrayValue[j * invStride + 6], iArrayValue[j * invStride + 7]);
+                    mesh.InversBind[j].Row2 = new Vector4(iArrayValue[j * invStride + 8], iArrayValue[j * invStride + 9], iArrayValue[j * invStride + 10], iArrayValue[j * invStride + 11]);
+                    mesh.InversBind[j].Row3 = new Vector4(iArrayValue[j * invStride + 12], iArrayValue[j * invStride + 13], iArrayValue[j * invStride + 14], iArrayValue[j * invStride + 15]);
+                }
+
                 // weight
                 var weightList = skin.Source[2].Float_Array.Value();
                 // effective joint count, vecor <=> joint|weight
@@ -194,10 +193,11 @@ namespace MyRender.MyEngine
                     
                     var joint = new int[] { 0, 0, 0, 0};
                     var weight = new float[] { 0f, 0f, 0f, 0f};
+                   
                     bool over = false;
                     for (int k = 0; k < effectNum; k++)
                     {
-                        if (k > joint.Length)
+                        if (k >= joint.Length)
                         {
                             over = true;
                             break;
@@ -269,7 +269,6 @@ namespace MyRender.MyEngine
                         mat.Row1 = new Vector4(floatArray[index * output_stride + 4], floatArray[index * output_stride + 5], floatArray[index * output_stride + 6], floatArray[index * output_stride + 7]);
                         mat.Row2 = new Vector4(floatArray[index * output_stride + 8], floatArray[index * output_stride + 9], floatArray[index * output_stride + 10], floatArray[index * output_stride + 11]);
                         mat.Row3 = new Vector4(floatArray[index * output_stride + 12], floatArray[index * output_stride + 13], floatArray[index * output_stride + 14], floatArray[index * output_stride + 15]);
-                        mat.Transpose();
                     }
                     else if (output_stride == 3)
                     {
@@ -285,11 +284,13 @@ namespace MyRender.MyEngine
                     }
 
                     var jointTransform = new JointTransform();
-                    jointTransform.position = new Vector3(mat.M31, mat.M32, mat.M33);
-                    jointTransform.ActionValue = Quaternion.FromMatrix(new Matrix3(mat));
+                    //jointTransform.position = new Vector3(mat.M31, mat.M32, mat.M33);
+                    //jointTransform.ActionValue = Quaternion.FromMatrix(new Matrix3(mat));
+                    jointTransform.Action = mat;
 
                     keyframe[index].pose.Add(jointName, jointTransform);
                 }
+
             }
 
             var animation = new Animation();

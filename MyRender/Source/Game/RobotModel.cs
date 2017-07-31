@@ -1,4 +1,5 @@
-﻿using MyRender.MyEngine;
+﻿using grendgine_collada;
+using MyRender.MyEngine;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -88,6 +89,29 @@ namespace MyRender.Game
             return true;
         }
 
+        protected override void skeletonLoader(Grendgine_Collada_Library_Visual_Scenes l_s, MeshSkinData[] meshSkin)
+        {
+            base.skeletonLoader(l_s, meshSkin);
+
+            foreach (var jointNode in l_s.Visual_Scene[0].Node)
+            {
+                if (jointNode.Type != Grendgine_Collada_Node_Type.JOINT)
+                    continue;
+
+                var result = loadJointData(jointNode);
+
+                //result.CalcInverseBindTransform(Matrix4.Identity);
+                Animation.JointHierarchy.Add(result);
+
+            }
+
+            // create joint table
+            foreach (var mesh in meshSkin)
+            {
+                Animation.CreateHashJoint(mesh.Joints, mesh.InversBind);
+            }
+        }
+
         public override void OnUpdate(FrameEventArgs e)
         {
             base.OnUpdate(e);
@@ -106,7 +130,7 @@ namespace MyRender.Game
 
             foreach (var model in ModelList)
             {
-
+                
                 if (SetUpShaderAction.ContainsKey(model.id)) SetUpShaderAction[model.id]();
 
                 // bind vertex buffer 
@@ -156,7 +180,6 @@ namespace MyRender.Game
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
-
             }
 
 
