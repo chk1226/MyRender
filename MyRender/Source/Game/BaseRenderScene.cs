@@ -10,7 +10,7 @@ namespace MyRender.Game
 {
     class BaseRenderScene : Scene
     {
-        public Cube testCube;
+        //public Cube testCube;
         private Vector2 _regMousePos = Vector2.Zero;
         private float max_camerz = 100;
         private float min_camerz = 5;
@@ -31,8 +31,13 @@ namespace MyRender.Game
             //AddChild(testCube);
             //testCube.LocalPosition = new Vector3(2, 0, 0);
 
-            var dae = new RobotModel();
-            dae.Loader(Resource.MRobot);
+            //var dae = new RobotModel();
+            //dae.Loader(Resource.MRobot);
+            //dae.LocalPosition = new Vector3(0, 0, 0);
+            //AddChild(dae);
+
+            var dae = new CowboyModel();
+            dae.Loader(Resource.MCowboy);
             dae.LocalPosition = new Vector3(0, 0, 0);
             AddChild(dae);
 

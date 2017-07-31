@@ -11,6 +11,7 @@ namespace MyRender.MyEngine
         public static readonly string SBlinPhong = @"Source\Shader\BlinPhong.glsl";
         public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
         public static readonly string SRobotNormalmap = @"Source\Shader\robot_NormalMap.glsl";
+        public static readonly string SCowboyNormalmap = @"Source\Shader\cowboy_NormalMap.glsl";
 
 
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -24,10 +25,16 @@ namespace MyRender.MyEngine
         public static readonly string IRobotGlow2 = @"Asset\model\robot\id02_glow.png";
         public static readonly string IRobotSpecular = @"Asset\model\robot\id01_specular.png";
         public static readonly string IRobotSpecular2 = @"Asset\model\robot\id02_specular.png";
+        public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
+        public static readonly string ICowboyNormal = @"Asset\model\robot\NormalMap.png";
         public static readonly string MRobot = @"..\..\Asset\model\robot\robot_plus.dae";
+        public static readonly string MCowboy = @"..\..\Asset\model\cowboy\model.dae";
+
 
         public static readonly string MBricksGUID = "Bricks";
         public static readonly string MRobotGUID = "Robot";
+        public static readonly string MCowboyGUID = "Cowboy";
+
 
         public Material CreateBricksM()
         {
@@ -66,6 +73,24 @@ namespace MyRender.MyEngine
                 m.TextureArray.Add(Material.TextureType.Specular2, GetTextureID(IRobotSpecular2));
 
                 m.ShaderProgram = GetShader(SRobotNormalmap);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateCowboyM()
+        {
+            var m = GetMaterial(MCowboyGUID);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = MCowboyGUID;
+                m.TextureArray.Add(Material.TextureType.Color, GetTextureID(ICowboyColor));
+                m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(ICowboyNormal));
+
+                m.ShaderProgram = GetShader(SCowboyNormalmap);
 
                 AddMaterial(m);
             }

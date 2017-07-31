@@ -19,7 +19,7 @@ namespace MyRender.MyEngine
 
         public Scene()
         {
-            MainCamera =  new Camera(new Vector3(45, 45, 8),
+            MainCamera =  new Camera(new Vector3(45, 45, 12),
                                 new Vector3(0, 2, 0),
                                 new Vector3(0, 1, 0),
                                 45,
