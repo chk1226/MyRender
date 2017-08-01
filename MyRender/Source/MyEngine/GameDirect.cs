@@ -36,6 +36,9 @@ namespace MyRender.MyEngine
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseMoveEventArgs> OnMouseMove;
         public Action<MouseWheelEventArgs> OnMouseWheel;
+        public Node.Action OnSatrt;
+        public Node.Action sss;
+
 
         public void Initial()
         {
@@ -66,6 +69,12 @@ namespace MyRender.MyEngine
         {
             if(MainScene != null)
             {
+                // onstart only do once
+                if(OnSatrt != null)
+                {
+                    OnSatrt();
+                }
+
                 OnUpdate(e);
             }
         }

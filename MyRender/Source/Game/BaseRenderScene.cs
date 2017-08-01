@@ -23,6 +23,10 @@ namespace MyRender.Game
             var light = new Light();
             AddChild(light);
 
+            MainCamera.ResetRotation(45, 75);
+            MainCamera.ResetZoomInOut(20, min_camerz, max_camerz);
+
+
             //testCube = new Cube();
             //AddChild(testCube);
             //testCube.LocalPosition = new Vector3(0, 0, 0);
@@ -31,10 +35,10 @@ namespace MyRender.Game
             //AddChild(testCube);
             //testCube.LocalPosition = new Vector3(2, 0, 0);
 
-            //var dae = new RobotModel();
-            //dae.Loader(Resource.MRobot);
-            //dae.LocalPosition = new Vector3(0, 0, 0);
-            //AddChild(dae);
+            //var dae2 = new RobotModel();
+            //dae2.Loader(Resource.MRobot);
+            //dae2.LocalPosition = new Vector3(0, 0, 0);
+            //AddChild(dae2);
 
             var dae = new CowboyModel();
             dae.Loader(Resource.MCowboy);

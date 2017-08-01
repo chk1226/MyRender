@@ -44,6 +44,7 @@ namespace MyRender.MyEngine
             }
             else
             {
+                // joint's framekey not found
                 currentLocalTransform = joint.localBindTransform;
             }
 

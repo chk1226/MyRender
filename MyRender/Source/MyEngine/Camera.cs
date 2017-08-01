@@ -116,31 +116,51 @@ namespace MyRender.MyEngine
             ProjectMatix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar));
         }
 
-        public void RotationScreen(float a_x, float a_y)
+        private void applyRotation()
         {
-
-            eye_rotation.X += (float)a_x;
-            eye_rotation.Y += (float)a_y;
-
             if (eye_rotation.Y <= 5.0f) eye_rotation.Y = 5.0f;
             else if (eye_rotation.Y >= 175.0f) eye_rotation.Y = 175.0f;
 
             eye = eyePosCalculate(focus, eye_rotation);
             ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
-            
+        }
+
+        public void RotationScreen(float a_x, float a_y)
+        {
+
+            eye_rotation.X += a_x;
+            eye_rotation.Y += a_y;
+
+            applyRotation();
+        }
+
+        public void ResetRotation(float x, float y)
+        {
+            eye_rotation.X = x;
+            eye_rotation.Y = y;
+
+            applyRotation();
+        }
+
+        private void applyZoomInOut(float min, float max)
+        {
+            if (eye_rotation.Z >= max) eye_rotation.Z = max;
+            if (eye_rotation.Z <= min) eye_rotation.Z = min;
+
+            eye = eyePosCalculate(focus, eye_rotation);
+            ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
         }
 
         public void ZoomInOut(float delta_z, float min, float max)
         {
-            
             eye_rotation.Z += delta_z;
+            applyZoomInOut(min, max);
+        }
 
-            if (eye_rotation.Z >= max) eye_rotation.Z = max;
-            if (eye_rotation.Z <= min) eye_rotation.Z = min;
-
-
-            eye = eyePosCalculate(focus, eye_rotation);
-            ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
+        public void ResetZoomInOut(float z, float min, float max)
+        {
+            eye_rotation.Z = z;
+            applyZoomInOut(min, max);
 
         }
 

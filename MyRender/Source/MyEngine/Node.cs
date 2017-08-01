@@ -57,15 +57,10 @@ namespace MyRender.MyEngine
                 return p.Xyz;
             }
         }
-        //public Vector3 Position;
+
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
         public Matrix4 WorldModelMatrix = Matrix4.Identity;
-        //private Vector3 _localRoation;
-        //public Vector3 LocalRotaion
-        //{
-        //    get { return _localRoation; }
-        //    private set { _localRoation = value; }
-        //}
+
         private Material _materialData;
         public Material MaterialData
         {
@@ -80,7 +75,7 @@ namespace MyRender.MyEngine
         public Node()
         {
             //localRoation = Quaternion.Identity;
-            OnStart();
+            GameDirect.Instance.OnSatrt += OnStart;
 
             //testid = testflowid++;
         } 
@@ -129,7 +124,10 @@ namespace MyRender.MyEngine
             effectChildWorldModelMatrix(q);
         }
 
-        public virtual void OnStart() { }
+        public virtual void OnStart()
+        {
+            GameDirect.Instance.OnSatrt -= OnStart;
+        }
         public virtual void OnUpdate(FrameEventArgs e) { }
         public virtual void OnRelease() { }
         public virtual void OnRender(FrameEventArgs e)
@@ -151,7 +149,6 @@ namespace MyRender.MyEngine
         }
 
         public virtual void OnMouseDown(MouseButtonEventArgs e) { }
-        //public virtual void OnMouseUp(object sender, MouseButtonEventArgs e) { }
         public virtual void OnMouseMove(MouseMoveEventArgs e) { }
         public virtual void OnMouseWheel(MouseWheelEventArgs e) { }
 

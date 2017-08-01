@@ -30,6 +30,8 @@ namespace MyRender.MyEngine
             {
                 hash[i] = searchJoint(jointSid[i]);
                 hash[i].inverseBindTransform = invBind[i];
+                //hash[i].debugInvBindTransform = invBind[i];
+
             }
             hashJoint.Add(hash);
         }

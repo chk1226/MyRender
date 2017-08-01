@@ -19,19 +19,17 @@ namespace MyRender.MyEngine
 
         // for debug
         //public Matrix4 debugInvBindTransform = Matrix4.Identity;
-        //public Matrix4 aaa = Matrix4.Identity;
 
+        public void CalcInverseBindTransform(Matrix4 parentBindTransform)
+        {
+            var bindTransform = parentBindTransform * localBindTransform;
+            inverseBindTransform = Matrix4.Invert(bindTransform);
 
-        //public void CalcInverseBindTransform(Matrix4 parentBindTransform)
-        //{
-        //    var bindTransform = parentBindTransform * localBindTransform;
-        //    inverseBindTransform = Matrix4.Invert(bindTransform);
-
-        //    foreach (var child in children)
-        //    {
-        //        child.CalcInverseBindTransform(bindTransform);
-        //    }
-        //}
+            foreach (var child in children)
+            {
+                child.CalcInverseBindTransform(bindTransform);
+            }
+        }
 
     }
 

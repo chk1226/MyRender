@@ -62,7 +62,7 @@ namespace MyRender.Game
         {
             base.skeletonLoader(l_s, meshSkin);
 
-            var jointNode = l_s.Visual_Scene[0].Node[1];
+            var jointNode = l_s.Visual_Scene[0].Node[1].node[0];
             var result = loadJointData(jointNode);
 
             //result.CalcInverseBindTransform(Matrix4.Identity);
