@@ -37,7 +37,6 @@ namespace MyRender.MyEngine
         public Action<MouseMoveEventArgs> OnMouseMove;
         public Action<MouseWheelEventArgs> OnMouseWheel;
         public Node.Action OnSatrt;
-        public Node.Action sss;
 
 
         public void Initial()

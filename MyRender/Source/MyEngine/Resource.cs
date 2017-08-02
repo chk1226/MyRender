@@ -32,6 +32,7 @@ namespace MyRender.MyEngine
         private Dictionary<string, Model> _modellArray = new Dictionary<string, Model>();
         private Dictionary<string, int> _shaderArray = new Dictionary<string, int>();
 
+        private string[] cubemapOrder = { "rt", "lf", "up", "dn", "bk", "ft" };
 
         private Resource()
         {
@@ -93,6 +94,24 @@ namespace MyRender.MyEngine
             _materialArray.Add(material.guid, material);
         }
 
+        public int GetCubemapTextureID(string str)
+        {
+            if (_texArray.ContainsKey(str))
+            {
+                return _texArray[str];
+            }
+
+            var id = LoadCubemapTexture(str);
+            if (id != 0)
+            {
+                _texArray.Add(str, id);
+            }
+
+            return id;
+
+        }
+
+
         public int GetTextureID(string str)
         {
             if (_texArray.ContainsKey(str))
@@ -110,6 +129,73 @@ namespace MyRender.MyEngine
 
         }
 
+        public int LoadCubemapTexture(string file_name)
+        {
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.TextureCubeMap, id);
+
+            try
+            {
+
+                for (int i = 0; i < cubemapOrder.Length; i++)
+                {
+                    var pathName = string.Format(_currentPath + file_name, cubemapOrder[i]);
+                    using (Bitmap bmp = new Bitmap(pathName))
+                    {
+                        //png画像の反転を直す
+                        //bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                        BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                                        ImageLockMode.ReadOnly,
+                                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                        GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0,
+                                    PixelInternalFormat.Rgba,
+                                    bmp_data.Width, bmp_data.Height, 0,
+                                    OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+                                    PixelType.UnsignedByte, bmp_data.Scan0);
+
+                        bmp.UnlockBits(bmp_data);
+                    }
+
+
+                    GL.TexParameter(TextureTarget.TextureCubeMap,
+                                    TextureParameterName.TextureMinFilter,
+                                    (int)TextureMinFilter.Linear);
+                    GL.TexParameter(TextureTarget.TextureCubeMap,
+                                    TextureParameterName.TextureMagFilter,
+                                    (int)TextureMagFilter.Linear);
+                    GL.TexParameter(TextureTarget.TextureCubeMap,
+                                    TextureParameterName.TextureWrapS,
+                                    (int)TextureWrapMode.ClampToEdge);
+                    GL.TexParameter(TextureTarget.TextureCubeMap,
+                                    TextureParameterName.TextureWrapT,
+                                    (int)TextureWrapMode.ClampToEdge);
+                    GL.TexParameter(TextureTarget.TextureCubeMap,
+                                    TextureParameterName.TextureWrapR,
+                                    (int)TextureWrapMode.ClampToEdge);
+                }
+
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                Log.Print("[LoadCubemapTexture]FileNotFound filename : " + file_name);
+                return 0;
+            }
+            catch (System.Exception e)
+            {
+                Log.Print("[LoadCubemapTexture] " + e.Message);
+                return 0;
+            }
+
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            return id;
+
+
+        }
+
+
         public int LoadTexture(string file_name)
         {
             int id = GL.GenTexture();
@@ -117,9 +203,6 @@ namespace MyRender.MyEngine
             try {
                 using (Bitmap bmp = new Bitmap(_currentPath + file_name))
                 {
-                    //bmp.RotateFlip(RotateFlipType.Rotate90FlipY);
-                    //bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
-                    
                     //png画像の反転を直す
                     bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
                     BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),

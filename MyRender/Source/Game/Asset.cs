@@ -8,12 +8,14 @@ namespace MyRender.MyEngine
 {
     partial class Resource
     {
+        // glsl
         public static readonly string SBlinPhong = @"Source\Shader\BlinPhong.glsl";
         public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
         public static readonly string SRobotNormalmap = @"Source\Shader\robot_NormalMap.glsl";
         public static readonly string SCowboyNormalmap = @"Source\Shader\cowboy_NormalMap.glsl";
+        public static readonly string SSkybox = @"Source\Shader\skybox.glsl";
 
-
+        // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
         public static readonly string IBricksNormal = @"Asset\Image\DiagonalHerringbone-NormalMap.bmp";
 
@@ -26,14 +28,19 @@ namespace MyRender.MyEngine
         public static readonly string IRobotSpecular = @"Asset\model\robot\id01_specular.png";
         public static readonly string IRobotSpecular2 = @"Asset\model\robot\id02_specular.png";
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
-        public static readonly string ICowboyNormal = @"Asset\model\robot\NormalMap.png";
+        public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
+        public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
+
+
+        // model
         public static readonly string MRobot = @"..\..\Asset\model\robot\robot_plus.dae";
         public static readonly string MCowboy = @"..\..\Asset\model\cowboy\model.dae";
 
-
+        // guid
         public static readonly string MBricksGUID = "Bricks";
         public static readonly string MRobotGUID = "Robot";
         public static readonly string MCowboyGUID = "Cowboy";
+        public static readonly string MSkyboxGUID = "Skybox";
 
 
         public Material CreateBricksM()
@@ -91,6 +98,24 @@ namespace MyRender.MyEngine
                 m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(ICowboyNormal));
 
                 m.ShaderProgram = GetShader(SCowboyNormalmap);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateSkyboxM()
+        {
+            var m = GetMaterial(MSkyboxGUID);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = MSkyboxGUID;
+                m.TextureArray.Add(Material.TextureType.Cubemap,
+                    GetCubemapTextureID(ISkybox));
+
+                m.ShaderProgram = GetShader(SSkybox);
 
                 AddMaterial(m);
             }

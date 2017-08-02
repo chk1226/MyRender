@@ -124,6 +124,15 @@ namespace MyRender.MyEngine
             effectChildWorldModelMatrix(q);
         }
 
+        public void Scale(float x, float y, float z)
+        {
+            var q = Matrix4.CreateScale(x, y, z);
+            q.Transpose();
+
+            LocalModelMatrix = q * LocalModelMatrix;
+            effectChildWorldModelMatrix(q);
+        }
+
         public virtual void OnStart()
         {
             GameDirect.Instance.OnSatrt -= OnStart;

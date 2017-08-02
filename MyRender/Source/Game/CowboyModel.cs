@@ -75,6 +75,11 @@ namespace MyRender.Game
             }
         }
 
+        public override void OnStart()
+        {
+            base.OnStart();
+
+        }
 
         public override void OnUpdate(FrameEventArgs e)
         {

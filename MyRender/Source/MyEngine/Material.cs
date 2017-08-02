@@ -14,7 +14,8 @@ namespace MyRender.MyEngine
             Glow,
             Glow2,
             Specular,
-            Specular2
+            Specular2,
+            Cubemap
         }
         
         public string guid;
