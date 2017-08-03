@@ -20,110 +20,9 @@ namespace MyRender.MyEngine
             var modelData = Resource.Instance.GetModel(cubeGUID);
             if (modelData == null)
             {
-                modelData = new Model();
+                modelData = Model.CreateCubeData();
                 modelData.guid = cubeGUID;
-                modelData.DrawType = PrimitiveType.Quads;
-
-                modelData.Vertices = new[]
-                {
-                    // front face
-                    new Vector3(-1.0f, -1.0f,  1.0f),
-                    new Vector3( 1.0f, -1.0f,  1.0f),
-                    new Vector3( 1.0f,  1.0f,  1.0f),
-                    new Vector3(-1.0f,  1.0f,  1.0f),
-                    // back face
-                    new Vector3( -1.0f, -1.0f, -1.0f),
-                    new Vector3( 1.0f, -1.0f, -1.0f),
-                    new Vector3( 1.0f, 1.0f, -1.0f),
-                    new Vector3( -1.0f, 1.0f, -1.0f),
-                    // top face
-                    new Vector3( -1.0f, 1.0f, 1.0f),
-                    new Vector3( 1.0f, 1.0f, 1.0f),
-                    new Vector3( 1.0f, 1.0f, -1.0f),
-                    new Vector3( -1.0f, 1.0f, -1.0f),
-                    // bottom face
-                    new Vector3( -1.0f, -1.0f, 1.0f),
-                    new Vector3( 1.0f, -1.0f, 1.0f),
-                    new Vector3( 1.0f, -1.0f, -1.0f),
-                    new Vector3( -1.0f, -1.0f, -1.0f),
-                    // right face
-                    new Vector3(1.0f, -1.0f, 1.0f),
-                    new Vector3( 1.0f, -1.0f, -1.0f),
-                    new Vector3( 1.0f,  1.0f, -1.0f),
-                    new Vector3(1.0f,  1.0f, 1.0f),
-                    // left face
-                    new Vector3(-1.0f, -1.0f, 1.0f),
-                    new Vector3( -1.0f, -1.0f, -1.0f),
-                    new Vector3( -1.0f,  1.0f, -1.0f),
-                    new Vector3(-1.0f,  1.0f, 1.0f)
-                };
-
-                modelData.Normals = new[]
-                {
-                    new Vector3( 0.0f, 0.0f, 1.0f),
-                    new Vector3( 0.0f, 0.0f, 1.0f),
-                    new Vector3( 0.0f, 0.0f, 1.0f),
-                    new Vector3( 0.0f, 0.0f, 1.0f),
-
-                    new Vector3( 0.0f, 0.0f, -1.0f),
-                    new Vector3( 0.0f, 0.0f, -1.0f),
-                    new Vector3( 0.0f, 0.0f, -1.0f),
-                    new Vector3( 0.0f, 0.0f, -1.0f),
-
-                    new Vector3( 0.0f, 1.0f, 0.0f),
-                    new Vector3( 0.0f, 1.0f, 0.0f),
-                    new Vector3( 0.0f, 1.0f, 0.0f),
-                    new Vector3( 0.0f, 1.0f, 0.0f),
-
-                    new Vector3( 0.0f, -1.0f, 0.0f),
-                    new Vector3( 0.0f, -1.0f, 0.0f),
-                    new Vector3( 0.0f, -1.0f, 0.0f),
-                    new Vector3( 0.0f, -1.0f, 0.0f),
-
-                    new Vector3( 1.0f, 0.0f, 0.0f),
-                    new Vector3( 1.0f, 0.0f, 0.0f),
-                    new Vector3( 1.0f, 0.0f, 0.0f),
-                    new Vector3( 1.0f, 0.0f, 0.0f),
-
-                    new Vector3( -1.0f, 0.0f, 0.0f),
-                    new Vector3( -1.0f, 0.0f, 0.0f),
-                    new Vector3( -1.0f, 0.0f, 0.0f),
-                    new Vector3( -1.0f, 0.0f, 0.0f),
-                };
-
-                modelData.Texcoords = new[]
-                {
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-
-                    new Vector2( 0.0f, 0.0f),
-                    new Vector2( 0.0f, 1.0f),
-                    new Vector2( 1.0f, 1.0f),
-                    new Vector2( 1.0f, 0.0f),
-                };
-
+                
                 // because normal map 
                 modelData.ComputeTangentBasis();
 
@@ -217,7 +116,7 @@ namespace MyRender.MyEngine
             GL.VertexAttribPointer(tangent, 3, VertexAttribPointerType.Float, false, 0, 0);
 
 
-            //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
+            //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
             GL.DrawArrays(ModelList[0].DrawType, 0, ModelList[0].Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);

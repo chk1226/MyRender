@@ -12,9 +12,9 @@ namespace MyRender.Game
     {
         //public Cube testCube;
         private Vector2 _regMousePos = Vector2.Zero;
-        private float max_camerz = 100;
+        private float max_camerz = 70;
         private float min_camerz = 5;
-
+        private float skyboxSize = 70;
 
         public override void OnStart()
         {
@@ -27,13 +27,23 @@ namespace MyRender.Game
             MainCamera.ResetZoomInOut(20, min_camerz, max_camerz);
 
 
-            //testCube = new Cube();
+
+            var skybox = new Skybox();
+            skybox.LocalPosition = new Vector3(0, 0, 0);
+            skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
+            AddChild(skybox);
+
+            //var testCube = new Cube();
+            //testCube.LocalPosition = new Vector3(0, 10, 0);
             //AddChild(testCube);
-            //testCube.LocalPosition = new Vector3(0, 0, 0);
 
             //testCube = new Cube();
+            //testCube.LocalPosition = new Vector3(0, 0, 0);
             //AddChild(testCube);
-            //testCube.LocalPosition = new Vector3(2, 0, 0);
+
+            //var testCube = new Cube();
+            //AddChild(testCube);
+            //testCube.LocalPosition = new Vector3(0, 0, 0);
 
             //var dae2 = new RobotModel();
             //dae2.Loader(Resource.MRobot);

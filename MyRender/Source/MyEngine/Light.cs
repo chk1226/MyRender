@@ -17,7 +17,9 @@ namespace MyRender.MyEngine
             Specular = new Vector4(0.9f, 0.9f, 0.9f, 1.0f);
             Diffuse = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             LocalPosition = new Vector3(0, 1000, 0);
-            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, 64);
+
+            // Shininess value is problem, sometime shader can't get value
+            //GL.Material(MaterialFace.Front, MaterialParameter.Shininess, 64);
 
             GL.Light(LightName.Light0, LightParameter.Position, new Vector4(LocalPosition, 1));
             GL.Light(LightName.Light0, LightParameter.Ambient, Ambient);

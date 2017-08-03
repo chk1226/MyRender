@@ -39,7 +39,7 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v)
 				
 	//specular <N,H>^n * I
 	vec3 H = normalize( v + dir_l );
-	dot_value = pow( max(dot(H, normal ), 0.0), gl_FrontMaterial.shininess);	
+	dot_value = pow( max(dot(H, normal ), 0.0), 64);	
 	vec4 Ls = gl_LightSource[0].specular * dot_value;
 	
 	return orign_color * min((La + Ld + Ls), 1.0);
