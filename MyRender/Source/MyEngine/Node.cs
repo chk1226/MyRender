@@ -156,6 +156,7 @@ namespace MyRender.MyEngine
         }
 
         public virtual void OnMouseDown(MouseButtonEventArgs e) { }
+        public virtual void OnMouseUp(MouseButtonEventArgs e) { }
         public virtual void OnMouseMove(MouseMoveEventArgs e) { }
         public virtual void OnMouseWheel(MouseWheelEventArgs e) { }
 
@@ -174,6 +175,7 @@ namespace MyRender.MyEngine
         {
             GameDirect.Instance.OnUpdate += node.OnUpdate;
             GameDirect.Instance.OnMouseDown += node.OnMouseDown;
+            GameDirect.Instance.OnMouseUp += node.OnMouseUp;
             GameDirect.Instance.OnMouseMove += node.OnMouseMove;
             GameDirect.Instance.OnMouseWheel += node.OnMouseWheel;
         }
@@ -182,6 +184,7 @@ namespace MyRender.MyEngine
         {
             GameDirect.Instance.OnUpdate -= node.OnUpdate;
             GameDirect.Instance.OnMouseDown -= node.OnMouseDown;
+            GameDirect.Instance.OnMouseUp -= node.OnMouseUp;
             GameDirect.Instance.OnMouseMove -= node.OnMouseMove;
             GameDirect.Instance.OnMouseWheel -= node.OnMouseWheel;
         }

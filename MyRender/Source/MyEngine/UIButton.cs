@@ -13,12 +13,22 @@ namespace MyRender.MyEngine
     class UIButton : UIBase
     {
         private readonly string guid = "UIButton";
-        private Color4 baseColor;
+        private Color4 leaveColor;
+        private Color4 enterColor;
+        private Color4 nowColor;
+        private bool clickState = false;
 
-        public UIButton(Rectangle rect, string textureName, Color4 color) : base(rect)
+        public event Action OnClick;
+        //public event Action OnEnter;
+        //public event Action OnLeave;
+
+
+        public UIButton(Rectangle rect, string textureName, Color4 enterColor, Color4 leaveColor) : base(rect)
         {
             ModelList = new Model[1];
-            baseColor = Algorithm.ColorNormalize(ref color);
+            this.enterColor = enterColor;
+            this.leaveColor = leaveColor;
+            nowColor = this.leaveColor;
 
             var modelData = Resource.Instance.GetModel(guid);
             if (modelData == null)
@@ -52,13 +62,7 @@ namespace MyRender.MyEngine
                     GL.UseProgram(MaterialData.ShaderProgram);
 
                     MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-
-                    //variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
-                    //GL.ActiveTexture(TextureUnit.Texture1);
-                    //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
-                    //GL.Uniform1(variable, 1);
-
-                    MaterialData.Uniform4("BASE_COLOR", baseColor.R, baseColor.G, baseColor.B, baseColor.A);
+                    MaterialData.Uniform4("BASE_COLOR", nowColor.R, nowColor.G, nowColor.B, nowColor.A);
                     
                 }
 
@@ -111,6 +115,57 @@ namespace MyRender.MyEngine
 
             m.Vertices[3].X = rect.Right;
             m.Vertices[3].Y = rect.Top;
+        }
+
+        private bool clickTest(int x, int y)
+        {
+            return rect.Contains(x, y);
+        }
+
+        public override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if(clickTest(e.X, e.Y))
+            {
+                clickState = true;
+            }
+            else
+            {
+                clickState = false;
+            }
+        }
+
+        public override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (clickTest(e.X, e.Y))
+            {
+                nowColor = Algorithm.ColorLearp(ref nowColor, ref enterColor, 0.3f);
+            }
+            else
+            {
+                nowColor = Algorithm.ColorLearp(ref nowColor, ref leaveColor, 0.3f);
+            }
+
+        }
+
+        public override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            if (clickTest(e.X, e.Y) &&
+                clickState)
+            {
+                if(OnClick != null)
+                {
+                    OnClick();
+                }
+            }
+
+            clickState = false;
+            
         }
 
     }

@@ -91,12 +91,17 @@ namespace MyRender
 
         private void handleMouse()
         {
-            
-            if(Mouse[OpenTK.Input.MouseButton.Right])
-            {
-                var state = Mouse.GetState();
-                GameDirect.Instance.OnMouseMove(MouseMoveData);
-            }
+            if (MouseMoveData == null) return;
+            //if(Mouse[OpenTK.Input.MouseButton.Right])
+            //{
+            GameDirect.Instance.OnMouseMove(MouseMoveData);
+            //}
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+            GameDirect.Instance.OnMouseUp(e);
 
         }
 

@@ -67,5 +67,16 @@ namespace MyRender.MyEngine
 
             return newColor;
         }
+
+        public static Color4 ColorLearp(ref Color4 from, ref Color4 to, float blend)
+        {
+            Color4 color;
+            color.R = to.R * blend + from.R * (1.0f - blend);
+            color.G = to.G * blend + from.G * (1.0f - blend);
+            color.B = to.B * blend + from.B * (1.0f - blend);
+            color.A = to.A * blend + from.A * (1.0f - blend);
+
+            return color;
+        }
     }
 }
