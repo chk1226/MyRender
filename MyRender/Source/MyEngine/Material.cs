@@ -1,5 +1,7 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 
 namespace MyRender.MyEngine
 {
@@ -21,5 +23,35 @@ namespace MyRender.MyEngine
         public string guid;
         public Dictionary<TextureType, int> TextureArray = new Dictionary<TextureType, int>();
         public int ShaderProgram = 0;
+
+
+        public void UniformCubemapTexture(string variableName, TextureUnit texId, Material.TextureType bindType, int value)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.ActiveTexture(texId);
+            GL.BindTexture(TextureTarget.TextureCubeMap, TextureArray[bindType]);
+            GL.Uniform1(variable, value);
+        }
+
+        public void UniformTexture(string variableName, TextureUnit texId, Material.TextureType bindType, int value)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.ActiveTexture(texId);
+            GL.BindTexture(TextureTarget.Texture2D, TextureArray[bindType]);
+            GL.Uniform1(variable, value);
+        }
+
+        public void Uniform4(string variableName, float x, float y, float z, float w)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.Uniform4(variable, x, y, z, w);
+        }
+
+        public void UniformMatrix4(string variableName, ref Matrix4 mat, bool transpose)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.UniformMatrix4(variable, transpose, ref mat);
+        }
+
     }
 }

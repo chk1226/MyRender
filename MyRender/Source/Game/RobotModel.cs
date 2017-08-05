@@ -126,7 +126,7 @@ namespace MyRender.Game
         public override void OnRender(FrameEventArgs e)
         {
             base.OnRender(e);
-            GL.Color4(Color4.White);  //byte型で指定
+            //GL.Color4(Color4.White);  //byte型で指定
 
             foreach (var model in ModelList)
             {

@@ -14,11 +14,11 @@ namespace MyRender.MyEngine
         public static readonly string SRobotNormalmap = @"Source\Shader\robot_NormalMap.glsl";
         public static readonly string SCowboyNormalmap = @"Source\Shader\cowboy_NormalMap.glsl";
         public static readonly string SSkybox = @"Source\Shader\skybox.glsl";
+        public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
         public static readonly string IBricksNormal = @"Asset\Image\DiagonalHerringbone-NormalMap.bmp";
-
         public static readonly string IRobotColor = @"Asset\model\robot\id01_color.png";
         public static readonly string IRobotColor2 = @"Asset\model\robot\id02_color.png";
         public static readonly string IRobotNormal = @"Asset\model\robot\id01_normal.png";
@@ -30,6 +30,8 @@ namespace MyRender.MyEngine
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
         public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
+        public static readonly string IUISprite = @"Asset\Image\sprite.png";
+        public static readonly string IUIBlack = @"Asset\Image\black.png";
 
 
         // model
@@ -41,7 +43,7 @@ namespace MyRender.MyEngine
         public static readonly string MRobotGUID = "Robot";
         public static readonly string MCowboyGUID = "Cowboy";
         public static readonly string MSkyboxGUID = "Skybox";
-
+        public static readonly string MUISpriteGUID = "UISprite";
 
         public Material CreateBricksM()
         {
@@ -116,6 +118,24 @@ namespace MyRender.MyEngine
                     GetCubemapTextureID(ISkybox));
 
                 m.ShaderProgram = GetShader(SSkybox);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateUISpriteM(string textureFile)
+        {
+            var m = GetMaterial(MUISpriteGUID + textureFile);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = MUISpriteGUID;
+                m.TextureArray.Add(Material.TextureType.Color,
+                    GetTextureID(textureFile));
+
+                m.ShaderProgram = GetShader(SUISprite);
 
                 AddMaterial(m);
             }

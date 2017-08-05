@@ -23,11 +23,8 @@ namespace MyRender.Game
                 modelData.guid = skyboxGUID;
 
                 // gen vertex buffer
-                modelData.VBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.VBO);
-                int size = modelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Vertices, BufferUsageHint.StaticDraw);
-
+                modelData.GenVerticesBuffer();
+  
                 Resource.Instance.AddModel(modelData);
             }
             ModelList[0] = modelData;
@@ -43,10 +40,7 @@ namespace MyRender.Game
                 {
                     GL.UseProgram(MaterialData.ShaderProgram);
 
-                    var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "cubemapTexture");
-                    GL.ActiveTexture(TextureUnit.Texture0);
-                    GL.BindTexture(TextureTarget.TextureCubeMap, MaterialData.TextureArray[Material.TextureType.Cubemap]);
-                    GL.Uniform1(variable, 0);
+                    MaterialData.UniformCubemapTexture("cubemapTexture", TextureUnit.Texture0, Material.TextureType.Cubemap, 0);
 
                 }
 
@@ -63,7 +57,7 @@ namespace MyRender.Game
             if (MaterialData == null) return;
             if (SetUpShaderAction.ContainsKey(skyboxGUID)) SetUpShaderAction[skyboxGUID]();
 
-            GL.Color4(Color4.White);  //byte型で指定
+            //GL.Color4(Color4.White);  //byte型で指定
 
             // bind vertex buffer 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);

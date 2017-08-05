@@ -2,6 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Runtime.InteropServices;
 
 namespace MyRender.MyEngine
 {
@@ -91,6 +92,71 @@ namespace MyRender.MyEngine
             }
 
 
+        }
+
+        public void ReloadVerticesBuffer()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
+            int size = Vertices.Length * Marshal.SizeOf(default(Vector3));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Vertices, BufferUsageHint.StaticDraw);
+        }
+
+        public int GenVerticesBuffer()
+        {
+            VBO = GL.GenBuffer();
+            ReloadVerticesBuffer();
+
+            return VBO;
+        }
+
+        public int GenNormalBuffer()
+        {
+            NBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, NBO);
+            int size = Normals.Length * Marshal.SizeOf(default(Vector3));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Normals, BufferUsageHint.StaticDraw);
+            return NBO;
+        }
+
+        public int GenTangentBuffer()
+        {
+            TangentBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, TangentBuffer);
+            int size = Tangent.Length * Marshal.SizeOf(default(Vector3));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Tangent, BufferUsageHint.StaticDraw);
+
+            return TangentBuffer;
+        }
+
+        public int GenJointBuffer()
+        {
+            JointBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, JointBuffer);
+            int size = JointsIndex.Length * Marshal.SizeOf(default(Vector4));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, JointsIndex, BufferUsageHint.StaticDraw);
+
+            return JointBuffer;
+        }
+
+        public int GenWeightBuffer()
+        {
+            WeightBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, WeightBuffer);
+            int size = Weights.Length * Marshal.SizeOf(default(Vector4));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Weights, BufferUsageHint.StaticDraw);
+
+            return WeightBuffer;
+        }
+
+
+        public int GenTexcoordsBuffer()
+        {
+            TBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, TBO);
+            int size = Texcoords.Length * Marshal.SizeOf(default(Vector2));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Texcoords, BufferUsageHint.StaticDraw);
+
+            return TBO;
         }
 
         public static Model CreateCubeData()
@@ -200,5 +266,26 @@ namespace MyRender.MyEngine
             return modelData;
         }
 
+        public static Model CreateUIData()
+        {
+            var modelData = new Model();
+            modelData.DrawType = PrimitiveType.Quads;
+
+            modelData.Vertices = new[]{
+                    new Vector3(0, 1,  0.0f),
+                    new Vector3(0, 0,  0.0f),
+                    new Vector3(1, 0,  0.0f),
+                    new Vector3(1, 1,  0.0f),
+            };
+
+            modelData.Texcoords = new[] {
+                    new Vector2( 0.0f, 1.0f),
+                    new Vector2( 0.0f, 0.0f),
+                    new Vector2( 1.0f, 0.0f),
+                    new Vector2( 1.0f, 1.0f),
+            };
+
+            return modelData;
+        }
     }
 }

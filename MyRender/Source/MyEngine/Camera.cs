@@ -42,6 +42,12 @@ namespace MyRender.MyEngine
             _viewMatrix.Transpose();
             
             ProjectMode = ProjectType.Perspective;
+
+            // Setup ui view and project matrix
+            UIViewMatrix = Matrix4.LookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY);
+            UIViewMatrix.Transpose();
+            UIProjectMatrix = Matrix4.CreateOrthographicOffCenter(0, _viewport.Width, _viewport.Height, 0, 0.125f, 1.125f);
+            UIProjectMatrix.Transpose();
         }
 
         public ProjectType ProjectMode { get; set; }
@@ -75,7 +81,7 @@ namespace MyRender.MyEngine
                 GL.LoadMatrix(ref t);
             }
         }
-
+        
         private Matrix4 _viewMatrix;
         public Matrix4 ViewMatrix
         {
@@ -87,6 +93,10 @@ namespace MyRender.MyEngine
                 GL.LoadMatrix(ref t);
             }
         }
+
+        public Matrix4 UIViewMatrix;
+        public Matrix4 UIProjectMatrix;
+
 
         /// <summary>
         /// Apply view matrix, project, viewport
@@ -114,6 +124,11 @@ namespace MyRender.MyEngine
 
             //Setup a perspective view
             ProjectMatix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar));
+
+            //Setup ui project
+            UIProjectMatrix = Matrix4.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0.125f, 1.125f);
+            UIProjectMatrix.Transpose();
+
         }
 
         private void applyRotation()
@@ -164,11 +179,6 @@ namespace MyRender.MyEngine
 
         }
 
-        //public void UpdateEye(Vector3 pos)
-        //{
-        //    eye = pos;
-        //    ViewMatrix = Matrix4.Transpose(Matrix4.LookAt(eye, focus, vUp));
-        //}
 
         // 1 parameter: focus, 2 parameter: eye_rotation
         private Vector3 eyePosCalculate(Vector3 f, Vector3 p)

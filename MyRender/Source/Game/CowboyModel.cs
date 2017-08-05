@@ -25,28 +25,18 @@ namespace MyRender.Game
                 {
                     GL.UseProgram(MaterialData.ShaderProgram);
 
-                    int color_id = MaterialData.TextureArray[Material.TextureType.Color];
                     int normal_id = MaterialData.TextureArray[Material.TextureType.Normal];
 
-                    var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
-                    GL.ActiveTexture(TextureUnit.Texture0);
-                    GL.BindTexture(TextureTarget.Texture2D, color_id);
-                    GL.Uniform1(variable, 0);
-
-                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
-                    GL.ActiveTexture(TextureUnit.Texture1);
-                    GL.BindTexture(TextureTarget.Texture2D, normal_id);
-                    GL.Uniform1(variable, 1);
-
-                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "VIEW_MAT");
+                    MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                    MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
                     var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                    GL.UniformMatrix4(variable, true, ref view_mat);
+                    MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                    
 
                     var joints = Animation.HashJoint[0];
                     for (int i = 0; i < joints.Length; i++)
                     {
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "jointTransforms[" + i.ToString() + "]");
-                        GL.UniformMatrix4(variable, true, ref joints[i].animatedTransform);
+                        MaterialData.UniformMatrix4("jointTransforms[" + i.ToString() + "]", ref joints[i].animatedTransform, true);
                     }
 
                 }
@@ -95,7 +85,7 @@ namespace MyRender.Game
         public override void OnRender(FrameEventArgs e)
         {
             base.OnRender(e);
-            GL.Color4(Color4.White);  //byte型で指定
+            //GL.Color4(Color4.Yellow);  //byte型で指定
 
             foreach (var model in ModelList)
             {

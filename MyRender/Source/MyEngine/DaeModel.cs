@@ -399,42 +399,24 @@ namespace MyRender.MyEngine
                 modelData.ComputeTangentBasis();
 
                 // gen vertex buffer
-                modelData.VBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.VBO);
-                int size = modelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Vertices, BufferUsageHint.StaticDraw);
+                modelData.GenVerticesBuffer();
 
                 // gen texture cood buffer
-                modelData.TBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TBO);
-                size = modelData.Texcoords.Length * Marshal.SizeOf(default(Vector2));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Texcoords, BufferUsageHint.StaticDraw);
+                modelData.GenTexcoordsBuffer();
 
                 // gen texture cood buffer
-                modelData.NBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.NBO);
-                size = modelData.Normals.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Normals, BufferUsageHint.StaticDraw);
+                modelData.GenNormalBuffer();
 
                 // gen tangent buffer 
-                modelData.TangentBuffer = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TangentBuffer);
-                size = modelData.Tangent.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Tangent, BufferUsageHint.StaticDraw);
+                modelData.GenTangentBuffer();
 
                 if(meshSkinData != null)
                 {
                     // gen jointIndices
-                    modelData.JointBuffer = GL.GenBuffer();
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.JointBuffer);
-                    size = modelData.JointsIndex.Length * Marshal.SizeOf(default(Vector4));
-                    GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.JointsIndex, BufferUsageHint.StaticDraw);
+                    modelData.GenJointBuffer();
 
                     // gen weight
-                    modelData.WeightBuffer = GL.GenBuffer();
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.WeightBuffer);
-                    size = modelData.Weights.Length * Marshal.SizeOf(default(Vector4));
-                    GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Weights, BufferUsageHint.StaticDraw);
+                    modelData.GenWeightBuffer();
                 }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

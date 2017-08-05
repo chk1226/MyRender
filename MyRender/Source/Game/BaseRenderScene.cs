@@ -5,12 +5,12 @@ using MyRender.Debug;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using System;
+using System.Drawing;
 
 namespace MyRender.Game
 {
     class BaseRenderScene : Scene
     {
-        //public Cube testCube;
         private Vector2 _regMousePos = Vector2.Zero;
         private float max_camerz = 70;
         private float min_camerz = 5;
@@ -26,24 +26,16 @@ namespace MyRender.Game
             MainCamera.ResetRotation(45, 75);
             MainCamera.ResetZoomInOut(20, min_camerz, max_camerz);
 
-
+            UIButton a = new UIButton(new Rectangle(100, 100, 70, 70), Resource.IUIBlack, new Color4(89f, 154f, 171f, 255f));
+            AddChild(a);
 
             var skybox = new Skybox();
-            skybox.LocalPosition = new Vector3(0, 0, 0);
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
             AddChild(skybox);
 
-            //var testCube = new Cube();
-            //testCube.LocalPosition = new Vector3(0, 10, 0);
-            //AddChild(testCube);
-
-            //testCube = new Cube();
-            //testCube.LocalPosition = new Vector3(0, 0, 0);
-            //AddChild(testCube);
-
-            //var testCube = new Cube();
-            //AddChild(testCube);
-            //testCube.LocalPosition = new Vector3(0, 0, 0);
+            var testCube = new Cube();
+            testCube.LocalPosition = new Vector3(0, 10, 0);
+            AddChild(testCube);
 
             //var dae2 = new RobotModel();
             //dae2.Loader(Resource.MRobot);
@@ -52,8 +44,9 @@ namespace MyRender.Game
 
             var dae = new CowboyModel();
             dae.Loader(Resource.MCowboy);
-            dae.LocalPosition = new Vector3(0, 0, 0);
             AddChild(dae);
+
+            
 
         }
 

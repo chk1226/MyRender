@@ -27,28 +27,16 @@ namespace MyRender.MyEngine
                 modelData.ComputeTangentBasis();
 
                 // gen vertex buffer
-                modelData.VBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.VBO);
-                int size = modelData.Vertices.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Vertices, BufferUsageHint.StaticDraw);
+                modelData.GenVerticesBuffer();
 
                 // gen texture cood buffer
-                modelData.TBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TBO);
-                size = modelData.Texcoords.Length * Marshal.SizeOf(default(Vector2));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Texcoords, BufferUsageHint.StaticDraw);
+                modelData.GenTexcoordsBuffer();
 
-                // gen texture cood buffer
-                modelData.NBO = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.NBO);
-                size = modelData.Normals.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Normals, BufferUsageHint.StaticDraw);
+                // gen normal texture cood buffer
+                modelData.GenNormalBuffer();
 
                 // gen tangent buffer 
-                modelData.TangentBuffer = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, modelData.TangentBuffer);
-                size = modelData.Tangent.Length * Marshal.SizeOf(default(Vector3));
-                GL.BufferData(BufferTarget.ArrayBuffer, size, modelData.Tangent, BufferUsageHint.StaticDraw);
+                modelData.GenTangentBuffer();
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
@@ -66,19 +54,10 @@ namespace MyRender.MyEngine
                 {
                     GL.UseProgram(MaterialData.ShaderProgram);
 
-                    var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
-                    GL.ActiveTexture(TextureUnit.Texture0);
-                    GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Color]);
-                    GL.Uniform1(variable, 0);
-
-                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
-                    GL.ActiveTexture(TextureUnit.Texture1);
-                    GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
-                    GL.Uniform1(variable, 1);
-
-                    variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "VIEW_MAT");
+                    MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                    MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
                     var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                    GL.UniformMatrix4(variable, true, ref view_mat);
+                    MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
                 }
 
             });
@@ -92,7 +71,7 @@ namespace MyRender.MyEngine
             if (MaterialData == null) return;
             if (SetUpShaderAction.ContainsKey(setShader)) SetUpShaderAction[setShader]();
 
-            GL.Color4(Color4.White);  //byte型で指定
+            //GL.Color4(Color4.White);  //byte型で指定
 
             // bind vertex buffer 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);

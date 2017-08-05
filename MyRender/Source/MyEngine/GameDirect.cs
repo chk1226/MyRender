@@ -127,8 +127,8 @@ namespace MyRender.MyEngine
         {
             _renderList.Sort(delegate(Node x, Node y)
             {
-                float x_z = x.ModelViewPosition.Z;
-                float y_z = y.ModelViewPosition.Z;
+                float x_z = x.ModelViewPosition().Z;
+                float y_z = y.ModelViewPosition().Z;
                 
                 if(x_z > y_z)
                 {

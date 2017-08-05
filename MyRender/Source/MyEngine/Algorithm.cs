@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics;
 
 namespace MyRender.MyEngine
 {
@@ -53,6 +54,18 @@ namespace MyRender.MyEngine
             array[index + 13] = mat.M42;
             array[index + 14] = mat.M13;
             array[index + 15] = mat.M14;
+        }
+
+        public static Color4 ColorNormalize(ref Color4 color)
+        {
+            Color4 newColor;
+
+            newColor.R = color.R / 255;
+            newColor.G = color.G / 255;
+            newColor.B = color.B / 255;
+            newColor.A = color.A / 255;
+
+            return newColor;
         }
     }
 }

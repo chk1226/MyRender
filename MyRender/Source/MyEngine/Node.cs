@@ -42,20 +42,18 @@ namespace MyRender.MyEngine
             }
         }
 
-        public Vector3 ModelViewPosition
+        public virtual Vector3 ModelViewPosition()
         {
-            get {
-                if(GameDirect.Instance.MainScene == null ||
-                    GameDirect.Instance.MainScene.MainCamera == null)
-                {
-                    return Vector3.Zero;
-                }
-
-                var p = new Vector4(0, 0, 0, 1);
-                p = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix * p;
-
-                return p.Xyz;
+            if(GameDirect.Instance.MainScene == null ||
+                GameDirect.Instance.MainScene.MainCamera == null)
+            {
+                return Vector3.Zero;
             }
+
+            var p = new Vector4(0, 0, 0, 1);
+            p = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix * p;
+
+            return p.Xyz;
         }
 
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
