@@ -176,12 +176,12 @@ namespace MyRender.MyEngine
                 }
 
             }
-            catch (System.IO.FileNotFoundException)
+            catch (FileNotFoundException)
             {
                 Log.Print("[LoadCubemapTexture]FileNotFound filename : " + file_name);
                 return 0;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Log.Print("[LoadCubemapTexture] " + e.Message);
                 return 0;
@@ -219,7 +219,7 @@ namespace MyRender.MyEngine
                 }
 
             }
-            catch (System.IO.FileNotFoundException)
+            catch (FileNotFoundException)
             {
                 Log.Print("[Loadtexture]FileNotFound filename : " + file_name);
                 return 0;
@@ -331,32 +331,49 @@ namespace MyRender.MyEngine
 
         }
 
-        public void OnRelease()
+        public void ReleaseTextures()
         {
-            foreach(var tex in _texArray)
+            foreach (var tex in _texArray)
             {
                 GL.DeleteTexture(tex.Value);
             }
             _texArray.Clear();
+        }
 
+        public void ReleaseMaterial()
+        {
             foreach (var m in _materialArray)
             {
-                
+                m.Value.Release();
             }
             _materialArray.Clear();
+        }
 
+        public void ReleaseModels()
+        {
             foreach (var m in _modellArray)
             {
                 m.Value.Release();
             }
             _modellArray.Clear();
+        }
 
-            GL.DeleteProgram(errorShader);
+        public void ReleaseShaders()
+        {
             foreach (var m in _shaderArray)
             {
                 GL.DeleteProgram(m.Value);
             }
             _shaderArray.Clear();
+        }
+
+        public void OnRelease()
+        {
+            ReleaseTextures();
+            ReleaseMaterial();
+            ReleaseModels();
+            ReleaseShaders();
+            GL.DeleteProgram(errorShader);
         }
     }
 }

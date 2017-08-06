@@ -53,5 +53,19 @@ namespace MyRender.MyEngine
             GL.UniformMatrix4(variable, transpose, ref mat);
         }
 
+        public void Release()
+        {
+            foreach (var tex in TextureArray)
+            {
+                GL.DeleteTexture(tex.Value);
+            }
+            TextureArray.Clear();
+
+            GL.DeleteProgram(ShaderProgram);
+
+
+        }
+
+
     }
 }

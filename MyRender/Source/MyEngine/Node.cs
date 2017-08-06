@@ -96,10 +96,23 @@ namespace MyRender.MyEngine
             RegisterCallback(child);
         }
 
+        public void RemoveAllChild()
+        {
+            foreach (var child in Children.Values)
+            {
+                child.Parent = null;
+                UnregisterCallback(child);
+                GameDirect.Instance.OnSatrt -= child.OnStart;
+
+                child.RemoveAllChild();
+            }
+
+            Children.Clear();
+
+        }
+
         public void SetParent(Node target)
         {
-            if (target == null) return;
-
             if (Parent != null)
             {
                 Parent._children.Remove(_guid);
@@ -107,9 +120,12 @@ namespace MyRender.MyEngine
             }
 
             Parent = target;
-            Parent._children.Add(_guid, this);
-            this.WorldModelMatrix = Parent.WorldModelMatrix * Parent.LocalModelMatrix;
-            RegisterCallback(this);
+            if(target != null)
+            {
+                Parent._children.Add(_guid, this);
+                this.WorldModelMatrix = Parent.WorldModelMatrix * Parent.LocalModelMatrix;
+                RegisterCallback(this);
+            }
         }
 
 

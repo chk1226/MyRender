@@ -131,7 +131,7 @@ namespace MyRender.MyEngine
             if (m == null)
             {
                 m = new Material();
-                m.guid = MUISpriteGUID;
+                m.guid = MUISpriteGUID + textureFile;
                 m.TextureArray.Add(Material.TextureType.Color,
                     GetTextureID(textureFile));
 

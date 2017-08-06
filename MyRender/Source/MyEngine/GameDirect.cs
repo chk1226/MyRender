@@ -59,10 +59,24 @@ namespace MyRender.MyEngine
         {
             if(scene != null)
             {
+                if(MainScene != null)
+                {
+                    // remove old scene
+                    MainScene.RemoveAllChild();
+                    MainScene.UnregisterCallback(MainScene);
+
+                    // remove resource
+                    Resource.Instance.ReleaseTextures();
+                    Resource.Instance.ReleaseShaders();
+                    Resource.Instance.ReleaseMaterial();
+                    Resource.Instance.ReleaseModels();
+
+                }
+
                 MainScene = scene;
                 MainScene.RegisterCallback(MainScene);
-
             }
+
         }
 
         public void OnUpdateFrame(FrameEventArgs e)

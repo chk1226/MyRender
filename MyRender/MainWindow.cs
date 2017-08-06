@@ -51,12 +51,13 @@ namespace MyRender
         {
             base.OnLoad(e);
             GameDirect.Instance.Initial();
-            GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
+            //GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
+            GameDirect.Instance.RunWithScene(new Game.MenuScene());
 
-            // HACK
+
+
             Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
             {
-
                 GameDirect.Instance.OnMouseWheel(_e);
             };
         }

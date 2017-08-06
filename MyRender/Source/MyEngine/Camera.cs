@@ -115,7 +115,7 @@ namespace MyRender.MyEngine
 
         public void UpdateViewport(Rectangle vp)
         {
-            this.Viewport = vp;
+            Viewport = vp;
             float aspect = 1.0f;
             if (vp.Height > 0)
             {

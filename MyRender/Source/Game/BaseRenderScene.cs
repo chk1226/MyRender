@@ -24,9 +24,14 @@ namespace MyRender.Game
             AddChild(light);
 
             MainCamera.ResetRotation(45, 75);
-            MainCamera.ResetZoomInOut(20, min_camerz, max_camerz);
+            MainCamera.ResetZoomInOut(30, min_camerz, max_camerz);
 
-            UIButton a = new UIButton(new Rectangle(100, 100, 70, 70), Resource.IUIBlack, new Color4(89f, 154f, 171f, 255f));
+            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f));
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new MenuScene());
+            };
+
             AddChild(a);
 
             var skybox = new Skybox();
@@ -34,7 +39,8 @@ namespace MyRender.Game
             AddChild(skybox);
 
             var testCube = new Cube();
-            testCube.LocalPosition = new Vector3(0, 10, 0);
+            testCube.LocalPosition = new Vector3(0, -1, 0);
+            testCube.Scale(5,1,5);
             AddChild(testCube);
 
             //var dae2 = new RobotModel();
@@ -45,8 +51,6 @@ namespace MyRender.Game
             var dae = new CowboyModel();
             dae.Loader(Resource.MCowboy);
             AddChild(dae);
-
-            
 
         }
 
@@ -88,15 +92,12 @@ namespace MyRender.Game
             {
                 var dX = e.X - _regMousePos.X;
                 var dY = e.Y - _regMousePos.Y;
-                //Log.Print(e.X .ToString() + "    " + _regMousePos.X.ToString());
-
 
                 MainCamera.RotationScreen(dX, dY);
 
                 _regMousePos.X = e.X;
                 _regMousePos.Y = e.Y;
 
-                //Log.Print("OnMouseMove");
 
             }
         }
