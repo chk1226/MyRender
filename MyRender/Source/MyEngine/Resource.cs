@@ -25,12 +25,18 @@ namespace MyRender.MyEngine
         }
 
         private string _currentPath;
+        public string CurrentPath
+        {
+            get { return _currentPath; }
+        }
         private int errorShader;
         private readonly string SError = @"Source\Shader\Error.glsl";
         private Dictionary<string, int> _texArray = new Dictionary<string, int>();
         private Dictionary<string, Material> _materialArray = new Dictionary<string, Material>();
         private Dictionary<string, Model> _modellArray = new Dictionary<string, Model>();
         private Dictionary<string, int> _shaderArray = new Dictionary<string, int>();
+        private Dictionary<string, UIFont.Glyphes> _fontArray = new Dictionary<string, UIFont.Glyphes>();
+
 
         private string[] cubemapOrder = { "rt", "lf", "up", "dn", "bk", "ft" };
 
@@ -40,6 +46,27 @@ namespace MyRender.MyEngine
 
             _currentPath = _currentPath.Remove(_currentPath.IndexOf("bin"));
             errorShader = SetUpShader(SError);
+        }
+
+        public UIFont.Glyphes GetFont(string bitmap, string xml)
+        {
+            var key = bitmap + xml;
+
+            if (_fontArray.ContainsKey(key))
+            {
+                return _fontArray[key];
+            }
+
+            var glyphes = new UIFont.Glyphes();
+            
+            if (!glyphes.Loader(bitmap, xml))
+            {
+                return null;
+            }
+
+            _fontArray.Add(key, glyphes);
+
+            return glyphes;
         }
 
         public int GetShader(string str)
@@ -112,14 +139,14 @@ namespace MyRender.MyEngine
         }
 
 
-        public int GetTextureID(string str)
+        public int GetTextureID(string str, bool flipY = true)
         {
             if (_texArray.ContainsKey(str))
             {
                 return _texArray[str];
             }
 
-            var id = LoadTexture(str);
+            var id = LoadTexture(str, flipY);
             if (id != 0)
             {
                 _texArray.Add(str, id);
@@ -195,8 +222,7 @@ namespace MyRender.MyEngine
 
         }
 
-
-        public int LoadTexture(string file_name)
+        public int LoadTexture(string file_name, bool flipY)
         {
             int id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, id);
@@ -204,7 +230,10 @@ namespace MyRender.MyEngine
                 using (Bitmap bmp = new Bitmap(_currentPath + file_name))
                 {
                     //png画像の反転を直す
-                    bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    if(flipY)
+                    {
+                        bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    }
                     BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
                                                     ImageLockMode.ReadOnly,
                                                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -224,7 +253,7 @@ namespace MyRender.MyEngine
                 Log.Print("[Loadtexture]FileNotFound filename : " + file_name);
                 return 0;
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 Log.Print("[Loadtexture] " + e.Message);
                 return 0;
@@ -367,12 +396,22 @@ namespace MyRender.MyEngine
             _shaderArray.Clear();
         }
 
+        public void ReleaseFont()
+        {
+            foreach (var m in _fontArray)
+            {
+                m.Value.Release();
+            }
+            _fontArray.Clear();
+        }
+
         public void OnRelease()
         {
             ReleaseTextures();
             ReleaseMaterial();
             ReleaseModels();
             ReleaseShaders();
+            ReleaseFont();
             GL.DeleteProgram(errorShader);
         }
     }

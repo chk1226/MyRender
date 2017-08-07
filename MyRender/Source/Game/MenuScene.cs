@@ -18,7 +18,8 @@ namespace MyRender.Game
             int wX = winRect.Width / 2 - spaceX * 2;
             int hY = 100;
 
-            UIButton a = new UIButton(new Rectangle(spaceX, spaceY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f));
+            UIButton a = new UIButton(new Rectangle(spaceX, spaceY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "Skybox, NormalMap, SkeletalAnimation");
             a.OnClick += delegate ()
             {
                 GameDirect.Instance.RunWithScene(new BaseRenderScene());

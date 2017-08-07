@@ -18,13 +18,17 @@ namespace MyRender.MyEngine
         private Color4 nowColor;
         private bool clickState = false;
 
+        private UIFont text;
         public event Action OnClick;
-        //public event Action OnEnter;
-        //public event Action OnLeave;
 
 
-        public UIButton(Rectangle rect, string textureName, Color4 enterColor, Color4 leaveColor) : base(rect)
+        public UIButton(Rectangle rect, string textureName, Color4 enterColor, Color4 leaveColor, string text) : base(rect)
         {
+            LocalPosition = new Vector3(rect.X, rect.Y, 0);
+            this.text = new UIFont(Resource.ITTFBitmap, Resource.XTTFBitmap, text);
+            this.text.LocalPosition = new Vector3(10, rect.Height/2 - this.text.GetGlyphes.BitmapRect.Y/2, 0);
+            AddChild(this.text);
+
             ModelList = new Model[1];
             this.enterColor = enterColor;
             this.leaveColor = leaveColor;
@@ -46,6 +50,7 @@ namespace MyRender.MyEngine
                 Resource.Instance.AddModel(modelData);
             }
             ModelList[0] = modelData;
+            updateModelData();
 
             MaterialData = Resource.Instance.CreateUISpriteM(textureName);
             
@@ -72,7 +77,6 @@ namespace MyRender.MyEngine
         public override void OnRender(FrameEventArgs e)
         {
             base.OnRender(e);
-            updateVertices();
 
             if (MaterialData == null) return;
             if (SetUpShaderAction.ContainsKey(guid)) SetUpShaderAction[guid]();
@@ -96,25 +100,32 @@ namespace MyRender.MyEngine
             GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
-        private void updateVertices()
+        protected override void updateModelData()
         {
+            base.updateModelData();
+        
             if (ModelList == null || ModelList[0] == null)
             {
                 return;
             }
 
             var m = ModelList[0];
-            m.Vertices[0].X = rect.Left;
-            m.Vertices[0].Y = rect.Top;
+            m.Vertices[0].X = 0;
+            m.Vertices[0].Y = 0;
+            m.Vertices[0].Z = depth;
 
-            m.Vertices[1].X = rect.Left;
-            m.Vertices[1].Y = rect.Bottom;
+            m.Vertices[1].X = 0;
+            m.Vertices[1].Y = rect.Height;
+            m.Vertices[1].Z = depth;
 
-            m.Vertices[2].X = rect.Right;
-            m.Vertices[2].Y = rect.Bottom;
+            m.Vertices[2].X = rect.Width;
+            m.Vertices[2].Y = rect.Height;
+            m.Vertices[2].Z = depth;
 
-            m.Vertices[3].X = rect.Right;
-            m.Vertices[3].Y = rect.Top;
+            m.Vertices[3].X = rect.Width;
+            m.Vertices[3].Y = 0;
+            m.Vertices[3].Z = depth;
+
         }
 
         private bool clickTest(int x, int y)

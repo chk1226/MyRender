@@ -148,14 +148,18 @@ namespace MyRender.MyEngine
             return WeightBuffer;
         }
 
-
-        public int GenTexcoordsBuffer()
+        public void ReloadTexcoordsBuffer()
         {
-            TBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, TBO);
             int size = Texcoords.Length * Marshal.SizeOf(default(Vector2));
             GL.BufferData(BufferTarget.ArrayBuffer, size, Texcoords, BufferUsageHint.StaticDraw);
 
+        }
+
+        public int GenTexcoordsBuffer()
+        {
+            TBO = GL.GenBuffer();
+            ReloadTexcoordsBuffer();
             return TBO;
         }
 

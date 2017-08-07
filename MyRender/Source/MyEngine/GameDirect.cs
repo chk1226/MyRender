@@ -70,6 +70,7 @@ namespace MyRender.MyEngine
                     Resource.Instance.ReleaseShaders();
                     Resource.Instance.ReleaseMaterial();
                     Resource.Instance.ReleaseModels();
+                    Resource.Instance.ReleaseFont();
 
                 }
 

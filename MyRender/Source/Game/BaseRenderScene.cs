@@ -26,7 +26,8 @@ namespace MyRender.Game
             MainCamera.ResetRotation(45, 75);
             MainCamera.ResetZoomInOut(30, min_camerz, max_camerz);
 
-            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f));
+            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "GoBack");
             a.OnClick += delegate ()
             {
                 GameDirect.Instance.RunWithScene(new MenuScene());

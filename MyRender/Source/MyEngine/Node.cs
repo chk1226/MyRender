@@ -13,6 +13,7 @@ namespace MyRender.MyEngine
         //public int testid = 0;
 
         private string _guid = Guid.NewGuid().ToString();
+        public string GUID { get { return _guid; } }
 
         private readonly Dictionary<string, Node> _children = new Dictionary<string, Node>();
         public Dictionary<string, Node> Children
@@ -72,13 +73,12 @@ namespace MyRender.MyEngine
 
         public Node()
         {
-            //localRoation = Quaternion.Identity;
             GameDirect.Instance.OnSatrt += OnStart;
 
             //testid = testflowid++;
         } 
 
-        public void AddChild(Node child)
+        public virtual void AddChild(Node child)
         {
             if (child == null) return;
 
@@ -111,7 +111,7 @@ namespace MyRender.MyEngine
 
         }
 
-        public void SetParent(Node target)
+        public virtual void SetParent(Node target)
         {
             if (Parent != null)
             {

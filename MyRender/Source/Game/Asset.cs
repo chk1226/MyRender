@@ -15,6 +15,7 @@ namespace MyRender.MyEngine
         public static readonly string SCowboyNormalmap = @"Source\Shader\cowboy_NormalMap.glsl";
         public static readonly string SSkybox = @"Source\Shader\skybox.glsl";
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
+        public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -32,7 +33,10 @@ namespace MyRender.MyEngine
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
         public static readonly string IUISprite = @"Asset\Image\sprite.png";
         public static readonly string IUIBlack = @"Asset\Image\black.png";
+        public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
 
+        // xml
+        public static readonly string XTTFBitmap = @"Asset\font\Mecha.ttf.xml";
 
         // model
         public static readonly string MRobot = @"..\..\Asset\model\robot\robot_plus.dae";
@@ -43,7 +47,7 @@ namespace MyRender.MyEngine
         public static readonly string MRobotGUID = "Robot";
         public static readonly string MCowboyGUID = "Cowboy";
         public static readonly string MSkyboxGUID = "Skybox";
-        public static readonly string MUISpriteGUID = "UISprite";
+        //public static readonly string MUISpriteGUID = "UISprite";
 
         public Material CreateBricksM()
         {
@@ -127,15 +131,33 @@ namespace MyRender.MyEngine
 
         public Material CreateUISpriteM(string textureFile)
         {
-            var m = GetMaterial(MUISpriteGUID + textureFile);
+            var m = GetMaterial(textureFile);
             if (m == null)
             {
                 m = new Material();
-                m.guid = MUISpriteGUID + textureFile;
+                m.guid = textureFile;
                 m.TextureArray.Add(Material.TextureType.Color,
                     GetTextureID(textureFile));
 
                 m.ShaderProgram = GetShader(SUISprite);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateUIFontM(string textureFile)
+        {
+            var m = GetMaterial(textureFile);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = textureFile;
+                m.TextureArray.Add(Material.TextureType.Color,
+                    GetTextureID(textureFile, false));
+
+                m.ShaderProgram = GetShader(SUIFont);
 
                 AddMaterial(m);
             }

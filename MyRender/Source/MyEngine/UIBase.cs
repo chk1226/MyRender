@@ -1,10 +1,5 @@
 ﻿using OpenTK;
-using System;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using System.Collections.Generic;
-using MyRender.Debug;
-using OpenTK.Input;
 using System.Drawing;
 
 namespace MyRender.MyEngine
@@ -12,11 +7,16 @@ namespace MyRender.MyEngine
     class UIBase : Node
     {
         protected Rectangle rect;
+        protected float depth = 0;
+
+        private float offsetDepth = 0.0001f;
 
         public UIBase(Rectangle rect)
         {
             this.rect = rect; 
         }
+
+        public UIBase(){ }
 
         public override Vector3 ModelViewPosition()
         {
@@ -64,7 +64,47 @@ namespace MyRender.MyEngine
             GL.PopMatrix();
         }
 
-        
+        protected virtual void updateModelData() { }
+
+        public override void AddChild(Node child)
+        {
+            if (child == null) return;
+
+            base.AddChild(child);
+
+            var uichild = child as UIBase;
+            if(uichild != null)
+            {
+                uichild.depth = this.depth + offsetDepth;
+                uichild.updateModelData();
+            }
+            
+        }
+
+        public override void SetParent(Node target)
+        {
+            base.SetParent(target);
+
+            if(target == null)
+            {
+                this.depth = 0;
+            }
+            else
+            {
+                var uiparent = target as UIBase;
+                if (uiparent != null)
+                {
+                    this.depth = uiparent.depth + offsetDepth;
+                }
+                else
+                {
+                    this.depth = 0;
+                }
+            }
+
+            this.updateModelData();
+        }
+
     }
-    
+
 }
