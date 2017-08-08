@@ -52,7 +52,7 @@ namespace MyRender
             base.OnLoad(e);
             GameDirect.Instance.Initial();
             //GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
-            GameDirect.Instance.RunWithScene(new Game.MenuScene());
+            GameDirect.Instance.RunWithScene(new Game.ShadowScene());
 
 
 
@@ -120,7 +120,7 @@ namespace MyRender
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0}";
+            Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0} DrawCall: {GameDirect.Instance.DrawCallCount}";
 
             GameDirect.Instance.OnRenderFrame(e);
             SwapBuffers();

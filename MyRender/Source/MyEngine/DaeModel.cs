@@ -28,7 +28,7 @@ namespace MyRender.MyEngine
         }
 
 
-        public virtual bool Loader(string path)
+        public virtual bool Loader(string path, bool loadAnimation = true)
         {
             var dae = Grendgine_Collada.Grendgine_Load_File(path);
             if(dae == null)
@@ -38,7 +38,7 @@ namespace MyRender.MyEngine
             }
 
             MeshSkinData[] meshSkinData = null;
-            if (dae.Library_Controllers != null)
+            if (dae.Library_Controllers != null && loadAnimation)
             {
                 meshSkinData = skinLoader(dae.Library_Controllers);
             }
@@ -49,7 +49,8 @@ namespace MyRender.MyEngine
             geometriesLoader(l_g, path, meshSkinData);
 
             if (dae.Library_Animations != null &&
-                dae.Library_Visual_Scene != null)
+                dae.Library_Visual_Scene != null &&
+                meshSkinData != null && loadAnimation)
             {
                 skeletonLoader(dae.Library_Visual_Scene, meshSkinData);
                 animationLoader(dae.Library_Animations);

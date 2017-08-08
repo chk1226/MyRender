@@ -12,7 +12,7 @@ namespace MyRender.Game
     class BaseRenderScene : Scene
     {
         private Vector2 _regMousePos = Vector2.Zero;
-        private float max_camerz = 70;
+        private float max_camerz = 60;
         private float min_camerz = 5;
         private float skyboxSize = 70;
 
@@ -52,14 +52,13 @@ namespace MyRender.Game
             var dae = new CowboyModel();
             dae.Loader(Resource.MCowboy);
             AddChild(dae);
-
+            
         }
 
 
         public override void OnUpdate(FrameEventArgs e)
         {
             base.OnUpdate(e);
-
 
         }
 

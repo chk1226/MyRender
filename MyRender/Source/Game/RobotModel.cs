@@ -8,10 +8,9 @@ namespace MyRender.Game
 {
     class RobotModel : DaeModel
     {
-
-        public override bool Loader(string path)
+        public override bool Loader(string path, bool loadAnimation = true)
         {
-            var result = base.Loader(path);
+            var result = base.Loader(path, loadAnimation);
             if (!result) return result;
 
             MaterialData = Resource.Instance.CreateRobotM();
@@ -26,57 +25,33 @@ namespace MyRender.Game
                     {
                         GL.UseProgram(MaterialData.ShaderProgram);
 
-                        int color_id;
-                        int normal_id;
-                        int glow_id;
-                        int specular_id;
                         int layer = 2;
                         if (model.id.Contains("02"))
                         {
-                            color_id = MaterialData.TextureArray[Material.TextureType.Color_02];
-                            normal_id = MaterialData.TextureArray[Material.TextureType.Normal_02];
-                            glow_id = MaterialData.TextureArray[Material.TextureType.Glow2];
-                            specular_id = MaterialData.TextureArray[Material.TextureType.Specular2];
+                            MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color_02, 0);
+                            MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal_02, 1);
+                            MaterialData.UniformTexture("TEX_GLOW", TextureUnit.Texture2, Material.TextureType.Glow2, 2);
+                            MaterialData.UniformTexture("TEX_SPECULAR", TextureUnit.Texture3, Material.TextureType.Specular2, 3);
+
                             layer = 0;
                         }
                         else //01
                         {
-                            color_id = MaterialData.TextureArray[Material.TextureType.Color];
-                            normal_id = MaterialData.TextureArray[Material.TextureType.Normal];
-                            glow_id = MaterialData.TextureArray[Material.TextureType.Glow];
-                            specular_id = MaterialData.TextureArray[Material.TextureType.Specular];
+                            MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                            MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
+                            MaterialData.UniformTexture("TEX_GLOW", TextureUnit.Texture2, Material.TextureType.Glow, 2);
+                            MaterialData.UniformTexture("TEX_SPECULAR", TextureUnit.Texture3, Material.TextureType.Specular, 3);
+
                             layer = 1;
                         }
 
-                        var variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_COLOR");
-                        GL.ActiveTexture(TextureUnit.Texture0);
-                        GL.BindTexture(TextureTarget.Texture2D, color_id);
-                        GL.Uniform1(variable, 0);
-
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "NORMAL_TEX_COLOR");
-                        GL.ActiveTexture(TextureUnit.Texture1);
-                        GL.BindTexture(TextureTarget.Texture2D, normal_id);
-                        GL.Uniform1(variable, 1);
-
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_GLOW");
-                        GL.ActiveTexture(TextureUnit.Texture2);
-                        GL.BindTexture(TextureTarget.Texture2D, glow_id);
-                        GL.Uniform1(variable, 2);
-
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "TEX_SPECULAR");
-                        GL.ActiveTexture(TextureUnit.Texture3);
-                        GL.BindTexture(TextureTarget.Texture2D, specular_id);
-                        GL.Uniform1(variable, 3);
-
-                        variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "VIEW_MAT");
                         var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                        GL.UniformMatrix4(variable, true, ref view_mat);
-
+                        MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                        
                         var joints = Animation.HashJoint[layer];
                         for(int i = 0; i < joints.Length; i++)
                         {
-                            variable = GL.GetUniformLocation(MaterialData.ShaderProgram, "jointTransforms[" + i.ToString() + "]");
-                            GL.UniformMatrix4(variable, true, ref joints[i].animatedTransform);
+                            MaterialData.UniformMatrix4("jointTransforms[" + i.ToString() + "]", ref joints[i].animatedTransform, true);
                         }
 
                     }
@@ -165,9 +140,9 @@ namespace MyRender.Game
                 GL.EnableVertexAttribArray(weight);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, model.WeightBuffer);
                 GL.VertexAttribPointer(weight, 4, VertexAttribPointerType.Float, false, 0, 0);
-                
+
                 //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
-                GL.DrawArrays(model.DrawType, 0, model.Vertices.Length);
+                GameDirect.Instance.DrawCall(model.DrawType, model.Vertices.Length);
 
                 GL.DisableClientState(ArrayCap.VertexArray);
                 GL.DisableClientState(ArrayCap.NormalArray);

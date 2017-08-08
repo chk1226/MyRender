@@ -8,39 +8,39 @@ namespace MyRender.Game
 {
     class CowboyModel : DaeModel
     {
-        public override bool Loader(string path)
+        public override bool Loader(string path, bool loadAnimation = true)
         {
-            var result = base.Loader(path);
+            var result = base.Loader(path, loadAnimation);
             if (!result) return result;
 
             MaterialData = Resource.Instance.CreateCowboyM();
 
             Rotation(1, 0, 0, -90);
 
-            var model = ModelList[0];
-
-            SetUpShaderAction.Add(model.id, delegate ()
+            foreach(var model in ModelList)
             {
-                if (MaterialData.ShaderProgram != 0)
+                SetUpShaderAction.Add(model.id, delegate ()
                 {
-                    GL.UseProgram(MaterialData.ShaderProgram);
+                    if (MaterialData.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(MaterialData.ShaderProgram);
 
-                    int normal_id = MaterialData.TextureArray[Material.TextureType.Normal];
-
-                    MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-                    MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
-                    var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                    MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                        MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                        MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
+                        var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
+                        MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
                     
 
-                    var joints = Animation.HashJoint[0];
-                    for (int i = 0; i < joints.Length; i++)
-                    {
-                        MaterialData.UniformMatrix4("jointTransforms[" + i.ToString() + "]", ref joints[i].animatedTransform, true);
-                    }
+                        var joints = Animation.HashJoint[0];
+                        for (int i = 0; i < joints.Length; i++)
+                        {
+                            MaterialData.UniformMatrix4("jointTransforms[" + i.ToString() + "]", ref joints[i].animatedTransform, true);
+                        }
 
-                }
-            });
+                    }
+                });
+            }
+
 
             Animation.animator.DoAnimation(Animation.AnimationData);
 
@@ -85,7 +85,6 @@ namespace MyRender.Game
         public override void OnRender(FrameEventArgs e)
         {
             base.OnRender(e);
-            //GL.Color4(Color4.Yellow);  //byte型で指定
 
             foreach (var model in ModelList)
             {
@@ -126,7 +125,7 @@ namespace MyRender.Game
                 GL.VertexAttribPointer(weight, 4, VertexAttribPointerType.Float, false, 0, 0);
 
                 //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
-                GL.DrawArrays(model.DrawType, 0, model.Vertices.Length);
+                GameDirect.Instance.DrawCall(model.DrawType, model.Vertices.Length);
 
                 GL.DisableClientState(ArrayCap.VertexArray);
                 GL.DisableClientState(ArrayCap.NormalArray);

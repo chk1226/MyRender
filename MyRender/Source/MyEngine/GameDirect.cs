@@ -30,15 +30,15 @@ namespace MyRender.MyEngine
         }
 
         private List<Node> _renderList = new List<Node>(100);
-
-        //public event Action<FrameEventArgs> OnRender;
+        
         public event Action<FrameEventArgs> OnUpdate;
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseButtonEventArgs> OnMouseUp;
         public Action<MouseMoveEventArgs> OnMouseMove;
         public Action<MouseWheelEventArgs> OnMouseWheel;
         public Node.Action OnSatrt;
-
+        private int regDrawCallCount = 0;
+        public int DrawCallCount = 0;
 
         public void Initial()
         {
@@ -85,10 +85,7 @@ namespace MyRender.MyEngine
             if(MainScene != null)
             {
                 // onstart only do once
-                if(OnSatrt != null)
-                {
-                    OnSatrt();
-                }
+                OnSatrt?.Invoke();
 
                 OnUpdate(e);
             }
@@ -168,11 +165,13 @@ namespace MyRender.MyEngine
 
         private void doRender(FrameEventArgs e)
         {
+            regDrawCallCount = 0;
             foreach(var node in _renderList)
             {
                 node.OnRender(e);
                 node.OnRenderFinsh(e);
             }
+            DrawCallCount = regDrawCallCount;
         }
 
         public void OnWindowResize()
@@ -194,5 +193,10 @@ namespace MyRender.MyEngine
             doRender(e);
         }
 
+        public void DrawCall(PrimitiveType type, int length)
+        {
+            GL.DrawArrays(type, 0, length);
+            regDrawCallCount++;
+        }
     }
 }

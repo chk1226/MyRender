@@ -96,7 +96,7 @@ namespace MyRender.MyEngine
 
 
             //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
-            GL.DrawArrays(ModelList[0].DrawType, 0, ModelList[0].Vertices.Length);
+            GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.NormalArray);

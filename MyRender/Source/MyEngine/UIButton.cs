@@ -91,7 +91,7 @@ namespace MyRender.MyEngine
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
 
-            GL.DrawArrays(ModelList[0].DrawType, 0, ModelList[0].Vertices.Length);
+            GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
 
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.TextureCoordArray);

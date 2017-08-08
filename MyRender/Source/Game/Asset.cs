@@ -11,9 +11,10 @@ namespace MyRender.MyEngine
         // glsl
         public static readonly string SBlinPhong = @"Source\Shader\BlinPhong.glsl";
         public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
-        public static readonly string SRobotNormalmap = @"Source\Shader\robot_NormalMap.glsl";
-        public static readonly string SCowboyNormalmap = @"Source\Shader\cowboy_NormalMap.glsl";
-        public static readonly string SSkybox = @"Source\Shader\skybox.glsl";
+        public static readonly string SRobotNormalmap = @"Source\Shader\RobotNormalMap.glsl";
+        public static readonly string SCowboyNormalmap = @"Source\Shader\CowboyNormalMap.glsl";
+        public static readonly string SHouseNormalmap = @"Source\Shader\HouseNormalMap.glsl";
+        public static readonly string SSkybox = @"Source\Shader\Skybox.glsl";
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
         public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";
 
@@ -30,9 +31,12 @@ namespace MyRender.MyEngine
         public static readonly string IRobotSpecular2 = @"Asset\model\robot\id02_specular.png";
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
         public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
+        public static readonly string IHouseNormal = @"Asset\model\house\N.png";
+        public static readonly string IHouseSpecular = @"Asset\model\house\S.png";
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
         public static readonly string IUISprite = @"Asset\Image\sprite.png";
         public static readonly string IUIBlack = @"Asset\Image\black.png";
+        public static readonly string IUIWhite = @"Asset\Image\white.png";
         public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
 
         // xml
@@ -41,13 +45,38 @@ namespace MyRender.MyEngine
         // model
         public static readonly string MRobot = @"..\..\Asset\model\robot\robot_plus.dae";
         public static readonly string MCowboy = @"..\..\Asset\model\cowboy\model.dae";
+        public static readonly string MHouse = @"..\..\Asset\model\house\Small_Building_1.dae";
+
 
         // guid
         public static readonly string MBricksGUID = "Bricks";
         public static readonly string MRobotGUID = "Robot";
         public static readonly string MCowboyGUID = "Cowboy";
+        public static readonly string MHomeGUID = "Home";
         public static readonly string MSkyboxGUID = "Skybox";
+        public static readonly string MPlaneGUID = "Plane";
+
         //public static readonly string MUISpriteGUID = "UISprite";
+
+        public Material CreatePlaneM()
+        {
+            string guid = MPlaneGUID;
+
+            var m = GetMaterial(guid);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = guid;
+                m.TextureArray.Add(Material.TextureType.Color, GetTextureID(IUIWhite));
+
+                m.ShaderProgram = GetShader(SBlinPhong);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
 
         public Material CreateBricksM()
         {
@@ -104,6 +133,24 @@ namespace MyRender.MyEngine
                 m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(ICowboyNormal));
 
                 m.ShaderProgram = GetShader(SCowboyNormalmap);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateHomeM()
+        {
+            var m = GetMaterial(MHomeGUID);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = MHomeGUID;
+                m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IHouseNormal));
+                m.TextureArray.Add(Material.TextureType.Specular, GetTextureID(IHouseSpecular));
+
+                m.ShaderProgram = GetShader(SHouseNormalmap);
 
                 AddMaterial(m);
             }
