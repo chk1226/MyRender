@@ -1,19 +1,20 @@
 ﻿using MyRender.Debug;
 using OpenTK;
+using System;
 using System.Collections.Generic;
 
 namespace MyRender.MyEngine
 {
     class Animator
     {
-        private AnimationModel entity;
+        private WeakReference aniModel;
 
         private float animationTime = 0;
         private Animation currentAnimation;
 
         public Animator(AnimationModel animationModel)
         {
-            entity = animationModel;
+            aniModel = new WeakReference(animationModel);
         }
 
         public void DoAnimation(Animation doAnimation)
@@ -28,9 +29,14 @@ namespace MyRender.MyEngine
 
             increaseAnimationTime(delta);
             var currentPos = calculateCurrentAnimationPose();
-            foreach(var joint in entity.JointHierarchy)
+
+            var entity = aniModel.Target as AnimationModel;
+            if(entity != null)
             {
-                applyPoseToJoints(joint, currentPos, Matrix4.Identity);
+                foreach(var joint in entity.JointHierarchy)
+                {
+                    applyPoseToJoints(joint, currentPos, Matrix4.Identity);
+                }
             }
 
         }
