@@ -53,7 +53,7 @@ namespace MyRender
             GameDirect.Instance.Initial();
             //GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
             GameDirect.Instance.RunWithScene(new Game.ShadowScene());
-
+            //GameDirect.Instance.RunWithScene(new Game.MenuScene());
 
 
             Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)
@@ -120,7 +120,7 @@ namespace MyRender
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0} DrawCall: {GameDirect.Instance.DrawCallCount}";
+            Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0} DrawCall: {Render.DrawcallCount}";
 
             GameDirect.Instance.OnRenderFrame(e);
             SwapBuffers();

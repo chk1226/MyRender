@@ -45,59 +45,34 @@ namespace MyRender.MyEngine
 
                 // gen texture cood buffer
                 modelData.GenTexcoordsBuffer();
-
+                
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 Resource.Instance.AddModel(modelData);
             }
             ModelList[0] = modelData;
             updateModelData();
-
-            MaterialData = Resource.Instance.CreateUISpriteM(textureName);
-            
-            //set shader action
-            SetUpShaderAction.Add(guid, delegate ()
-            {
-                // reload vertex
-                modelData.ReloadVerticesBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
-
-                if (MaterialData.ShaderProgram != 0)
-                {
-                    GL.UseProgram(MaterialData.ShaderProgram);
-
-                    MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-                    MaterialData.Uniform4("BASE_COLOR", nowColor.R, nowColor.G, nowColor.B, nowColor.A);
-                    
-                }
-
-            });
-        }
-
-        public override void OnRender(FrameEventArgs e)
-        {
-            base.OnRender(e);
-
-            if (MaterialData == null) return;
-            if (SetUpShaderAction.ContainsKey(guid)) SetUpShaderAction[guid]();
-            
-            // bind vertex buffer 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-
-            // bind texture coord buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TBO);
-            GL.EnableClientState(ArrayCap.TextureCoordArray);
-            GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
-
-            GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
-
-            GL.DisableClientState(ArrayCap.VertexArray);
-            GL.DisableClientState(ArrayCap.TextureCoordArray);
-
+            modelData.ReloadVerticesBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+
+            // generate render object
+            Render render = Render.CreateRender(Resource.Instance.CreateUISpriteM(textureName), delegate (Render r) {
+                var m = r.MaterialData;
+
+                if (m.ShaderProgram != 0)
+                {
+                    GL.UseProgram(m.ShaderProgram);
+
+                    m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                    m.Uniform4("BASE_COLOR", nowColor.R, nowColor.G, nowColor.B, nowColor.A);
+
+                }
+            },
+            this,
+            modelData,
+            Render.UI);
+            RenderList.Add(render);
+
         }
 
         protected override void updateModelData()

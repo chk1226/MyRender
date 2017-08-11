@@ -35,9 +35,14 @@ namespace MyRender.MyEngine
 
         public void UniformTexture(string variableName, TextureUnit texId, Material.TextureType bindType, int value)
         {
+            UniformTexture(variableName, texId, TextureArray[bindType], value);
+        }
+
+        public void UniformTexture(string variableName, TextureUnit texId, int bindID, int value)
+        {
             var variable = GL.GetUniformLocation(ShaderProgram, variableName);
             GL.ActiveTexture(texId);
-            GL.BindTexture(TextureTarget.Texture2D, TextureArray[bindType]);
+            GL.BindTexture(TextureTarget.Texture2D, bindID);
             GL.Uniform1(variable, value);
         }
 

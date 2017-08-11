@@ -29,16 +29,31 @@ namespace MyRender.MyEngine
             private set { _mainScene = value; }
         }
 
-        private List<Node> _renderList = new List<Node>(100);
-        
+        private List<Render> _prerenderList = new List<Render>(50);
+        private List<Render> _renderList = new List<Render>(100);
+        private List<Render> _postrenderList = new List<Render>(50);
+
+        private FrameBuffer depthBuffer;
+        public FrameBuffer DepthBuffer
+        {
+            get
+            {
+                if(depthBuffer == null)
+                {
+                    depthBuffer= new FrameBuffer();
+                    depthBuffer.GenDepthBuffer();
+                }
+
+                return depthBuffer;
+            }
+        }
+
         public event Action<FrameEventArgs> OnUpdate;
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseButtonEventArgs> OnMouseUp;
         public Action<MouseMoveEventArgs> OnMouseMove;
         public Action<MouseWheelEventArgs> OnMouseWheel;
         public Node.Action OnSatrt;
-        private int regDrawCallCount = 0;
-        public int DrawCallCount = 0;
 
         public void Initial()
         {
@@ -64,6 +79,8 @@ namespace MyRender.MyEngine
                     // remove old scene
                     MainScene.RemoveAllChild();
                     MainScene.UnregisterCallback(MainScene);
+                    OnSatrt -= MainScene.OnStart;
+                    MainScene.OnRelease();
 
                     // remove resource
                     Resource.Instance.ReleaseTextures();
@@ -71,6 +88,7 @@ namespace MyRender.MyEngine
                     Resource.Instance.ReleaseMaterial();
                     Resource.Instance.ReleaseModels();
                     Resource.Instance.ReleaseFont();
+                    releaseFrameBuffer();
 
                 }
 
@@ -93,7 +111,10 @@ namespace MyRender.MyEngine
 
         private void doTraverseTree()
         {
+            _prerenderList.Clear();
             _renderList.Clear();
+            _postrenderList.Clear();
+
             if(MainScene == null)
             {
                 return;
@@ -116,15 +137,29 @@ namespace MyRender.MyEngine
 
             foreach (var pair in node)
             {
-                // if model data is empty, continue
-                if(pair.Value.ModelList == null || 
-                    pair.Value.ModelList.Length == 0)
+                var child = pair.Value;
+                // if renderlist is empty, continue
+                if(child.RenderList.Count == 0)
                 {
                     continue;
                 }
 
-                // add root to list
-                _renderList.Add(pair.Value);
+                foreach(var render in child.RenderList)
+                {
+                    if(render.Priority >= Render.Prerender)
+                    {
+                        _prerenderList.Add(render);
+                    }
+                    else if(render.Priority <= Render.Postrender)
+                    {
+                        _postrenderList.Add(render);
+                    }
+                    else
+                    {
+                        _renderList.Add(render);
+                    }
+                }
+
                 // left to right traverse
                 if(pair.Value.Children.Count == 0)
                 {
@@ -138,22 +173,63 @@ namespace MyRender.MyEngine
 
         private void sortSceneGraph()
         {
-            _renderList.Sort(delegate(Node x, Node y)
+            // prerender sort
+            _prerenderList.Sort(delegate (Render x, Render y)
             {
-                float x_z = x.ModelViewPosition().Z;
-                float y_z = y.ModelViewPosition().Z;
-                
-                if(x_z > y_z)
-                {
-                    return 1;
-                }
-                else if(x_z < y_z)
+                if (x.Priority > y.Priority)
                 {
                     return -1;
                 }
+                else if (x.Priority < y.Priority)
+                {
+                    return 1;
+                }
 
                 return 0;
+
             });
+
+            // render sort
+            _renderList.Sort(delegate(Render x, Render y)
+            {
+                if(x.Priority > y.Priority)
+                {
+                    return -1;
+                }
+                else if(x.Priority < y.Priority)
+                {
+                    return 1;
+                }
+                else
+                {
+                    Node xNode;
+                    Node yNode;
+                    
+                    if(x.WNode.TryGetTarget(out xNode) &&
+                    y.WNode.TryGetTarget(out yNode))
+                    {
+                        float x_z = xNode.ModelViewPosition().Z;
+                        float y_z = yNode.ModelViewPosition().Z;
+
+                        if (x_z > y_z)
+                        {
+                            return 1;
+                        }
+                        else if (x_z < y_z)
+                        {
+                            return -1;
+                        }
+
+                    }
+                    
+                    return 0;
+                }
+
+            });
+
+
+            // postrender sort
+            //TODO
 
             // for debug
             //Log.Print("***sortSceneGraph****");
@@ -163,15 +239,39 @@ namespace MyRender.MyEngine
             //}
         }
 
+        private void doPrerender(FrameEventArgs e)
+        {
+            foreach(var pre in _prerenderList)
+            {
+                // prerender begin
+                pre.OnRenderBegin(e);
+
+                foreach(var render in _renderList)
+                {
+                    render.ReplaceRender = pre;
+                    render.OnRenderBegin(e);
+                    render.OnRender(e);
+                    render.OnRenderFinsh(e);
+                }
+
+                // prerender end
+                pre.OnRenderFinsh(e);
+            }
+
+
+        }
+
         private void doRender(FrameEventArgs e)
         {
-            regDrawCallCount = 0;
-            foreach(var node in _renderList)
+            GL.ClearColor(Color4.Gray);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            foreach(var render in _renderList)
             {
-                node.OnRender(e);
-                node.OnRenderFinsh(e);
+                render.OnRenderBegin(e);
+                render.OnRender(e);
+                render.OnRenderFinsh(e);
             }
-            DrawCallCount = regDrawCallCount;
         }
 
         public void OnWindowResize()
@@ -187,16 +287,23 @@ namespace MyRender.MyEngine
             doTraverseTree();
             sortSceneGraph();
 
-            GL.ClearColor(Color4.Gray);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            Render.DrawcallCount = 0;
+            // prerender
+            doPrerender(e);
 
             doRender(e);
+
+            // postrender
+            //TODO
         }
 
-        public void DrawCall(PrimitiveType type, int length)
+        private void releaseFrameBuffer()
         {
-            GL.DrawArrays(type, 0, length);
-            regDrawCallCount++;
+            if(depthBuffer != null)
+            {
+                depthBuffer.OnRelease();
+            }
         }
+
     }
 }

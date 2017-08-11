@@ -41,7 +41,7 @@ namespace MyRender.Game
 
             var testCube = new Cube();
             testCube.LocalPosition = new Vector3(0, -1, 0);
-            testCube.Scale(5,1,5);
+            testCube.Scale(4, 1, 4);
             AddChild(testCube);
 
             //var dae2 = new RobotModel();
@@ -62,12 +62,6 @@ namespace MyRender.Game
 
         }
 
-        public override void OnRender(FrameEventArgs e)
-        {
-            base.OnRender(e);
-
-
-        }
 
         public override void OnMouseDown(MouseButtonEventArgs e)
         {

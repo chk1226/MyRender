@@ -59,17 +59,10 @@ namespace MyRender.MyEngine
 
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
         public Matrix4 WorldModelMatrix = Matrix4.Identity;
-
-        private Material _materialData;
-        public Material MaterialData
-        {
-            get { return _materialData; }
-            set { _materialData = value; }
-        }
         
         public Model[] ModelList;
         public delegate void Action();
-        protected Dictionary<string, Action> SetUpShaderAction = new Dictionary<string, Action>();
+        public List<Render> RenderList = new List<Render>();
 
         public Node()
         {
@@ -105,6 +98,7 @@ namespace MyRender.MyEngine
                 GameDirect.Instance.OnSatrt -= child.OnStart;
 
                 child.RemoveAllChild();
+                child.OnRelease();
             }
 
             Children.Clear();
@@ -152,8 +146,7 @@ namespace MyRender.MyEngine
             GameDirect.Instance.OnSatrt -= OnStart;
         }
         public virtual void OnUpdate(FrameEventArgs e) { }
-        public virtual void OnRelease() { }
-        public virtual void OnRender(FrameEventArgs e)
+        public virtual void OnRenderBegin(FrameEventArgs e)
         {
             GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
@@ -164,10 +157,6 @@ namespace MyRender.MyEngine
 
         public virtual void OnRenderFinsh(FrameEventArgs e)
         {
-            if (MaterialData != null && MaterialData.ShaderProgram != 0)
-            {
-                GL.UseProgram(0);
-            }
             GL.PopMatrix();
         }
 
@@ -176,6 +165,15 @@ namespace MyRender.MyEngine
         public virtual void OnMouseMove(MouseMoveEventArgs e) { }
         public virtual void OnMouseWheel(MouseWheelEventArgs e) { }
 
+        public virtual void OnRelease()
+        {
+            foreach(var r in RenderList)
+            {
+                r.Release();
+            }
+
+            RenderList.Clear();
+        }
 
         private void effectChildWorldModelMatrix(Matrix4 effect)
         {

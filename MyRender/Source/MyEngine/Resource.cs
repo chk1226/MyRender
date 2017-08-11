@@ -30,6 +30,7 @@ namespace MyRender.MyEngine
             get { return _currentPath; }
         }
         private int errorShader;
+        public int ErrorShader { get { return errorShader; } }
         private readonly string SError = @"Source\Shader\Error.glsl";
         private Dictionary<string, int> _texArray = new Dictionary<string, int>();
         private Dictionary<string, Material> _materialArray = new Dictionary<string, Material>();

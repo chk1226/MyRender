@@ -29,53 +29,27 @@ namespace MyRender.Game
             }
             ModelList[0] = modelData;
 
-            // set material
-            MaterialData = Resource.Instance.CreateSkyboxM();
+            // generate render object
+            Render render = Render.CreateRender(Resource.Instance.CreateSkyboxM(), delegate (Render r) {
+                var m = r.MaterialData;
 
-            //set shader action
-            SetUpShaderAction.Add(skyboxGUID, delegate ()
-            {
-
-                if (MaterialData.ShaderProgram != 0)
+                if (m.ShaderProgram != 0)
                 {
-                    GL.UseProgram(MaterialData.ShaderProgram);
+                    GL.UseProgram(m.ShaderProgram);
 
-                    MaterialData.UniformCubemapTexture("cubemapTexture", TextureUnit.Texture0, Material.TextureType.Cubemap, 0);
+                    m.UniformCubemapTexture("cubemapTexture", TextureUnit.Texture0, Material.TextureType.Cubemap, 0);
 
                 }
-
-            });
-        }
-
-
-        public override void OnRender(FrameEventArgs e)
-        {
-            base.OnRender(e);
-
-            GL.DepthFunc( DepthFunction.Lequal);
-
-            if (MaterialData == null) return;
-            if (SetUpShaderAction.ContainsKey(skyboxGUID)) SetUpShaderAction[skyboxGUID]();
-
-            //GL.Color4(Color4.White);  //byte型で指定
-
-            // bind vertex buffer 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-
-
-            //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureID);
-            GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
-
-            GL.DisableClientState(ArrayCap.VertexArray);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindTexture(TextureTarget.TextureCubeMap, 0);
-
-            GL.DepthFunc(DepthFunction.Less);
+            },
+            this,
+            modelData,
+            Render.Skybox);
+            render.EnableCubemap();
+            render.EnableDepthFunc(DepthFunction.Lequal);
+            RenderList.Add(render);
 
         }
+        
     }
 
 }

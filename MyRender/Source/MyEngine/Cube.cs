@@ -1,15 +1,11 @@
-﻿using MyRender.MyEngine;
-using OpenTK;
-using OpenTK.Graphics;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Runtime.InteropServices;
 
 namespace MyRender.MyEngine
 {
     class Cube : Node
     {
         private readonly string cubeGUID = "cube";
-        private readonly string setShader = "NormalMapping";
 
         public override void OnStart()
         {
@@ -44,71 +40,28 @@ namespace MyRender.MyEngine
             } 
             ModelList[0] = modelData;
 
-            MaterialData = Resource.Instance.CreateBricksM();
+            // generate render object
+            Render render = Render.CreateRender(Resource.Instance.CreateBricksM(), delegate(Render r) {
+                var m = r.MaterialData;
 
-            //set shader action
-            SetUpShaderAction.Add(setShader, delegate()
-            {
-
-                if (MaterialData.ShaderProgram != 0)
+                if (m.ShaderProgram != 0)
                 {
-                    GL.UseProgram(MaterialData.ShaderProgram);
+                    GL.UseProgram(m.ShaderProgram);
 
-                    MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-                    MaterialData.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
+                    m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                    m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
                     var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                    MaterialData.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                    m.UniformMatrix4("VIEW_MAT", ref view_mat, true);
                 }
+            },
+            this,
+            modelData,
+            Render.Normal);
+            render.AddVertexAttribute("tangent", ModelList[0].TangentBuffer, 3, false);
 
-            });
-
+            RenderList.Add(render);
         }
 
-        public override void OnRender(FrameEventArgs e)
-        {
-            base.OnRender(e);
-
-            if (MaterialData == null) return;
-            if (SetUpShaderAction.ContainsKey(setShader)) SetUpShaderAction[setShader]();
-
-            //GL.Color4(Color4.White);  //byte型で指定
-
-            // bind vertex buffer 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-
-            // bind normal buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].NBO);
-            GL.EnableClientState(ArrayCap.NormalArray);
-            GL.NormalPointer(NormalPointerType.Float, 0, 0);
-
-            // bind texture coord buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TBO);
-            GL.EnableClientState(ArrayCap.TextureCoordArray);
-            GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
-
-            // tangent buffer
-            var tangent = GL.GetAttribLocation(MaterialData.ShaderProgram, "tangent");
-            GL.EnableVertexAttribArray(tangent);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TangentBuffer);
-            GL.VertexAttribPointer(tangent, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-
-            //GL.BindTexture(TextureTarget.Texture2D, MaterialData.TextureArray[Material.TextureType.Normal]);
-            GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
-
-            GL.DisableClientState(ArrayCap.VertexArray);
-            GL.DisableClientState(ArrayCap.NormalArray);
-            GL.DisableClientState(ArrayCap.TextureCoordArray);
-
-            GL.DisableVertexAttribArray(tangent);
-
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindTexture(TextureTarget.Texture2D, 0);
-
-        }
 
 
     }

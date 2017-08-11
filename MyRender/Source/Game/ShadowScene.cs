@@ -1,5 +1,6 @@
 ﻿using MyRender.MyEngine;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
 namespace MyRender.Game
@@ -15,10 +16,11 @@ namespace MyRender.Game
             base.OnStart();
 
             var light = new Light();
-            light.Ambient = new Vector4(0.5f, 0.5f, 0.5f, 1);
+            light.Ambient = new Vector4(0.0f, 0.5f, 0.5f, 1);
             light.Specular = new Vector4(0.3f, 0.3f, 0.3f, 1);
             //light.Diffuse = new Vector4(0, 0, 0, 1);
             AddChild(light);
+            light.EnableLightDepthMap();
 
             MainCamera.ResetRotation(-163, 61);
             MainCamera.ResetZoomInOut(15, min_camerz, max_camerz);
@@ -30,7 +32,7 @@ namespace MyRender.Game
             var dae = new HomeModel();
             dae.Loader(Resource.MHouse, false);
             AddChild(dae);
-
+            
 
         }
 

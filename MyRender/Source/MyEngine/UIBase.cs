@@ -33,9 +33,8 @@ namespace MyRender.MyEngine
 
         }
 
-        public override void OnRender(FrameEventArgs e)
+        public override void OnRenderBegin(FrameEventArgs e)
         {
-
             GL.MatrixMode(MatrixMode.Projection);
             GL.PushMatrix();
             var vm = GameDirect.Instance.MainScene.MainCamera.UIProjectMatrix;
@@ -47,17 +46,10 @@ namespace MyRender.MyEngine
             vm = GameDirect.Instance.MainScene.MainCamera.UIViewMatrix * WorldModelMatrix * LocalModelMatrix;
             vm.Transpose();
             GL.LoadMatrix(ref vm);
-
         }
 
         public override void OnRenderFinsh(FrameEventArgs e)
         {
-            if (MaterialData != null && MaterialData.ShaderProgram != 0)
-            {
-                GL.UseProgram(0);
-            }
-
-
             GL.MatrixMode(MatrixMode.Modelview);
             GL.PopMatrix();
             GL.MatrixMode(MatrixMode.Projection);

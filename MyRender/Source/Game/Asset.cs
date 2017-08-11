@@ -17,6 +17,7 @@ namespace MyRender.MyEngine
         public static readonly string SSkybox = @"Source\Shader\Skybox.glsl";
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
         public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";
+        public static readonly string SShadowBlinPhong = @"Source\Shader\ShaodwBlinPhong.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -56,6 +57,7 @@ namespace MyRender.MyEngine
         public static readonly string MSkyboxGUID = "Skybox";
         public static readonly string MPlaneGUID = "Plane";
 
+
         //public static readonly string MUISpriteGUID = "UISprite";
 
         public Material CreatePlaneM()
@@ -69,7 +71,7 @@ namespace MyRender.MyEngine
                 m.guid = guid;
                 m.TextureArray.Add(Material.TextureType.Color, GetTextureID(IUIWhite));
 
-                m.ShaderProgram = GetShader(SBlinPhong);
+                m.ShaderProgram = GetShader(SShadowBlinPhong);
 
                 AddMaterial(m);
             }
@@ -175,6 +177,24 @@ namespace MyRender.MyEngine
 
             return m;
         }
+
+        //public Material CreateDepthRenderM()
+        //{
+        //    var m = GetMaterial(MSkyboxGUID);
+        //    if (m == null)
+        //    {
+        //        m = new Material();
+        //        m.guid = MSkyboxGUID;
+        //        m.TextureArray.Add(Material.TextureType.Cubemap,
+        //            GetCubemapTextureID(ISkybox));
+
+        //        m.ShaderProgram = GetShader(SSkybox);
+
+        //        AddMaterial(m);
+        //    }
+
+        //    return m;
+        //}
 
         public Material CreateUISpriteM(string textureFile)
         {

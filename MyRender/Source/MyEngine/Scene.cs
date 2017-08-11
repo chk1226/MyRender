@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 
 namespace MyRender.MyEngine
 {
@@ -16,6 +17,8 @@ namespace MyRender.MyEngine
                 _mainCamera = value;
             }
         }
+
+        public WeakReference<Light> SceneLight;
 
         public Scene()
         {

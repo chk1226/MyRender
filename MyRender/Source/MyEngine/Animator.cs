@@ -7,14 +7,14 @@ namespace MyRender.MyEngine
 {
     class Animator
     {
-        private WeakReference aniModel;
+        private WeakReference<AnimationModel> aniModel;
 
         private float animationTime = 0;
         private Animation currentAnimation;
 
         public Animator(AnimationModel animationModel)
         {
-            aniModel = new WeakReference(animationModel);
+            aniModel = new WeakReference<AnimationModel>(animationModel);
         }
 
         public void DoAnimation(Animation doAnimation)
@@ -30,8 +30,8 @@ namespace MyRender.MyEngine
             increaseAnimationTime(delta);
             var currentPos = calculateCurrentAnimationPose();
 
-            var entity = aniModel.Target as AnimationModel;
-            if(entity != null)
+            AnimationModel entity;
+            if(aniModel.TryGetTarget(out entity))
             {
                 foreach(var joint in entity.JointHierarchy)
                 {
