@@ -3,14 +3,14 @@ varying vec4 posE;
 varying vec3 normalE;	
 varying vec4 lightPosP;
 
-uniform mat4 LIGHT_PVM;
+uniform mat4 LIGHT_BPVM;
 
 void main(void)
 {
 	posE = gl_ModelViewMatrix * gl_Vertex;
     normalE = gl_NormalMatrix * gl_Normal;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-	lightPosP = LIGHT_PVM * gl_Vertex;
+	lightPosP = LIGHT_BPVM * gl_Vertex;
 
 	gl_Position = ftransform();
 }
@@ -25,20 +25,37 @@ varying vec4 lightPosP;
 uniform mat4 VIEW_MAT;
 
 
+float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
+{
+	// We retrive the two moments previously stored (depth and depth*depth)
+	vec2 moments = texture2D(shadowMap, lPos.xy).rg;
+	
+	// Surface is fully lit. as the current fragment is before the light occluder
+	if (lPos.z - bias <= moments.x)
+		return 1.0 ;
+	
+	// The fragment is either in shadow or penumbra. We now use chebyshev's upperBound to check
+	// How likely this pixel is to be lit (p_max)
+	float variance = moments.y - (moments.x * moments.x);
+	variance = max(variance, 0.00002);
+	
+	float d = (lPos.z - bias) - moments.x;
+	float p_max = variance / (variance + d*d);
+	
+	return p_max;
+}
+
 //parallel light
 vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D shadowMap, vec4 lPos)
 {
 	//ambient
 	vec4 La = gl_LightSource[0].ambient;
 		
-	float visibility = 1.0;
 	lPos = lPos / lPos.w;
+	// bias
 	float bias = 0.001 * tan(acos( dot(normal, dir_l) ));
 	bias = clamp(bias, 0.0, 0.01);
-	if(texture2D(shadowMap, lPos.xy).x < lPos.z - bias)
-	{
-		visibility = 0;
-	}
+	float visibility = chebyshevUpperBound(shadowMap, lPos, bias);
 
 	//diffuse <N,L>*I
 	float dot_value = max( dot( normal, dir_l), 0.0 );
@@ -60,5 +77,5 @@ void main(void)
 	vec3 dirL = normalize( VIEW_MAT * gl_LightSource[0].position).xyz;	
 
 	gl_FragColor = BlinnPhong(color, dirL, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
-
+	//gl_FragColor = texture2D(SHADOWMAP, gl_TexCoord[0].st);
 }

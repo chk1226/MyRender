@@ -8,6 +8,7 @@ namespace MyRender.MyEngine
     class Render
     {
         public static readonly int Prerender = 1500;
+        public static readonly int PrePostrender = 1300;
         public static readonly int Skybox = 1250;
         public static readonly int Normal = 1000;
         public static readonly int UI = 750;

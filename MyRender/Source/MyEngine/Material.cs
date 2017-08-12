@@ -52,6 +52,12 @@ namespace MyRender.MyEngine
             GL.Uniform4(variable, x, y, z, w);
         }
 
+        public void Uniform2(string variableName, float x, float y)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.Uniform2(variable, x, y);
+        }
+
         public void UniformMatrix4(string variableName, ref Matrix4 mat, bool transpose)
         {
             var variable = GL.GetUniformLocation(ShaderProgram, variableName);

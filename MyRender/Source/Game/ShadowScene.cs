@@ -3,6 +3,10 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
+// reference
+// shadowmap http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+// vsm http://fabiensanglard.net/shadowmappingVSM/
+
 namespace MyRender.Game
 {
     class ShadowScene : Scene
@@ -16,21 +20,27 @@ namespace MyRender.Game
             base.OnStart();
 
             var light = new Light();
-            light.Ambient = new Vector4(0.0f, 0.5f, 0.5f, 1);
             light.Specular = new Vector4(0.3f, 0.3f, 0.3f, 1);
-            //light.Diffuse = new Vector4(0, 0, 0, 1);
+            light.Ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             AddChild(light);
-            light.EnableLightDepthMap();
+            light.EnableLightShadowMap();
 
             MainCamera.ResetRotation(-163, 61);
             MainCamera.ResetZoomInOut(15, min_camerz, max_camerz);
 
-            var plane = new Plane(30, 30, 1, 1);
-            plane.LocalPosition = new Vector3(-15, 0, -15);
+            var plane = new Plane(100, 100, 1, 1);
+            plane.LocalPosition = new Vector3(-50, 0, -50);
             AddChild(plane);
+
+            var vp = MainCamera.Viewport;
+            var gaussian = new Plane(vp.Width, vp.Height, 1, 1, Plane.PlaneType.Gaussian);
+            gaussian.LocalPosition = new Vector3(-vp.Width/2.0f, 0, -vp.Height/2.0f);
+            gaussian.Rotation(1,0,0,-90);
+            AddChild(gaussian);
 
             var dae = new HomeModel();
             dae.Loader(Resource.MHouse, false);
+            dae.LocalPosition = new Vector3(0, 5, 0);
             AddChild(dae);
             
 

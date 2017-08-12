@@ -18,6 +18,8 @@ namespace MyRender.MyEngine
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
         public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";
         public static readonly string SShadowBlinPhong = @"Source\Shader\ShaodwBlinPhong.glsl";
+        public static readonly string SVSM = @"Source\Shader\VarianceShadowMap.glsl";
+        public static readonly string SGaussianBlur = @"Source\Shader\GaussianBlur.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";

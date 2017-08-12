@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 namespace MyRender.MyEngine
@@ -17,6 +18,7 @@ namespace MyRender.MyEngine
         /// Diffuse default value is Vector4(0.3f, 0.3f, 0.3f, 1.0f)
         /// </summary>
         public Vector4 Diffuse = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+        public bool EnableSadowmap = false;
 
         private Matrix4 lightViewMatrix;
         private Matrix4 lightProjectMatrix;
@@ -29,7 +31,7 @@ namespace MyRender.MyEngine
         {
             base.OnStart();
 
-            LocalPosition = new Vector3(0, 100, 1);
+            LocalPosition = new Vector3(50, 100, 100);
 
             // Shininess value is problem, sometime shader can't get value
             //GL.Material(MaterialFace.Front, MaterialParameter.Shininess, 64);
@@ -52,16 +54,17 @@ namespace MyRender.MyEngine
             GL.Light(LightName.Light0, LightParameter.Specular, Specular);
         }
 
-        public Matrix4 LightProjectView()
+        public Matrix4 LightBiasProjectView()
         {
             return biasMatrix * lightProjectMatrix * lightViewMatrix;
         }
 
-        public void EnableLightDepthMap()
+        public void EnableLightShadowMap()
         {
+            EnableSadowmap = true;
             // generate render object
             var material = new Material();
-            material.ShaderProgram = Resource.Instance.ErrorShader;
+            material.ShaderProgram = Resource.Instance.GetShader(Resource.SVSM);
             Render render = Render.CreateRender(material, delegate (Render r) {
                 var m = r.MaterialData;
 
@@ -92,7 +95,7 @@ namespace MyRender.MyEngine
             regProjectMatrix = GameDirect.Instance.MainScene.MainCamera.ProjectMatix;
             GameDirect.Instance.MainScene.MainCamera.ProjectMatix = lightProjectMatrix;
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, GameDirect.Instance.DepthBuffer.FB);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, GameDirect.Instance.DepthColor32fRG.FB);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
         }
@@ -102,6 +105,7 @@ namespace MyRender.MyEngine
             GameDirect.Instance.MainScene.MainCamera.ViewMatrix = regViewMatrix;
             GameDirect.Instance.MainScene.MainCamera.ProjectMatix = regProjectMatrix;
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
 
         }
 

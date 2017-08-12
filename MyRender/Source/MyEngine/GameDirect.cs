@@ -30,21 +30,37 @@ namespace MyRender.MyEngine
         }
 
         private List<Render> _prerenderList = new List<Render>(50);
+        private List<Render> _prepostrenderList = new List<Render>(10);
         private List<Render> _renderList = new List<Render>(100);
         private List<Render> _postrenderList = new List<Render>(50);
 
-        private FrameBuffer depthBuffer;
-        public FrameBuffer DepthBuffer
+        private FrameBuffer depthColor32fRG;
+        public FrameBuffer DepthColor32fRG
         {
             get
             {
-                if(depthBuffer == null)
+                if (depthColor32fRG == null)
                 {
-                    depthBuffer= new FrameBuffer();
-                    depthBuffer.GenDepthBuffer();
+                    depthColor32fRG = new FrameBuffer();
+                    depthColor32fRG.GenDepthColor32fRG();
                 }
 
-                return depthBuffer;
+                return depthColor32fRG;
+            }
+        }
+
+        private FrameBuffer color32fRG;
+        public FrameBuffer Color32fRG
+        {
+            get
+            {
+                if (color32fRG == null)
+                {
+                    color32fRG = new FrameBuffer();
+                    color32fRG.GenColor32fRG();
+                }
+
+                return color32fRG;
             }
         }
 
@@ -112,6 +128,7 @@ namespace MyRender.MyEngine
         private void doTraverseTree()
         {
             _prerenderList.Clear();
+            _prepostrenderList.Clear();
             _renderList.Clear();
             _postrenderList.Clear();
 
@@ -150,6 +167,10 @@ namespace MyRender.MyEngine
                     {
                         _prerenderList.Add(render);
                     }
+                    else if(render.Priority >= Render.PrePostrender)
+                    {
+                        _prepostrenderList.Add(render);
+                    }
                     else if(render.Priority <= Render.Postrender)
                     {
                         _postrenderList.Add(render);
@@ -175,6 +196,22 @@ namespace MyRender.MyEngine
         {
             // prerender sort
             _prerenderList.Sort(delegate (Render x, Render y)
+            {
+                if (x.Priority > y.Priority)
+                {
+                    return -1;
+                }
+                else if (x.Priority < y.Priority)
+                {
+                    return 1;
+                }
+
+                return 0;
+
+            });
+
+            // pre post render sort
+            _prepostrenderList.Sort(delegate (Render x, Render y)
             {
                 if (x.Priority > y.Priority)
                 {
@@ -248,18 +285,34 @@ namespace MyRender.MyEngine
 
                 foreach(var render in _renderList)
                 {
-                    render.ReplaceRender = pre;
-                    render.OnRenderBegin(e);
-                    render.OnRender(e);
-                    render.OnRenderFinsh(e);
+                    if(render.Priority == Render.Normal)
+                    {
+                        render.ReplaceRender = pre;
+                        render.OnRenderBegin(e);
+                        render.OnRender(e);
+                        render.OnRenderFinsh(e);
+                    }
                 }
 
                 // prerender end
                 pre.OnRenderFinsh(e);
+                
             }
 
 
         }
+
+        private void doPrepostrender(FrameEventArgs e)
+        {
+            foreach (var prepost in _prepostrenderList)
+            {
+                prepost.OnRenderBegin(e);
+                prepost.OnRender(e);
+                prepost.OnRenderFinsh(e);
+
+            }
+        }
+
 
         private void doRender(FrameEventArgs e)
         {
@@ -291,6 +344,9 @@ namespace MyRender.MyEngine
             // prerender
             doPrerender(e);
 
+            // prepost render
+            doPrepostrender(e);
+
             doRender(e);
 
             // postrender
@@ -299,9 +355,15 @@ namespace MyRender.MyEngine
 
         private void releaseFrameBuffer()
         {
-            if(depthBuffer != null)
+
+            if(depthColor32fRG != null)
             {
-                depthBuffer.OnRelease();
+                depthColor32fRG.OnRelease();
+            }
+
+            if(color32fRG != null)
+            {
+                color32fRG.OnRelease();
             }
         }
 
