@@ -46,8 +46,12 @@ namespace MyRender.Game
                             layer = 1;
                         }
 
-                        var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                        m.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                        Light Light;
+                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out Light))
+                        {
+                            var dir = Light.GetDirectVector();
+                            m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                        }
 
                         var joints = Animation.HashJoint[layer];
                         for (int i = 0; i < joints.Length; i++)

@@ -31,7 +31,7 @@ namespace MyRender.MyEngine
         {
             base.OnStart();
 
-            LocalPosition = new Vector3(50, 100, 100);
+            LocalPosition = new Vector3(0, 100, 100);
 
             // Shininess value is problem, sometime shader can't get value
             //GL.Material(MaterialFace.Front, MaterialParameter.Shininess, 64);
@@ -48,7 +48,7 @@ namespace MyRender.MyEngine
 
         public void SetupLight()
         {
-            GL.Light(LightName.Light0, LightParameter.Position, new Vector4(LocalPosition, 1));
+            //GL.Light(LightName.Light0, LightParameter.Position, new Vector4(LocalPosition, 1));
             GL.Light(LightName.Light0, LightParameter.Ambient, Ambient);
             GL.Light(LightName.Light0, LightParameter.Diffuse, Diffuse);
             GL.Light(LightName.Light0, LightParameter.Specular, Specular);
@@ -107,6 +107,14 @@ namespace MyRender.MyEngine
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
 
+        }
+
+        public Vector3 GetDirectVector()
+        {
+            var p = new Vector4(LocalPosition, 0);
+            p = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * p;
+            p.Normalize();
+            return p.Xyz;
         }
 
     }

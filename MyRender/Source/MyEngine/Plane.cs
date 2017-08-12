@@ -16,14 +16,16 @@ namespace MyRender.MyEngine
         private Vector2 rect;
         private int sliceX;
         private int sliceY;
-        private PlaneType planeType;
+        private PlaneType planeType = PlaneType.Normal;
+        private FrameBuffer useFrame;
+        private FrameBuffer bindFrame;
 
-        public Plane(float width, float height, uint sliceX, uint sliceY, PlaneType type = PlaneType.Normal)
+
+        public Plane(float width, float height, uint sliceX, uint sliceY)
         {
             rect = new Vector2(width, height);
             this.sliceX = (int)sliceX;
             this.sliceY = (int)sliceY;
-            planeType = type;
             ModelList = new Model[1];
 
             var modelData = Resource.Instance.GetModel(GUID);
@@ -47,6 +49,23 @@ namespace MyRender.MyEngine
                 Resource.Instance.AddModel(modelData);
             }
             ModelList[0] = modelData;
+        }
+
+        public void SetPlaneType(PlaneType type)
+        {
+            planeType = type;
+        }
+
+        public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
+        {
+            useFrame = use;
+            bindFrame = bind;
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+            var modelData = ModelList[0];
 
             // generate render object
             if (planeType == PlaneType.Normal)
@@ -59,14 +78,15 @@ namespace MyRender.MyEngine
                         GL.UseProgram(m.ShaderProgram);
 
                         m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-                        var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                        m.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+
                         Light light;
                         if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                         {
-                            if(light.EnableSadowmap)
+                            var dir = light.GetDirectVector();
+                            m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                            if (light.EnableSadowmap)
                             {
-                                m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, GameDirect.Instance.Color32fRG.CB_Texture, 1);
+                                if(useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
                                 var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
                                 m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
                             }
@@ -80,7 +100,7 @@ namespace MyRender.MyEngine
 
                 RenderList.Add(render);
             }
-            else if(planeType == PlaneType.Gaussian)
+            else if (planeType == PlaneType.Gaussian)
             {
                 var material = new Material();
                 material.ShaderProgram = Resource.Instance.GetShader(Resource.SGaussianBlur);
@@ -90,8 +110,8 @@ namespace MyRender.MyEngine
                     if (m.ShaderProgram != 0)
                     {
                         GL.UseProgram(m.ShaderProgram);
-                        
-                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, GameDirect.Instance.DepthColor32fRG.CB_Texture, 0);
+
+                        if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
                         var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
                         m.Uniform2("Offset", 1.0f / vp.Width, 1.0f / vp.Height);
                     }
@@ -102,7 +122,6 @@ namespace MyRender.MyEngine
 
                 RenderList.Add(render);
             }
-
         }
 
         public override void OnRenderBegin(FrameEventArgs e)
@@ -113,7 +132,7 @@ namespace MyRender.MyEngine
             }
             else if(planeType == PlaneType.Gaussian)
             {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, GameDirect.Instance.Color32fRG.FB);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindFrame.FB);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
 
                 GL.MatrixMode(MatrixMode.Projection);

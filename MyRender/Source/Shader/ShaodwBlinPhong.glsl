@@ -22,7 +22,7 @@ uniform sampler2D SHADOWMAP;
 varying vec4 posE;	
 varying vec3 normalE;
 varying vec4 lightPosP;
-uniform mat4 VIEW_MAT;
+uniform vec3 DIR_LIGHT;
 
 
 float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
@@ -73,9 +73,8 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D sha
 void main(void)
 {
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
-	// parallel light
-	vec3 dirL = normalize( VIEW_MAT * gl_LightSource[0].position).xyz;	
 
-	gl_FragColor = BlinnPhong(color, dirL, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
+	// parallel light
+	gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
 	//gl_FragColor = texture2D(SHADOWMAP, gl_TexCoord[0].st);
 }

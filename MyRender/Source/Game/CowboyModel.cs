@@ -29,8 +29,12 @@ namespace MyRender.Game
 
                         m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
                         m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture1, Material.TextureType.Normal, 1);
-                        var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                        m.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                        Light Light;
+                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out Light))
+                        {
+                            var dir = Light.GetDirectVector();
+                            m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                        }
 
                         var joints = Animation.HashJoint[0];
                         for (int i = 0; i < joints.Length; i++)

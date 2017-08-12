@@ -31,6 +31,7 @@ namespace MyRender.MyEngine
             this.zNear = zNear;
             this.zFar = zFar;
             _projectMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fovy), aspect, zNear, zFar);
+
             _projectMatrix.Transpose();
 
             // Setup a view matrix
@@ -74,7 +75,7 @@ namespace MyRender.MyEngine
         public Matrix4 ProjectMatix
         {
             get { return _projectMatrix;}
-            private set {
+            set {
                 _projectMatrix = value;
                 GL.MatrixMode(MatrixMode.Projection);
                 var t = Matrix4.Transpose(this._projectMatrix);
@@ -142,11 +143,13 @@ namespace MyRender.MyEngine
 
         public void RotationScreen(float a_x, float a_y)
         {
-
+            
             eye_rotation.X += a_x;
             eye_rotation.Y += a_y;
 
             applyRotation();
+
+            //Log.Print(eye_rotation.ToString());
         }
 
         public void ResetRotation(float x, float y)

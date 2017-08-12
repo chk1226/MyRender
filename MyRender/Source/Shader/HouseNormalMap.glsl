@@ -21,7 +21,7 @@ void main(void)
 @fragment shader
 uniform sampler2D NORMAL_TEX_COLOR;
 uniform sampler2D TEX_SPECULAR;
-uniform mat4 VIEW_MAT;
+uniform vec3 DIR_LIGHT;
 
 varying vec4 posE;	
 varying vec3 normalE;
@@ -57,11 +57,10 @@ void main(void)
 	vec3 b = normalize(cross(normalE, t));
 
 	// parallel light
-	vec3 dirL = normalize( VIEW_MAT * gl_LightSource[0].position).xyz;	
 	vec3 dirL_tbn;
-	dirL_tbn.x = dot(dirL, t); 
-    dirL_tbn.y = dot(dirL, b); 
-    dirL_tbn.z = dot(dirL, normalE); 
+	dirL_tbn.x = dot(DIR_LIGHT, t); 
+    dirL_tbn.y = dot(DIR_LIGHT, b); 
+    dirL_tbn.z = dot(DIR_LIGHT, normalE); 
 
 	// eye_tbn
 	vec3 eye_tbn;

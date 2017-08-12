@@ -27,8 +27,12 @@ namespace MyRender.Game
                         //MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
                         m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Normal, 0);
                         m.UniformTexture("TEX_SPECULAR", TextureUnit.Texture1, Material.TextureType.Specular, 1);
-                        var view_mat = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
-                        m.UniformMatrix4("VIEW_MAT", ref view_mat, true);
+                        Light Light;
+                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out Light))
+                        {
+                            var dir = Light.GetDirectVector();
+                            m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                        }
 
                     }
                 },
