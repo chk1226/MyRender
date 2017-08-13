@@ -58,6 +58,12 @@ namespace MyRender.MyEngine
             GL.Uniform4(variable, x, y, z, w);
         }
 
+        public void Uniform1(string variableName, float x)
+        {
+            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+            GL.Uniform1(variable, x);
+        }
+
         public void Uniform2(string variableName, float x, float y)
         {
             var variable = GL.GetUniformLocation(ShaderProgram, variableName);

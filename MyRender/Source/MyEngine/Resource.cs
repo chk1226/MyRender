@@ -37,7 +37,7 @@ namespace MyRender.MyEngine
         private Dictionary<string, Model> _modellArray = new Dictionary<string, Model>();
         private Dictionary<string, int> _shaderArray = new Dictionary<string, int>();
         private Dictionary<string, UIFont.Glyphes> _fontArray = new Dictionary<string, UIFont.Glyphes>();
-
+        private Dictionary<FrameBuffer.Type, FrameBuffer> _frameBuffer = new Dictionary<FrameBuffer.Type, FrameBuffer>();
 
         private string[] cubemapOrder = { "rt", "lf", "up", "dn", "bk", "ft" };
 
@@ -47,6 +47,42 @@ namespace MyRender.MyEngine
 
             _currentPath = _currentPath.Remove(_currentPath.IndexOf("bin"));
             errorShader = SetUpShader(SError);
+        }
+
+        public FrameBuffer GetFrameBuffer(FrameBuffer.Type type)
+        {
+            if(_frameBuffer.ContainsKey(type))
+            {
+                return _frameBuffer[type];
+            }
+
+            FrameBuffer f = new FrameBuffer();
+            switch(type)
+            {
+                case FrameBuffer.Type.ShadowmapFrame:
+                    f.GenShadowmapFrame();
+                    f.type = FrameBuffer.Type.ShadowmapFrame;
+                    break;
+                case FrameBuffer.Type.GaussianXFrame:
+                    f.GenGaussianFrame();
+                    f.type = FrameBuffer.Type.GaussianXFrame;
+                    break;
+                case FrameBuffer.Type.GaussianYFrame:
+                    f.GenGaussianFrame();
+                    f.type = FrameBuffer.Type.GaussianYFrame;
+                    break;
+
+                default:
+                    f = null;
+                    break;
+            }
+
+            if( f != null)
+            {
+                _frameBuffer.Add(f.type, f);
+            }
+
+            return f;
         }
 
         public UIFont.Glyphes GetFont(string bitmap, string xml)
@@ -406,6 +442,15 @@ namespace MyRender.MyEngine
             _fontArray.Clear();
         }
 
+        public void ReleaseFrameBuffer()
+        {
+            foreach (var m in _frameBuffer)
+            {
+                m.Value.Release();
+            }
+            _frameBuffer.Clear();
+        }
+
         public void OnRelease()
         {
             ReleaseTextures();
@@ -413,6 +458,7 @@ namespace MyRender.MyEngine
             ReleaseModels();
             ReleaseShaders();
             ReleaseFont();
+            ReleaseFrameBuffer();
             GL.DeleteProgram(errorShader);
         }
     }

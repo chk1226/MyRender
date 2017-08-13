@@ -25,7 +25,8 @@ namespace MyRender.Game
                     {
                         GL.UseProgram(m.ShaderProgram);
 
-                        m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Normal, 0);
+                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+                        //m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Normal, 0);
                         Light light;
                         if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                         {
@@ -44,7 +45,7 @@ namespace MyRender.Game
                 this,
                 model,
                 Render.Normal);
-                render.AddVertexAttribute("tangent", model.TangentBuffer, 3, false);
+                //render.AddVertexAttribute("tangent", model.TangentBuffer, 3, false);
 
                 RenderList.Add(render);
 

@@ -17,6 +17,7 @@ namespace MyRender.MyEngine
         private int sliceX;
         private int sliceY;
         private PlaneType planeType = PlaneType.Normal;
+        private bool isHorizontal;
         private FrameBuffer useFrame;
         private FrameBuffer bindFrame;
 
@@ -51,9 +52,10 @@ namespace MyRender.MyEngine
             ModelList[0] = modelData;
         }
 
-        public void SetPlaneType(PlaneType type)
+        public void SetPlaneType(PlaneType type, bool horizontal)
         {
             planeType = type;
+            isHorizontal = horizontal;
         }
 
         public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
@@ -86,7 +88,7 @@ namespace MyRender.MyEngine
                             m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
                             if (light.EnableSadowmap)
                             {
-                                if(useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
+                                if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
                                 var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
                                 m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
                             }
@@ -104,7 +106,8 @@ namespace MyRender.MyEngine
             {
                 var material = new Material();
                 material.ShaderProgram = Resource.Instance.GetShader(Resource.SGaussianBlur);
-                Render render = Render.CreateRender(material, delegate (Render r) {
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
                     var m = r.MaterialData;
 
                     if (m.ShaderProgram != 0)
@@ -113,12 +116,20 @@ namespace MyRender.MyEngine
 
                         if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
                         var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
-                        m.Uniform2("Offset", 1.0f / vp.Width, 1.0f / vp.Height);
+                        if(isHorizontal)
+                        {
+                            m.Uniform2("Offset", 0, 1.0f / vp.Height);
+                        }
+                        else
+                        {
+                            m.Uniform2("Offset", 1.0f / vp.Width, 0);
+                        }
+
                     }
                 },
                 this,
                 modelData,
-                Render.PrePostrender);
+                (isHorizontal) ? Render.PrePostrender : Render.PrePostrender + 1);
 
                 RenderList.Add(render);
             }
@@ -191,20 +202,20 @@ namespace MyRender.MyEngine
                 {
                     current.X = j * offset.X;
 
-                    model.Vertices[i * (sliceX * 4) + j * 4] = new Vector3(current.X, 0, current.Y + offset.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 1] = new Vector3(current.X, 0, current.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 2] = new Vector3(current.X + offset.X, 0, current.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 3] = new Vector3(current.X + offset.X, 0, current.Y + offset.Y);
+                    model.Vertices[i * (sliceX * 4) + j * 4] = new Vector3(current.X, 0, current.Y);
+                    model.Vertices[i * (sliceX * 4) + j * 4 + 1] = new Vector3(current.X, 0, current.Y + offset.Y);
+                    model.Vertices[i * (sliceX * 4) + j * 4 + 2] = new Vector3(current.X + offset.X, 0, current.Y + offset.Y);
+                    model.Vertices[i * (sliceX * 4) + j * 4 + 3] = new Vector3(current.X + offset.X, 0, current.Y);
 
                     model.Normals[i * (sliceX * 4) + j * 4] = Vector3.UnitY;
                     model.Normals[i * (sliceX * 4) + j * 4 + 1] = Vector3.UnitY;
                     model.Normals[i * (sliceX * 4) + j * 4 + 2] = Vector3.UnitY;
                     model.Normals[i * (sliceX * 4) + j * 4 + 3] = Vector3.UnitY;
 
-                    model.Texcoords[i * (sliceX * 4) + j * 4] = new Vector2(0, 1);
-                    model.Texcoords[i * (sliceX * 4) + j * 4 + 1] = new Vector2(0, 0);
-                    model.Texcoords[i * (sliceX * 4) + j * 4 + 2] = new Vector2(1, 0);
-                    model.Texcoords[i * (sliceX * 4) + j * 4 + 3] = new Vector2(1, 1);
+                    model.Texcoords[i * (sliceX * 4) + j * 4] = new Vector2(0, 0);
+                    model.Texcoords[i * (sliceX * 4) + j * 4 + 1] = new Vector2(0, 1);
+                    model.Texcoords[i * (sliceX * 4) + j * 4 + 2] = new Vector2(1, 1);
+                    model.Texcoords[i * (sliceX * 4) + j * 4 + 3] = new Vector2(1, 0);
 
 
                 }

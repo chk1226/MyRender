@@ -34,51 +34,6 @@ namespace MyRender.MyEngine
         private List<Render> _renderList = new List<Render>(100);
         private List<Render> _postrenderList = new List<Render>(50);
 
-        private FrameBuffer depthColor32fRG;
-        public FrameBuffer DepthColor32fRG
-        {
-            get
-            {
-                if (depthColor32fRG == null)
-                {
-                    depthColor32fRG = new FrameBuffer();
-                    depthColor32fRG.GenDepthColor32fRG();
-                }
-
-                return depthColor32fRG;
-            }
-        }
-
-        private FrameBuffer color32fRG;
-        public FrameBuffer Color32fRG
-        {
-            get
-            {
-                if (color32fRG == null)
-                {
-                    color32fRG = new FrameBuffer();
-                    color32fRG.GenColor32fRG();
-                }
-
-                return color32fRG;
-            }
-        }
-
-        private FrameBuffer depthBuffer;
-        public FrameBuffer DepthBudder
-        {
-            get
-            {
-                if (depthBuffer == null)
-                {
-                    depthBuffer = new FrameBuffer();
-                    depthBuffer.GenDepthBuffer();
-                }
-
-                return depthBuffer;
-            }
-        }
-
         public event Action<FrameEventArgs> OnUpdate;
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseButtonEventArgs> OnMouseUp;
@@ -91,8 +46,7 @@ namespace MyRender.MyEngine
 
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
-            //GL.Enable(EnableCap.CullFace);
-            //GL.CullFace( CullFaceMode.Front);
+
         }
 
         public void OnRelease()
@@ -119,7 +73,7 @@ namespace MyRender.MyEngine
                     Resource.Instance.ReleaseMaterial();
                     Resource.Instance.ReleaseModels();
                     Resource.Instance.ReleaseFont();
-                    releaseFrameBuffer();
+                    Resource.Instance.ReleaseFrameBuffer();
 
                 }
 
@@ -366,25 +320,6 @@ namespace MyRender.MyEngine
 
             // postrender
             //TODO
-        }
-
-        private void releaseFrameBuffer()
-        {
-
-            if(depthColor32fRG != null)
-            {
-                depthColor32fRG.OnRelease();
-            }
-
-            if(color32fRG != null)
-            {
-                color32fRG.OnRelease();
-            }
-
-            if(depthBuffer != null)
-            {
-                depthBuffer.OnRelease();
-            }
         }
 
     }

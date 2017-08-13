@@ -20,29 +20,63 @@ namespace MyRender.Game
             base.OnStart();
 
             var light = new Light();
-            light.Specular = new Vector4(0.3f, 0.3f, 0.3f, 1);
-            light.Ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+            //light.Specular = new Vector4(0.3f, 0.3f, 0.3f, 1);
+            light.Ambient = new Vector4(0.7f, 0.7f, 0.7f, 1.0f);
             AddChild(light);
             light.EnableLightShadowMap();
 
-            MainCamera.ResetRotation(-163, 61);
+            MainCamera.ResetRotation(0, 61);
             MainCamera.ResetZoomInOut(15, min_camerz, max_camerz);
 
-            var plane = new Plane(100, 100, 1, 1);
-            plane.LocalPosition = new Vector3(-50, 0, -50);
-            AddChild(plane);
-
-            var vp = MainCamera.Viewport;
-            var gaussian = new Plane(vp.Width, vp.Height, 1, 1, Plane.PlaneType.Gaussian);
-            gaussian.LocalPosition = new Vector3(-vp.Width/2.0f, 0, -vp.Height/2.0f);
-            gaussian.Rotation(1,0,0,-90);
-            AddChild(gaussian);
+            var skybox = new Skybox();
+            skybox.Scale(70, 70, 70);
+            AddChild(skybox);
 
             var dae = new HomeModel();
             dae.Loader(Resource.MHouse, false);
-            dae.LocalPosition = new Vector3(0, 5, 0);
+            dae.LocalPosition = new Vector3(0, 0, 0);
+            dae.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
             AddChild(dae);
-            
+
+            var plane = new Plane(100, 100, 1, 1);
+            plane.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame), null);
+            plane.LocalPosition = new Vector3(-50, 0, -50);
+            AddChild(plane);
+
+            //var cube = new Cube();
+            //cube.LocalPosition = new Vector3(0, 1, 0);
+            //AddChild(cube);
+
+            //cube = new Cube();
+            //cube.LocalPosition = new Vector3(1, 3, 1);
+            //AddChild(cube);
+
+            //plane = new Plane(10, 10, 1, 1);
+            //plane.SetFrameBuffer(GameDirect.Instance.DepthBudder, null);
+            //plane.LocalPosition = new Vector3(0, 3, 0);
+            //AddChild(plane);
+
+            //plane = new Plane(5, 5, 1, 1);
+            //plane.SetFrameBuffer(GameDirect.Instance.DepthBudder, null);
+            //plane.LocalPosition = new Vector3(2, 5, 2);
+            //AddChild(plane);
+
+            var vp = MainCamera.Viewport;
+            var gaussian = new Plane(vp.Width, vp.Height, 1, 1);
+            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, false);
+            gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
+            gaussian.Rotation(1, 0, 0, -90);
+            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer( FrameBuffer.Type.ShadowmapFrame),
+                Resource.Instance.GetFrameBuffer( FrameBuffer.Type.GaussianXFrame));
+            AddChild(gaussian);
+
+            gaussian = new Plane(vp.Width, vp.Height, 1, 1);
+            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, true);
+            gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
+            gaussian.Rotation(1, 0, 0, -90);
+            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
+            AddChild(gaussian);
 
         }
 

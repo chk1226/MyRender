@@ -33,6 +33,10 @@ float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
 	// Surface is fully lit. as the current fragment is before the light occluder
 	if (lPos.z - bias <= moments.x)
 		return 1.0 ;
+
+	// prevent over sampling problem 
+	if(lPos.z >= 1.0)
+		return 1.0;
 	
 	// The fragment is either in shadow or penumbra. We now use chebyshev's upperBound to check
 	// How likely this pixel is to be lit (p_max)
@@ -56,12 +60,6 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D sha
 	float bias = 0.001 * tan(acos( dot(normal, dir_l) ));
 	bias = clamp(bias, 0.0, 0.01);
 	float visibility = chebyshevUpperBound(shadowMap, lPos, bias);
-	//float visibility = 0;
-	//if(texture2D(SHADOWMAP, lPos.xy).x >= lPos.z - bias)
-	//{
-	//	visibility = 1;
-	//}
-
 
 
 	//diffuse <N,L>*I
@@ -83,4 +81,6 @@ void main(void)
 
 	// parallel light
 	gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
+
+	//gl_FragColor = texture2D(SHADOWMAP, gl_TexCoord[0].st);
 }

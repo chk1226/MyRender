@@ -35,7 +35,8 @@ namespace MyRender.MyEngine
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
         public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
         public static readonly string IHouseNormal = @"Asset\model\house\N.png";
-        public static readonly string IHouseSpecular = @"Asset\model\house\S.png";
+        //public static readonly string IHouseSpecular = @"Asset\model\house\S.png";
+        public static readonly string IHouseColor = @"Asset\model\house\C.png";
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
         public static readonly string IUISprite = @"Asset\Image\sprite.png";
         public static readonly string IUIBlack = @"Asset\Image\black.png";
@@ -152,10 +153,11 @@ namespace MyRender.MyEngine
             {
                 m = new Material();
                 m.guid = MHomeGUID;
-                m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IHouseNormal));
+                //m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IHouseNormal));
                 //m.TextureArray.Add(Material.TextureType.Specular, GetTextureID(IHouseSpecular));
+                m.TextureArray.Add(Material.TextureType.Color, GetTextureID(IUIWhite));
 
-                m.ShaderProgram = GetShader(SHouseNormalmap);
+                m.ShaderProgram = GetShader(SShadowBlinPhong);
 
                 //m.ShaderProgram = GetShader(SShadowBlinPhong);
 
