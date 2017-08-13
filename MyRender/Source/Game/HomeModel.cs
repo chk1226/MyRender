@@ -6,6 +6,8 @@ namespace MyRender.Game
 {
     class HomeModel : DaeModel
     {
+        private FrameBuffer useFrame;
+
         public override bool Loader(string path, bool loadAnimation = true)
         {
             var result = base.Loader(path, loadAnimation);
@@ -19,19 +21,22 @@ namespace MyRender.Game
                 Render render = Render.CreateRender(Resource.Instance.CreateHomeM(), delegate (Render r)
                 {
                     var m = r.MaterialData;
-
                     if (m.ShaderProgram != 0)
                     {
                         GL.UseProgram(m.ShaderProgram);
 
-                        //MaterialData.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
                         m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Normal, 0);
-                        m.UniformTexture("TEX_SPECULAR", TextureUnit.Texture1, Material.TextureType.Specular, 1);
-                        Light Light;
-                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out Light))
+                        Light light;
+                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                         {
-                            var dir = Light.GetDirectVector();
+                            var dir = light.GetDirectVector();
                             m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                            if (light.EnableSadowmap)
+                            {
+                                if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
+                                var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
+                                m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
+                            }
                         }
 
                     }
@@ -49,6 +54,9 @@ namespace MyRender.Game
             return true;
         }
 
-
+        public void SetFrameBuffer(FrameBuffer use)
+        {
+            useFrame = use;
+        }
     }
 }

@@ -109,55 +109,50 @@ namespace MyRender.MyEngine
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
-        //public void GenDepthBuffer()
-        //{
-        //    GenDepthTexture();
+        public void GenDepthBuffer()
+        {
+            DB_Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, DB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                                TextureParameterName.TextureMinFilter,
+                                (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.Clamp);
 
-        //    //frame buffer
-        //    FB = GL.GenFramebuffer();
-        //    GL.BindFramebuffer(FramebufferTarget.Framebuffer, FB);
-        //    GL.FramebufferTexture2D( FramebufferTarget.Framebuffer,
-        //                                FramebufferAttachment.DepthAttachment,
-        //                                TextureTarget.Texture2D,
-        //                                DB_Texture, 0);
-        //    GL.DrawBuffer(DrawBufferMode.None);
+            var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+            PixelInternalFormat.DepthComponent,
+            vp.Width,
+            vp.Height,
+            0,
+            PixelFormat.DepthComponent,
+            PixelType.Float,
+            IntPtr.Zero);
 
-        //    if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
-        //        Log.Print("GenDepthBuffer fail...");
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
-        //    GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            //frame buffer
+            FB = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FB);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+                                        FramebufferAttachment.DepthAttachment,
+                                        TextureTarget.Texture2D,
+                                        DB_Texture, 0);
+            GL.DrawBuffer(DrawBufferMode.None);
 
-        //}
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                Log.Print("GenDepthBuffer fail...");
 
-        //public void GenDepthTexture()
-        //{
-        //    DB_Texture = GL.GenTexture();
-        //    GL.BindTexture(TextureTarget.Texture2D, DB_Texture);
-        //    GL.TexParameter(TextureTarget.Texture2D,
-        //                        TextureParameterName.TextureMinFilter,
-        //                        (int)TextureMinFilter.Linear);
-        //    GL.TexParameter(TextureTarget.Texture2D,
-        //                    TextureParameterName.TextureMagFilter,
-        //                    (int)TextureMagFilter.Linear);
-        //    GL.TexParameter(TextureTarget.Texture2D,
-        //                    TextureParameterName.TextureWrapS,
-        //                    (int)TextureWrapMode.Clamp);
-        //    GL.TexParameter(TextureTarget.Texture2D,
-        //                    TextureParameterName.TextureWrapT,
-        //                    (int)TextureWrapMode.Clamp);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-        //    var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
-        //    GL.TexImage2D(TextureTarget.Texture2D, 0,
-        //    PixelInternalFormat.DepthComponent,
-        //    vp.Width,
-        //    vp.Height,
-        //    0, 
-        //    PixelFormat.DepthComponent,
-        //    PixelType.Float, 
-        //    IntPtr.Zero);
-
-        //    GL.BindTexture(TextureTarget.Texture2D, 0);
-        //}
+        }
 
         public void OnRelease()
         {

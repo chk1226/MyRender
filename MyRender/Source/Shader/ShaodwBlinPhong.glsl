@@ -18,11 +18,11 @@ void main(void)
 @fragment shader
 uniform sampler2D TEX_COLOR;
 uniform sampler2D SHADOWMAP;
+uniform vec3 DIR_LIGHT;
 
 varying vec4 posE;	
 varying vec3 normalE;
 varying vec4 lightPosP;
-uniform vec3 DIR_LIGHT;
 
 
 float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
@@ -56,6 +56,13 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D sha
 	float bias = 0.001 * tan(acos( dot(normal, dir_l) ));
 	bias = clamp(bias, 0.0, 0.01);
 	float visibility = chebyshevUpperBound(shadowMap, lPos, bias);
+	//float visibility = 0;
+	//if(texture2D(SHADOWMAP, lPos.xy).x >= lPos.z - bias)
+	//{
+	//	visibility = 1;
+	//}
+
+
 
 	//diffuse <N,L>*I
 	float dot_value = max( dot( normal, dir_l), 0.0 );
@@ -76,5 +83,4 @@ void main(void)
 
 	// parallel light
 	gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
-	//gl_FragColor = texture2D(SHADOWMAP, gl_TexCoord[0].st);
 }

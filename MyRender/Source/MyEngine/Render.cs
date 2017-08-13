@@ -137,7 +137,7 @@ namespace MyRender.MyEngine
                 GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
             }
 
-            // bind Vertex Attrib Array
+            // bind Vertex Attribute Array
             foreach (var va in vertexAttribute)
             {
                 va.BindVertexAttribute();

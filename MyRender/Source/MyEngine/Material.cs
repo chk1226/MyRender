@@ -27,15 +27,21 @@ namespace MyRender.MyEngine
 
         public void UniformCubemapTexture(string variableName, TextureUnit texId, Material.TextureType bindType, int value)
         {
-            var variable = GL.GetUniformLocation(ShaderProgram, variableName);
-            GL.ActiveTexture(texId);
-            GL.BindTexture(TextureTarget.TextureCubeMap, TextureArray[bindType]);
-            GL.Uniform1(variable, value);
+            if (TextureArray.ContainsKey(bindType))
+            {
+                var variable = GL.GetUniformLocation(ShaderProgram, variableName);
+                GL.ActiveTexture(texId);
+                GL.BindTexture(TextureTarget.TextureCubeMap, TextureArray[bindType]);
+                GL.Uniform1(variable, value);
+            }
         }
 
         public void UniformTexture(string variableName, TextureUnit texId, Material.TextureType bindType, int value)
         {
-            UniformTexture(variableName, texId, TextureArray[bindType], value);
+            if(TextureArray.ContainsKey(bindType))
+            {
+                UniformTexture(variableName, texId, TextureArray[bindType], value);
+            }
         }
 
         public void UniformTexture(string variableName, TextureUnit texId, int bindID, int value)

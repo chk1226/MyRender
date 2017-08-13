@@ -95,6 +95,7 @@ namespace MyRender.MyEngine
                 m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IBricksNormal));
                 //m.ShaderProgram = GetShader(SBlinPhong);
                 m.ShaderProgram = GetShader(SNormalmap);
+                //m.ShaderProgram = GetShader(SShadowBlinPhong);
 
                 AddMaterial(m);
             }
@@ -152,9 +153,11 @@ namespace MyRender.MyEngine
                 m = new Material();
                 m.guid = MHomeGUID;
                 m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IHouseNormal));
-                m.TextureArray.Add(Material.TextureType.Specular, GetTextureID(IHouseSpecular));
+                //m.TextureArray.Add(Material.TextureType.Specular, GetTextureID(IHouseSpecular));
 
                 m.ShaderProgram = GetShader(SHouseNormalmap);
+
+                //m.ShaderProgram = GetShader(SShadowBlinPhong);
 
                 AddMaterial(m);
             }

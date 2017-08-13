@@ -64,6 +64,21 @@ namespace MyRender.MyEngine
             }
         }
 
+        private FrameBuffer depthBuffer;
+        public FrameBuffer DepthBudder
+        {
+            get
+            {
+                if (depthBuffer == null)
+                {
+                    depthBuffer = new FrameBuffer();
+                    depthBuffer.GenDepthBuffer();
+                }
+
+                return depthBuffer;
+            }
+        }
+
         public event Action<FrameEventArgs> OnUpdate;
         public Action<MouseButtonEventArgs> OnMouseDown;
         public Action<MouseButtonEventArgs> OnMouseUp;
@@ -77,7 +92,7 @@ namespace MyRender.MyEngine
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.CullFace);
-
+            //GL.CullFace( CullFaceMode.Front);
         }
 
         public void OnRelease()
@@ -364,6 +379,11 @@ namespace MyRender.MyEngine
             if(color32fRG != null)
             {
                 color32fRG.OnRelease();
+            }
+
+            if(depthBuffer != null)
+            {
+                depthBuffer.OnRelease();
             }
         }
 
