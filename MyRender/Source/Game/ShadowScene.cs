@@ -13,20 +13,21 @@ namespace MyRender.Game
     {
         private Vector2 _regMousePos = Vector2.Zero;
         private float max_camerz = 70;
-        private float min_camerz = 5;
+        private float min_camerz = 25;
 
         public override void OnStart()
         {
             base.OnStart();
 
             var light = new Light();
-            //light.Specular = new Vector4(0.3f, 0.3f, 0.3f, 1);
+            light.Specular = Vector4.Zero;
             light.Ambient = new Vector4(0.7f, 0.7f, 0.7f, 1.0f);
             AddChild(light);
             light.EnableLightShadowMap();
+            light.IsMove = true;
 
             MainCamera.ResetRotation(0, 61);
-            MainCamera.ResetZoomInOut(15, min_camerz, max_camerz);
+            MainCamera.ResetZoomInOut(70, min_camerz, max_camerz);
 
             var skybox = new Skybox();
             skybox.Scale(70, 70, 70);
@@ -35,6 +36,7 @@ namespace MyRender.Game
             var dae = new HomeModel();
             dae.Loader(Resource.MHouse, false);
             dae.LocalPosition = new Vector3(0, 0, 0);
+            dae.Scale(4, 4, 4);
             dae.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
             AddChild(dae);
 
@@ -43,27 +45,9 @@ namespace MyRender.Game
             plane.LocalPosition = new Vector3(-50, 0, -50);
             AddChild(plane);
 
-            //var cube = new Cube();
-            //cube.LocalPosition = new Vector3(0, 1, 0);
-            //AddChild(cube);
-
-            //cube = new Cube();
-            //cube.LocalPosition = new Vector3(1, 3, 1);
-            //AddChild(cube);
-
-            //plane = new Plane(10, 10, 1, 1);
-            //plane.SetFrameBuffer(GameDirect.Instance.DepthBudder, null);
-            //plane.LocalPosition = new Vector3(0, 3, 0);
-            //AddChild(plane);
-
-            //plane = new Plane(5, 5, 1, 1);
-            //plane.SetFrameBuffer(GameDirect.Instance.DepthBudder, null);
-            //plane.LocalPosition = new Vector3(2, 5, 2);
-            //AddChild(plane);
-
             var vp = MainCamera.Viewport;
             var gaussian = new Plane(vp.Width, vp.Height, 1, 1);
-            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, false);
+            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, true);
             gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
             gaussian.Rotation(1, 0, 0, -90);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer( FrameBuffer.Type.ShadowmapFrame),
@@ -71,7 +55,7 @@ namespace MyRender.Game
             AddChild(gaussian);
 
             gaussian = new Plane(vp.Width, vp.Height, 1, 1);
-            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, true);
+            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, false);
             gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
             gaussian.Rotation(1, 0, 0, -90);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame),

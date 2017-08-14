@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace MyRender.MyEngine
 {
@@ -19,11 +20,14 @@ namespace MyRender.MyEngine
         /// </summary>
         public Vector4 Diffuse = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
         public bool EnableSadowmap = false;
+        public bool IsMove = false;
 
         private Matrix4 lightViewMatrix;
         private Matrix4 lightProjectMatrix;
         private Matrix4 biasMatrix;
-        private float shadowmapResolution = 16;
+        private float shadowmapResolution = 4;
+        private float angle = 0;
+        private float radius = 50;
 
         private Matrix4 regViewMatrix;
         private Matrix4 regProjectMatrix;
@@ -45,6 +49,27 @@ namespace MyRender.MyEngine
                                     0.0f, 0.0f, 0.0f, 1.0f);
 
             GameDirect.Instance.MainScene.SceneLight = new System.WeakReference<Light>(this);
+        }
+
+
+        public override void OnUpdate(FrameEventArgs e)
+        {
+            base.OnUpdate(e);
+
+            if(IsMove)
+            {
+                double x = radius * Math.Cos(angle * Algorithm.Radin);
+                double y = radius * Math.Sin(angle * Algorithm.Radin);
+                var pos = LocalPosition;
+                pos.X = (float)x;
+                pos.Z = (float)y;
+                LocalPosition = pos;
+
+                updateLightMatrix();
+
+                angle += 0.5f;
+            }
+
         }
 
         public void SetupLight()

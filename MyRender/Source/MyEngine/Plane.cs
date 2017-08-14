@@ -116,7 +116,7 @@ namespace MyRender.MyEngine
 
                         if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
                         var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
-                        if(isHorizontal)
+                        if (!isHorizontal)
                         {
                             m.Uniform2("Offset", 0, 1.0f / vp.Height);
                         }
@@ -129,7 +129,7 @@ namespace MyRender.MyEngine
                 },
                 this,
                 modelData,
-                (isHorizontal) ? Render.PrePostrender : Render.PrePostrender + 1);
+                (isHorizontal) ? Render.PrePostrender + 1 : Render.PrePostrender);
 
                 RenderList.Add(render);
             }
