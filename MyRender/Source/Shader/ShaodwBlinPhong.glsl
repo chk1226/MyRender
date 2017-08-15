@@ -2,15 +2,19 @@
 varying vec4 posE;	
 varying vec3 normalE;	
 varying vec4 lightPosP;
+varying vec4 posP;	
 
 uniform mat4 LIGHT_BPVM;
 
 void main(void)
 {
 	posE = gl_ModelViewMatrix * gl_Vertex;
-    normalE = gl_NormalMatrix * gl_Normal;
+    posP = gl_ModelViewProjectionMatrix * gl_Vertex;
+	normalE = gl_NormalMatrix * gl_Normal;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	lightPosP = LIGHT_BPVM * gl_Vertex;
+
+
 
 	gl_Position = ftransform();
 }
@@ -18,11 +22,13 @@ void main(void)
 @fragment shader
 uniform sampler2D TEX_COLOR;
 uniform sampler2D SHADOWMAP;
+uniform sampler2D SSAO;
 uniform vec3 DIR_LIGHT;
 
 varying vec4 posE;	
 varying vec3 normalE;
 varying vec4 lightPosP;
+varying vec4 posP;	
 
 
 float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
@@ -50,10 +56,10 @@ float chebyshevUpperBound(sampler2D shadowMap, vec4 lPos, float bias)
 }
 
 //parallel light
-vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D shadowMap, vec4 lPos)
+vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v, sampler2D shadowMap, vec4 lPos, float ambientFactor)
 {
 	//ambient
-	vec4 La = gl_LightSource[0].ambient;
+	vec4 La = gl_LightSource[0].ambient * ambientFactor;
 		
 	lPos = lPos / lPos.w;
 	// bias
@@ -79,8 +85,12 @@ void main(void)
 {
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
 
+	vec4 pos_p = posP / posP.w;	
+	pos_p = pos_p * 0.5 + 0.5;
+	float ambientFactor = texture2D(SSAO, pos_p.st).r;
+	
 	// parallel light
-	gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP);
+	gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz), SHADOWMAP, lightPosP, ambientFactor);
 
 	//gl_FragColor = texture2D(SHADOWMAP, gl_TexCoord[0].st);
 }

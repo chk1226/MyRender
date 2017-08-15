@@ -10,7 +10,7 @@ namespace MyRender.MyEngine
 {
     partial class Algorithm
     {
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
         public static Random GetRandom
         {
             get { return _random; }
@@ -77,6 +77,11 @@ namespace MyRender.MyEngine
             color.A = to.A * blend + from.A * (1.0f - blend);
 
             return color;
+        }
+
+        public static float Lerp(float from, float to, float progression)
+        {
+            return from + progression * (to - from);
         }
     }
 }

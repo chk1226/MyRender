@@ -13,13 +13,15 @@ namespace MyRender.MyEngine
         public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
         public static readonly string SRobotNormalmap = @"Source\Shader\RobotNormalMap.glsl";
         public static readonly string SCowboyNormalmap = @"Source\Shader\CowboyNormalMap.glsl";
-        public static readonly string SHouseNormalmap = @"Source\Shader\HouseNormalMap.glsl";
+        //public static readonly string SHouseNormalmap = @"Source\Shader\HouseNormalMap.glsl";
         public static readonly string SSkybox = @"Source\Shader\Skybox.glsl";
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
         public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";
         public static readonly string SShadowBlinPhong = @"Source\Shader\ShaodwBlinPhong.glsl";
         public static readonly string SVSM = @"Source\Shader\VarianceShadowMap.glsl";
         public static readonly string SGaussianBlur = @"Source\Shader\GaussianBlur.glsl";
+        public static readonly string SMRT = @"Source\Shader\MRT.glsl";
+        public static readonly string SSSAO = @"Source\Shader\SSAO.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -34,9 +36,9 @@ namespace MyRender.MyEngine
         public static readonly string IRobotSpecular2 = @"Asset\model\robot\id02_specular.png";
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
         public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
-        public static readonly string IHouseNormal = @"Asset\model\house\N.png";
+        //public static readonly string IHouseNormal = @"Asset\model\house\N.png";
         //public static readonly string IHouseSpecular = @"Asset\model\house\S.png";
-        public static readonly string IHouseColor = @"Asset\model\house\C.png";
+        //public static readonly string IHouseColor = @"Asset\model\house\C.png";
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
         public static readonly string IUISprite = @"Asset\Image\sprite.png";
         public static readonly string IUIBlack = @"Asset\Image\black.png";

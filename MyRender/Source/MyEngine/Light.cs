@@ -25,7 +25,7 @@ namespace MyRender.MyEngine
         private Matrix4 lightViewMatrix;
         private Matrix4 lightProjectMatrix;
         private Matrix4 biasMatrix;
-        private float shadowmapResolution = 4;
+        private float shadowmapResolution = 1.0f/4;
         private float angle = 0;
         private float radius = 50;
 
@@ -109,7 +109,7 @@ namespace MyRender.MyEngine
         {
             lightViewMatrix = Matrix4.Transpose(Matrix4.LookAt(LocalPosition, Vector3.Zero, Vector3.UnitY));
             var c = GameDirect.Instance.MainScene.MainCamera;
-            lightProjectMatrix = Matrix4.Transpose(Matrix4.CreateOrthographic(c.Viewport.Width / shadowmapResolution, c.Viewport.Height / shadowmapResolution, c.zNear, c.zFar));
+            lightProjectMatrix = Matrix4.Transpose(Matrix4.CreateOrthographic(c.Viewport.Width * shadowmapResolution, c.Viewport.Height * shadowmapResolution, c.zNear, c.zFar));
         }
 
         public override void OnRenderBegin(FrameEventArgs e)

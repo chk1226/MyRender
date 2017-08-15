@@ -7,20 +7,10 @@ namespace MyRender.MyEngine
 {
     class Plane : Node
     {
-        public enum PlaneType
-        {
-            Normal,
-            Gaussian
-        }
-
         private Vector2 rect;
         private int sliceX;
         private int sliceY;
-        private PlaneType planeType = PlaneType.Normal;
-        private bool isHorizontal;
         private FrameBuffer useFrame;
-        private FrameBuffer bindFrame;
-
 
         public Plane(float width, float height, uint sliceX, uint sliceY)
         {
@@ -37,7 +27,7 @@ namespace MyRender.MyEngine
 
                 modelData.guid = GUID;
 
-                createPlaneData(modelData);
+                CreatePlaneData(modelData, rect, this.sliceX, this.sliceY);
                 // gen vertex buffer
                 modelData.GenVerticesBuffer();
 
@@ -52,135 +42,50 @@ namespace MyRender.MyEngine
             ModelList[0] = modelData;
         }
 
-        public void SetPlaneType(PlaneType type, bool horizontal)
-        {
-            planeType = type;
-            isHorizontal = horizontal;
-        }
-
-        public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
+        public void SetFrameBuffer(FrameBuffer use)
         {
             useFrame = use;
-            bindFrame = bind;
         }
 
         public override void OnStart()
         {
             base.OnStart();
             var modelData = ModelList[0];
+ 
+            Render render = Render.CreateRender(Resource.Instance.CreatePlaneM(), delegate (Render r) {
+                var m = r.MaterialData;
 
-            // generate render object
-            if (planeType == PlaneType.Normal)
-            {
-                Render render = Render.CreateRender(Resource.Instance.CreatePlaneM(), delegate (Render r) {
-                    var m = r.MaterialData;
-
-                    if (m.ShaderProgram != 0)
-                    {
-                        GL.UseProgram(m.ShaderProgram);
-
-                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-
-                        Light light;
-                        if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
-                        {
-                            var dir = light.GetDirectVector();
-                            m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
-                            if (light.EnableSadowmap)
-                            {
-                                if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
-                                var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
-                                m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
-                            }
-                        }
-
-                    }
-                },
-                this,
-                modelData,
-                Render.Normal);
-
-                RenderList.Add(render);
-            }
-            else if (planeType == PlaneType.Gaussian)
-            {
-                var material = new Material();
-                material.ShaderProgram = Resource.Instance.GetShader(Resource.SGaussianBlur);
-                Render render = Render.CreateRender(material, delegate (Render r)
+                if (m.ShaderProgram != 0)
                 {
-                    var m = r.MaterialData;
+                    GL.UseProgram(m.ShaderProgram);
 
-                    if (m.ShaderProgram != 0)
+                    m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
+
+                    Light light;
+                    if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                     {
-                        GL.UseProgram(m.ShaderProgram);
-
-                        if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
-                        var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
-                        if (!isHorizontal)
+                        var dir = light.GetDirectVector();
+                        m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
+                        if (light.EnableSadowmap)
                         {
-                            m.Uniform2("Offset", 0, 1.0f / vp.Height);
+                            if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
+                            //HACK
+                            m.UniformTexture("SSAO", TextureUnit.Texture2, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame).CB_Texture, 2);
+                            var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
+                            m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
                         }
-                        else
-                        {
-                            m.Uniform2("Offset", 1.0f / vp.Width, 0);
-                        }
-
                     }
-                },
-                this,
-                modelData,
-                (isHorizontal) ? Render.PrePostrender + 1 : Render.PrePostrender);
 
-                RenderList.Add(render);
-            }
+                }
+            },
+            this,
+            modelData,
+            Render.Normal);
+
+            RenderList.Add(render);
         }
 
-        public override void OnRenderBegin(FrameEventArgs e)
-        {
-            if(planeType == PlaneType.Normal)
-            {
-                base.OnRenderBegin(e);
-            }
-            else if(planeType == PlaneType.Gaussian)
-            {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindFrame.FB);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                GL.MatrixMode(MatrixMode.Projection);
-                GL.PushMatrix();
-                var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
-                var vm = Matrix4.CreateOrthographic(vp.Width, vp.Height, 0.125f, 1.125f); ;
-                GL.LoadMatrix(ref vm);
-
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.PushMatrix();
-                vm = GameDirect.Instance.MainScene.MainCamera.UIViewMatrix * WorldModelMatrix * LocalModelMatrix;
-                vm.Transpose();
-                GL.LoadMatrix(ref vm);
-
-            }
-
-        }
-
-        public override void OnRenderFinsh(FrameEventArgs e)
-        {
-            if (planeType == PlaneType.Normal)
-            {
-                base.OnRenderFinsh(e);
-            }
-            else if (planeType == PlaneType.Gaussian)
-            {
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.PopMatrix();
-                GL.MatrixMode(MatrixMode.Projection);
-                GL.PopMatrix();
-
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            }
-
-        }
-
-        private void createPlaneData(Model model)
+        static public void CreatePlaneData(Model model, Vector2 rect, int sliceX, int sliceY)
         {
             if(model == null)
             {

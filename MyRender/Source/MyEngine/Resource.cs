@@ -71,7 +71,14 @@ namespace MyRender.MyEngine
                     f.GenGaussianFrame();
                     f.type = FrameBuffer.Type.GaussianYFrame;
                     break;
-
+                case FrameBuffer.Type.GBuffer:
+                    f.GenGBuffer();
+                    f.type = FrameBuffer.Type.GBuffer;
+                    break;
+                case FrameBuffer.Type.SSAOFrame:
+                    f.GenSSAOFrame();
+                    f.type = FrameBuffer.Type.SSAOFrame;
+                    break;
                 default:
                     f = null;
                     break;
@@ -168,7 +175,7 @@ namespace MyRender.MyEngine
             var id = LoadCubemapTexture(str);
             if (id != 0)
             {
-                _texArray.Add(str, id);
+                AddTexture(str, id);
             }
 
             return id;
@@ -186,7 +193,7 @@ namespace MyRender.MyEngine
             var id = LoadTexture(str, flipY);
             if (id != 0)
             {
-                _texArray.Add(str, id);
+                AddTexture(str, id);
             }
 
             return id;
@@ -314,6 +321,15 @@ namespace MyRender.MyEngine
 
             return id;
         }
+
+        public void AddTexture(string str, int id)
+        {
+            if(!_texArray.ContainsKey(str))
+            {
+                _texArray.Add(str, id);
+            }
+        }
+       
 
         public void DeleteTexture(int id)
         {

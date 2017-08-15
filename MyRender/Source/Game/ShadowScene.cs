@@ -29,6 +29,9 @@ namespace MyRender.Game
             MainCamera.ResetRotation(0, 61);
             MainCamera.ResetZoomInOut(70, min_camerz, max_camerz);
 
+            var mrt = new MRT();
+            AddChild(mrt);
+
             var skybox = new Skybox();
             skybox.Scale(70, 70, 70);
             AddChild(skybox);
@@ -41,27 +44,28 @@ namespace MyRender.Game
             AddChild(dae);
 
             var plane = new Plane(100, 100, 1, 1);
-            plane.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame), null);
+            plane.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
             plane.LocalPosition = new Vector3(-50, 0, -50);
             AddChild(plane);
 
-            var vp = MainCamera.Viewport;
-            var gaussian = new Plane(vp.Width, vp.Height, 1, 1);
-            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, true);
-            gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
-            gaussian.Rotation(1, 0, 0, -90);
-            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer( FrameBuffer.Type.ShadowmapFrame),
-                Resource.Instance.GetFrameBuffer( FrameBuffer.Type.GaussianXFrame));
+
+            var gaussian = new ScreenEffect();
+            gaussian.EnableGaussian(true);
+            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ShadowmapFrame),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame));
             AddChild(gaussian);
 
-            gaussian = new Plane(vp.Width, vp.Height, 1, 1);
-            gaussian.SetPlaneType(Plane.PlaneType.Gaussian, false);
-            gaussian.LocalPosition = new Vector3(-vp.Width / 2.0f, 0, -vp.Height / 2.0f);
-            gaussian.Rotation(1, 0, 0, -90);
+            gaussian = new ScreenEffect();
+            gaussian.EnableGaussian(false);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
             AddChild(gaussian);
 
+            var ssao = new ScreenEffect();
+            ssao.EnableSSAO();
+            ssao.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBuffer),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame));
+            AddChild(ssao);
         }
 
         public override void OnMouseDown(MouseButtonEventArgs e)
