@@ -35,10 +35,14 @@ namespace MyRender.Game
                             if (light.EnableSadowmap)
                             {
                                 if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
-                                //HACK
-                                m.UniformTexture("SSAO", TextureUnit.Texture2, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame).CB_Texture, 2);
                                 var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
                                 m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
+                            }
+
+                            var frame = Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianRYFrame);
+                            if (frame != null)
+                            {
+                                m.UniformTexture("SSAO", TextureUnit.Texture2, frame.CB_Texture, 2);
                             }
                         }
 

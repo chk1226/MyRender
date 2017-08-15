@@ -79,6 +79,14 @@ namespace MyRender.MyEngine
                     f.GenSSAOFrame();
                     f.type = FrameBuffer.Type.SSAOFrame;
                     break;
+                case FrameBuffer.Type.GaussianRXFrame:
+                    f.GenGaussianFrame();
+                    f.type = FrameBuffer.Type.GaussianRXFrame;
+                    break;
+                case FrameBuffer.Type.GaussianRYFrame:
+                    f.GenGaussianFrame();
+                    f.type = FrameBuffer.Type.GaussianRYFrame;
+                    break;
                 default:
                     f = null;
                     break;

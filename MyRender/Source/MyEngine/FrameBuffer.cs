@@ -12,7 +12,9 @@ namespace MyRender.MyEngine
             GaussianXFrame,
             GaussianYFrame,
             GBuffer,
-            SSAOFrame
+            SSAOFrame,
+            GaussianRXFrame,
+            GaussianRYFrame
         }
 
 
@@ -23,6 +25,49 @@ namespace MyRender.MyEngine
         public int Normal = 0;
         public int DB = 0;
         public Type type;
+
+        public void GenGaussianRFrame()
+        {
+            // color
+            CB_Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, CB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMinFilter,
+                            (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.ClampToEdge);
+
+            var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+            PixelInternalFormat.R32f,
+            vp.Width,
+            vp.Height,
+            0,
+            PixelFormat.Red,
+            PixelType.Float,
+            IntPtr.Zero);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            //frame buffer
+            FB = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FB);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+                                        FramebufferAttachment.ColorAttachment0,
+                                        TextureTarget.Texture2D,
+                                        CB_Texture, 0);
+
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                Log.Print("GenGaussianRFrame fail...");
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
 
         public void GenSSAOFrame()
         {
@@ -62,7 +107,7 @@ namespace MyRender.MyEngine
                                         CB_Texture, 0);
 
             if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
-                Log.Print("GenGaussianFrame fail...");
+                Log.Print("GenSSAOFrame fail...");
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

@@ -15,9 +15,10 @@ uniform vec3 SAMPLES[64];
 uniform mat4 PROJECTION;
 uniform vec2 NOISE_SCALE;
 
-const int kernelSize = 32;
-const float radius = 1.00;
-const float bias = 0.025;
+const int kernelSize = 38;
+const float radius = 1;
+const float bias = 0.045;
+const float power = 1;
 
 void main(void)
 {				
@@ -53,6 +54,7 @@ void main(void)
 	} 
 
 	occlusion = 1.0 - (occlusion / kernelSize);
+	occlusion = pow(occlusion, power);
 	gl_FragColor = vec4(occlusion, 0, 0, 1);
 	
 }

@@ -7,27 +7,30 @@ namespace MyRender.MyEngine
 {
     class Plane : Node
     {
-        private Vector2 rect;
-        private int sliceX;
-        private int sliceY;
-        private FrameBuffer useFrame;
+        protected Vector2 rect;
+        protected int sliceX;
+        protected int sliceY;
 
-        public Plane(float width, float height, uint sliceX, uint sliceY)
+        public Plane(float width, float height, uint sliceX, uint sliceY, string id = "")
         {
             rect = new Vector2(width, height);
             this.sliceX = (int)sliceX;
             this.sliceY = (int)sliceY;
             ModelList = new Model[1];
 
-            var modelData = Resource.Instance.GetModel(GUID);
+            if (id == "")
+            {
+                id = GUID;
+            }
+            var modelData = Resource.Instance.GetModel(id);
             if (modelData == null)
             {
                 modelData = new Model();
                 modelData.DrawType = PrimitiveType.Quads;
 
-                modelData.guid = GUID;
+                modelData.guid = id;
 
-                CreatePlaneData(modelData, rect, this.sliceX, this.sliceY);
+                createPlaneData(modelData, rect, this.sliceX, this.sliceY);
                 // gen vertex buffer
                 modelData.GenVerticesBuffer();
 
@@ -42,50 +45,8 @@ namespace MyRender.MyEngine
             ModelList[0] = modelData;
         }
 
-        public void SetFrameBuffer(FrameBuffer use)
-        {
-            useFrame = use;
-        }
 
-        public override void OnStart()
-        {
-            base.OnStart();
-            var modelData = ModelList[0];
- 
-            Render render = Render.CreateRender(Resource.Instance.CreatePlaneM(), delegate (Render r) {
-                var m = r.MaterialData;
-
-                if (m.ShaderProgram != 0)
-                {
-                    GL.UseProgram(m.ShaderProgram);
-
-                    m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Material.TextureType.Color, 0);
-
-                    Light light;
-                    if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
-                    {
-                        var dir = light.GetDirectVector();
-                        m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
-                        if (light.EnableSadowmap)
-                        {
-                            if (useFrame != null) m.UniformTexture("SHADOWMAP", TextureUnit.Texture1, useFrame.CB_Texture, 1);
-                            //HACK
-                            m.UniformTexture("SSAO", TextureUnit.Texture2, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame).CB_Texture, 2);
-                            var bmvp = light.LightBiasProjectView() * WorldModelMatrix * LocalModelMatrix;
-                            m.UniformMatrix4("LIGHT_BPVM", ref bmvp, true);
-                        }
-                    }
-
-                }
-            },
-            this,
-            modelData,
-            Render.Normal);
-
-            RenderList.Add(render);
-        }
-
-        static public void CreatePlaneData(Model model, Vector2 rect, int sliceX, int sliceY)
+        protected void createPlaneData(Model model, Vector2 rect, int sliceX, int sliceY)
         {
             if(model == null)
             {

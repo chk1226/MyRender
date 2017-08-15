@@ -24,7 +24,14 @@ namespace MyRender.Game
             {
                 GameDirect.Instance.RunWithScene(new BaseRenderScene());
             };
+            AddChild(a);
 
+            a = new UIButton(new Rectangle(winRect.Width / 2, spaceY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "SoftShadowMap, SSAO");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new ShadowScene());
+            };
             AddChild(a);
 
         }

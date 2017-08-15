@@ -13,7 +13,6 @@ namespace MyRender.MyEngine
         public static readonly string SNormalmap = @"Source\Shader\NormalMap.glsl";
         public static readonly string SRobotNormalmap = @"Source\Shader\RobotNormalMap.glsl";
         public static readonly string SCowboyNormalmap = @"Source\Shader\CowboyNormalMap.glsl";
-        //public static readonly string SHouseNormalmap = @"Source\Shader\HouseNormalMap.glsl";
         public static readonly string SSkybox = @"Source\Shader\Skybox.glsl";
         public static readonly string SUISprite = @"Source\Shader\UISprite.glsl";
         public static readonly string SUIFont = @"Source\Shader\UIFont.glsl";

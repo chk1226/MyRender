@@ -5,7 +5,9 @@ using System;
 
 namespace MyRender.MyEngine
 {
-    class ScreenEffect : Node
+    // ssao reference
+    // https://learnopengl.com/#!Advanced-Lighting/SSAO
+    class ScreenEffect : Plane
     {
         public enum EffectType
         {
@@ -15,8 +17,8 @@ namespace MyRender.MyEngine
         }
 
         private EffectType type = EffectType.None;
-        private Vector2 rect;
-        private readonly string screenEffectID = "ScreenEffect";
+        //private Vector2 rect;
+        static private readonly string screenEffectID = "ScreenEffect";
         private FrameBuffer useFrame;
         private FrameBuffer bindFrame;
 
@@ -51,33 +53,8 @@ namespace MyRender.MyEngine
             genRotationNoise();
         }
 
-        public ScreenEffect()
+        public ScreenEffect(float width, float height) : base(width, height, 1, 1, screenEffectID)
         {
-            var v = GameDirect.Instance.MainScene.MainCamera.Viewport;
-            rect = new Vector2(v.Width, v.Height);
-            ModelList = new Model[1];
-
-            var modelData = Resource.Instance.GetModel(screenEffectID);
-            if (modelData == null)
-            {
-                modelData = new Model();
-                modelData.DrawType = PrimitiveType.Quads;
-
-                modelData.guid = GUID;
-
-                Plane.CreatePlaneData(modelData, rect, 1, 1);
-                // gen vertex buffer
-                modelData.GenVerticesBuffer();
-
-                // gen texture cood buffer
-                modelData.GenTexcoordsBuffer();
-
-                // gen normal texture cood buffer
-                modelData.GenNormalBuffer();
-
-                Resource.Instance.AddModel(modelData);
-            }
-            ModelList[0] = modelData;
 
             LocalPosition = new Vector3(-rect.X / 2.0f, 0, -rect.Y / 2.0f);
             Rotation(1, 0, 0, -90);
