@@ -43,6 +43,7 @@ namespace MyRender.MyEngine
         public static readonly string IUIBlack = @"Asset\Image\black.png";
         public static readonly string IUIWhite = @"Asset\Image\white.png";
         public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
+        public static readonly string ITerrainPlane = @"Asset\Image\terrain\Grass0146_5_S.png";
 
         // xml
         public static readonly string XTTFBitmap = @"Asset\font\Mecha.ttf.xml";

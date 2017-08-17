@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics;
+using MyRender.Debug;
 
 namespace MyRender.MyEngine
 {
@@ -16,7 +17,7 @@ namespace MyRender.MyEngine
             get { return _random; }
         }
 
-        private static float radin = (float)Math.PI / 180.0f;
+        private static float radin = MathHelper.Pi / 180.0f;
         public static float Radin { get { return radin; } }
 
         // reference https://stackoverflow.com/questions/4436764/rotating-a-quaternion-on-1-axis
@@ -83,5 +84,82 @@ namespace MyRender.MyEngine
         {
             return from + progression * (to - from);
         }
+
+
+
+        #region perlin noise
+
+        private static readonly int firstOctave = 3;
+        private static readonly int octaves = 8;
+        private static readonly float persistence = 0.6f;
+        private static float noiseScale = 10;
+        //private static readonly int baseSeed = 75863;
+
+        //reference 
+        // https://www.shadertoy.com/view/Mls3RS
+        // http://flafla2.github.io/2014/08/09/perlinnoise.html
+        static float noise(int x, int y)
+        {
+            float dot = Vector2.Dot(new Vector2(x, y), new Vector2(12.9898f, 78.233f));
+            dot = (float)Math.Sin(dot) * 36875.5453f;
+            dot -= (int)dot;
+
+            return dot;
+        }
+
+        static float smoothNoise(int x, int y)
+        {
+            return noise(x, y) / 4.0f + 
+                (noise(x + 1, y) + noise(x - 1, y) + noise(x, y + 1) + noise(x, y - 1)) / 8.0f + 
+                (noise(x + 1, y + 1) + noise(x + 1, y - 1) + noise(x - 1, y + 1) + noise(x - 1, y - 1)) / 16.0f;
+        }
+
+        static float cosInterpolation(float x, float y, float n)
+        {
+            float f = (1.0f - (float)Math.Cos(n * MathHelper.Pi)) * 0.5f;
+            return x * (1.0f - f) + y * f;
+        }
+
+        static float interpolationNoise(float x, float y)
+        {
+            int ix = (int)x;
+            int iy = (int)y;
+            float fracx = x - (int)x;
+            float fracy = y - (int)y;
+
+            float v1 = smoothNoise(ix, iy);
+            float v2 = smoothNoise(ix + 1, iy);
+            float v3 = smoothNoise(ix, iy + 1);
+            float v4 = smoothNoise(ix + 1, iy + 1);
+
+            float i1 = cosInterpolation(v1, v2, fracx);
+            float i2 = cosInterpolation(v3, v4, fracx);
+
+            return cosInterpolation(i1, i2, fracy);
+
+        }
+
+        public static float PerlinNoise2D(float x, float y)
+        {
+            float sum = 0;
+            float frequency = 0;
+            float amplitude = 0;
+            for (int i = firstOctave; i < octaves + firstOctave; i++)
+            {
+                frequency = (float)Math.Pow(2.0, i);
+                amplitude = (float)Math.Pow(persistence, i) * noiseScale; 
+                sum = sum + interpolationNoise(x * frequency, y * frequency) * amplitude;
+            }
+            //Log.Print(sum.ToString());
+
+            return sum;
+        }
+
+        #endregion
+
+
+
+
+
     }
 }

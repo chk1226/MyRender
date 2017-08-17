@@ -112,10 +112,15 @@ namespace MyRender.MyEngine
         public int GenNormalBuffer()
         {
             NBO = GL.GenBuffer();
+            ReloadNormalBuffer();
+            return NBO;
+        }
+
+        public void ReloadNormalBuffer()
+        {
             GL.BindBuffer(BufferTarget.ArrayBuffer, NBO);
             int size = Normals.Length * Marshal.SizeOf(default(Vector3));
             GL.BufferData(BufferTarget.ArrayBuffer, size, Normals, BufferUsageHint.StaticDraw);
-            return NBO;
         }
 
         public int GenTangentBuffer()
