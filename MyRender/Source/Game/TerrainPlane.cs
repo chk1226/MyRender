@@ -21,7 +21,7 @@ namespace MyRender.Game
             refreshModelData();
 
             Material material = new Material();
-            material.ShaderProgram = Resource.Instance.GetShader(Resource.SBlinPhong);
+            material.ShaderProgram = Resource.Instance.GetShader(Resource.STerrian);
             Render render = Render.CreateRender(material, delegate (Render r) {
                 var m = r.MaterialData;
 
@@ -30,6 +30,7 @@ namespace MyRender.Game
                     GL.UseProgram(m.ShaderProgram);
 
                     m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Resource.Instance.GetTextureID(Resource.ITerrainPlane), 0);
+                    m.UniformTexture("TEX2_COLOR", TextureUnit.Texture1, Resource.Instance.GetTextureID(Resource.ITerrain2Plane), 1);
                     Light light;
                     if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                     {
@@ -45,11 +46,13 @@ namespace MyRender.Game
            RenderList.Add(render);
         }
 
+        // reference
+        // https://stackoverflow.com/questions/13983189/opengl-how-to-calculate-normals-in-a-terrain-height-grid
         private Vector3 computeNormal(float hL, float hR, float hD, float hU)
         {
 
             // deduce terrain normal
-            var N = new Vector3(hL - hR, hD - hU, 2.0f);
+            var N = new Vector3(hL - hR, 2.0f, hD - hU);
             N.Normalize();
             return N;
         }

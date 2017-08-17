@@ -21,6 +21,7 @@ namespace MyRender.MyEngine
         public static readonly string SGaussianBlur = @"Source\Shader\GaussianBlur.glsl";
         public static readonly string SMRT = @"Source\Shader\MRT.glsl";
         public static readonly string SSSAO = @"Source\Shader\SSAO.glsl";
+        public static readonly string STerrian = @"Source\Shader\Terrain.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -44,6 +45,8 @@ namespace MyRender.MyEngine
         public static readonly string IUIWhite = @"Asset\Image\white.png";
         public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
         public static readonly string ITerrainPlane = @"Asset\Image\terrain\Grass0146_5_S.png";
+        public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S 1.png";
+
 
         // xml
         public static readonly string XTTFBitmap = @"Asset\font\Mecha.ttf.xml";

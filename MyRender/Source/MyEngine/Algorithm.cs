@@ -89,11 +89,9 @@ namespace MyRender.MyEngine
 
         #region perlin noise
 
-        private static readonly int firstOctave = 3;
-        private static readonly int octaves = 8;
-        private static readonly float persistence = 0.6f;
-        private static float noiseScale = 10;
-        //private static readonly int baseSeed = 75863;
+        private static readonly int octaves = 4;
+        private static readonly float persistence = 0.3f;
+        private static float noiseScale =10;
 
         //reference 
         // https://www.shadertoy.com/view/Mls3RS
@@ -142,12 +140,11 @@ namespace MyRender.MyEngine
         public static float PerlinNoise2D(float x, float y)
         {
             float sum = 0;
-            float frequency = 0;
-            float amplitude = 0;
-            for (int i = firstOctave; i < octaves + firstOctave; i++)
+            float d = (float)Math.Pow(2, octaves - 1);
+            for (int i = 0; i < octaves; i++)
             {
-                frequency = (float)Math.Pow(2.0, i);
-                amplitude = (float)Math.Pow(persistence, i) * noiseScale; 
+                float frequency = (float)Math.Pow(2.0, i) / d;
+                float amplitude = (float)Math.Pow(persistence, i) * noiseScale; 
                 sum = sum + interpolationNoise(x * frequency, y * frequency) * amplitude;
             }
             //Log.Print(sum.ToString());

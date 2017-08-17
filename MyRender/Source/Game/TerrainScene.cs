@@ -12,6 +12,7 @@ namespace MyRender.Game
         private Vector2 _regMousePos = Vector2.Zero;
         private float max_camerz = 70;
         private float min_camerz = 5;
+        private float skyboxSize = 80;
 
         public override void OnStart()
         {
@@ -22,12 +23,13 @@ namespace MyRender.Game
 
             MainCamera.ResetZoomInOut(25, min_camerz, max_camerz);
 
+            var skybox = new Skybox();
+            skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
+            AddChild(skybox);
+
             var t = new TerrainPlane(50, 50, 50, 50);
             AddChild(t);
-
-            var c = new Cube();
-            AddChild(c);
-
+            
 
 
         }
