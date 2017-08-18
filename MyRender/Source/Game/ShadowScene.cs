@@ -39,7 +39,8 @@ namespace MyRender.Game
             };
             AddChild(a);
 
-            var mrt = new MRT();
+            var mrt = new PreRender();
+            mrt.SetType( PreRender.PreRenderType.MRT);
             AddChild(mrt);
 
             var skybox = new Skybox();
