@@ -1,15 +1,18 @@
 ﻿@vertex shader
 varying vec4 posP;
 varying vec4 reflectionPosP;
+varying vec3 ToCamera;
 
 uniform mat4 REFLECTION_PVM;
-
+uniform mat4 ModelMatrix;
+uniform vec3 CameraPos;
 
 void main(void)
 {
     posP = gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	reflectionPosP = REFLECTION_PVM * gl_Vertex;
+	ToCamera = CameraPos - (ModelMatrix * gl_Vertex).xyz;
 	gl_Position = ftransform();
 
 }
@@ -22,8 +25,9 @@ uniform float MoveFactor;
 
 varying vec4 posP;
 varying vec4 reflectionPosP;
+varying vec3 ToCamera;
 
-const float waveStrength = 0.01;
+const float waveStrength = 0.005;
 
 //parallel light
 //vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v)
@@ -50,17 +54,20 @@ void main(void)
 	vec2 distor2 = (texture2D(DUDVMAP, gl_TexCoord[0].st + vec2(-MoveFactor, MoveFactor)).rg * 2.0 - 1.0) * waveStrength;
 	vec2 total = distor1 + distor2;
 
-    vec4 posProject = posP/posP.w;
-    posProject = posProject/2 + 0.5;
+    vec4 posProject = posP / posP.w;
+    posProject = posProject / 2 + 0.5;
 
-	vec4 rPosP = reflectionPosP/reflectionPosP.w;
-	rPosP = rPosP/2 + 0.5;
+	vec4 rPosP = reflectionPosP / reflectionPosP.w;
+	rPosP = rPosP / 2 + 0.5;
 
-    vec2 ref = vec2(rPosP.x, rPosP.y);
-	vec4 reflection = texture2D(REFLECTION, ref + total);	
-	vec4 refraction = texture2D(REFRACTION, posProject.xy + total);	
+	vec4 reflection = texture2D(REFLECTION, rPosP.xy + total);	
+	// clamp is prevent glitch
+	vec4 refraction = texture2D(REFRACTION, clamp(posProject.xy + total, 0.001, 0.999));	
 
-	vec4 color = mix(reflection, refraction, 0.5);
+	// Fresnel Effect
+	float refractionFactor = dot(normalize(ToCamera), vec3(0, 1, 0));
+	// pow is tweak value
+	vec4 color = mix(reflection, refraction, pow(refractionFactor, 2));
 
 	// parallel light
 	//gl_FragColor = BlinnPhong(color, DIR_LIGHT, normalize(normalE), normalize(-posE.xyz));

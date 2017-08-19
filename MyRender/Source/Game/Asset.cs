@@ -24,7 +24,6 @@ namespace MyRender.MyEngine
         public static readonly string STerrian = @"Source\Shader\Terrain.glsl";
         public static readonly string SWater = @"Source\Shader\Water.glsl";
 
-
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
         public static readonly string IBricksNormal = @"Asset\Image\DiagonalHerringbone-NormalMap.bmp";
@@ -46,7 +45,7 @@ namespace MyRender.MyEngine
         public static readonly string ITerrainPlane = @"Asset\Image\terrain\NatureForests0038_5_S.png";
         public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S_1.png";
         public static readonly string IDudvmap = @"Asset\Image\dudvmap.png";
-
+        public static readonly string IWaterNormalmap = @"Asset\Image\normalMap.png";
 
         // xml
         public static readonly string XTTFBitmap = @"Asset\font\Mecha.ttf.xml";
@@ -55,7 +54,6 @@ namespace MyRender.MyEngine
         public static readonly string MRobot = @"..\..\Asset\model\robot\robot_plus.dae";
         public static readonly string MCowboy = @"..\..\Asset\model\cowboy\model.dae";
         public static readonly string MHouse = @"..\..\Asset\model\house\Small_Building_1.dae";
-
 
         // guid
         public static readonly string MBricksGUID = "Bricks";

@@ -11,7 +11,7 @@ namespace MyRender.Game
     {
         public WeakReference<PreRender> ReflectionNode;
 
-        private readonly float waveSpeed = 0.01f;
+        private readonly float waveSpeed = 0.008f;
         private float moveFactor = 0;
 
         public WaterPlane(float width, float height, float waterHeight, uint slicex, uint slicey)
@@ -37,6 +37,10 @@ namespace MyRender.Game
                     m.UniformTexture("REFRACTION", TextureUnit.Texture1, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture, 1);
                     m.UniformTexture("DUDVMAP", TextureUnit.Texture2, Resource.Instance.GetTextureID(Resource.IDudvmap), 2);
                     m.Uniform1("MoveFactor", moveFactor);
+                    var camerPos = GameDirect.Instance.MainScene.MainCamera.eye;
+                    m.Uniform3("CameraPos", camerPos.X, camerPos.Y, camerPos.Z);
+                    var modelMatrix = WorldModelMatrix * LocalModelMatrix;
+                    m.UniformMatrix4("ModelMatrix", ref modelMatrix, true);
 
                     PreRender reflection;
                     if(ReflectionNode.TryGetTarget(out reflection))
