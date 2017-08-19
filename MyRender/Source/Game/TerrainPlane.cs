@@ -8,6 +8,7 @@ namespace MyRender.Game
 {
     class TerrainPlane : Plane
     {
+
         public TerrainPlane(float width, float height, uint slicex, uint slicey)
             :base(width, height, slicex, slicey)
         {
@@ -31,6 +32,18 @@ namespace MyRender.Game
 
                     m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Resource.Instance.GetTextureID(Resource.ITerrainPlane), 0);
                     m.UniformTexture("TEX2_COLOR", TextureUnit.Texture1, Resource.Instance.GetTextureID(Resource.ITerrain2Plane), 1);
+
+                    if (r.ReplaceRender != null && r.ReplaceRender.Parameter.Count != 0)
+                    {
+                        var clipPlane = (Vector4)r.ReplaceRender.Parameter[0];
+                        if (clipPlane != null)
+                        {
+                            m.Uniform4("ClipPlane", clipPlane.X, clipPlane.Y, clipPlane.Z, clipPlane.W);
+                        }
+                    }
+                    var modelm = WorldModelMatrix * LocalModelMatrix;
+                    m.UniformMatrix4("ModelMatrix", ref modelm, true);
+
                     Light light;
                     if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
                     {
@@ -82,12 +95,7 @@ namespace MyRender.Game
                     model.Vertices[i * (sliceX * 4) + j * 4 + 1] = new Vector3(current.X, Algorithm.PerlinNoise2D(j, i+ 1), current.Y + offset.Y);
                     model.Vertices[i * (sliceX * 4) + j * 4 + 2] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i+1), current.Y + offset.Y);
                     model.Vertices[i * (sliceX * 4) + j * 4 + 3] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i), current.Y);
-
-                    //model.Texcoords[i * (sliceX * 4) + j * 4] = new Vector2(0, 0);
-                    //model.Texcoords[i * (sliceX * 4) + j * 4 + 1] = new Vector2(0, 1);
-                    //model.Texcoords[i * (sliceX * 4) + j * 4 + 2] = new Vector2(1, 1);
-                    //model.Texcoords[i * (sliceX * 4) + j * 4 + 3] = new Vector2(1, 0);
-
+                    
                 }
 
             }
@@ -122,6 +130,8 @@ namespace MyRender.Game
 
             }
             model.ReloadNormalBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
         }
     }
 }

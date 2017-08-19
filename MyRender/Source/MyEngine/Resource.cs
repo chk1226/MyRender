@@ -87,6 +87,15 @@ namespace MyRender.MyEngine
                     f.GenGaussianFrame();
                     f.type = FrameBuffer.Type.GaussianRYFrame;
                     break;
+
+                case FrameBuffer.Type.ReflectionFrame:
+                    f.GenRGBColorDepthFrame();
+                    f.type = FrameBuffer.Type.ReflectionFrame;
+                    break;
+                case FrameBuffer.Type.RefractionFrame:
+                    f.GenRGBColorDepthFrame();
+                    f.type = FrameBuffer.Type.RefractionFrame;
+                    break;
                 default:
                     f = null;
                     break;

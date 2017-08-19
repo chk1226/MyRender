@@ -3,6 +3,8 @@ varying vec4 posE;
 varying vec3 normalE;	
 varying float blendY;	
 
+uniform mat4 ModelMatrix;
+uniform vec4 ClipPlane;
 
 void main(void)
 {
@@ -11,6 +13,8 @@ void main(void)
 	blendY = gl_Vertex.y;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_Position = ftransform();
+
+	gl_ClipDistance[0] = dot(ModelMatrix * gl_Vertex, ClipPlane);
 }
 
 @fragment shader
@@ -38,7 +42,7 @@ vec4 BlinnPhong(vec4 orign_color, vec3 dir_l, vec3 normal, vec3 v)
 	dot_value = pow( max(dot(H, normal ), 0.0), 0);	
 	vec4 Ls = gl_LightSource[0].specular * dot_value;
 	
-	return orign_color * min((La + Ld + Ls * 0.3), 1.0);
+	return orign_color * min((La + Ld + Ls * 0.4), 1.0);
 }
 
 

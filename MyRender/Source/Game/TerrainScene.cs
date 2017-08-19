@@ -13,7 +13,7 @@ namespace MyRender.Game
         private float max_camerz = 70;
         private float min_camerz = 5;
         private float skyboxSize = 80;
-
+        private float waterHeight = 0;
         public override void OnStart()
         {
             base.OnStart();
@@ -27,10 +27,31 @@ namespace MyRender.Game
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
             AddChild(skybox);
 
+            // terrain plane
             var t = new TerrainPlane(50, 50, 50, 50);
             AddChild(t);
-            
 
+            // water plane
+            var water = new WaterPlane(50, 50, waterHeight, 1, 1);
+            AddChild(water);
+
+            // reflection
+            var pre = new PreRender();
+            pre.SetType(PreRender.PreRenderType.Reflection);
+            pre.WaterHeight = waterHeight;
+            AddChild(pre);
+            water.ReflectionNode = new System.WeakReference<PreRender>(pre);
+            // refraction
+            pre = new PreRender();
+            pre.SetType(PreRender.PreRenderType.Refraction);
+            pre.WaterHeight = waterHeight;
+            AddChild(pre);
+
+            var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer( FrameBuffer.Type.ReflectionFrame).CB_Texture);
+            AddChild(uisprite);
+
+            //uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ReflectionFrame).CB_Texture);
+            //AddChild(uisprite);
 
         }
 

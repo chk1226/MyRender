@@ -22,6 +22,8 @@ namespace MyRender.MyEngine
         public static readonly string SMRT = @"Source\Shader\MRT.glsl";
         public static readonly string SSSAO = @"Source\Shader\SSAO.glsl";
         public static readonly string STerrian = @"Source\Shader\Terrain.glsl";
+        public static readonly string SWater = @"Source\Shader\Water.glsl";
+
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -36,16 +38,14 @@ namespace MyRender.MyEngine
         public static readonly string IRobotSpecular2 = @"Asset\model\robot\id02_specular.png";
         public static readonly string ICowboyColor = @"Asset\model\cowboy\diffuse.png";
         public static readonly string ICowboyNormal = @"Asset\model\cowboy\NormalMap.png";
-        //public static readonly string IHouseNormal = @"Asset\model\house\N.png";
-        //public static readonly string IHouseSpecular = @"Asset\model\house\S.png";
-        //public static readonly string IHouseColor = @"Asset\model\house\C.png";
         public static readonly string ISkybox = @"Asset\Image\skybox\lake1_{0}.png";
         public static readonly string IUISprite = @"Asset\Image\sprite.png";
         public static readonly string IUIBlack = @"Asset\Image\black.png";
         public static readonly string IUIWhite = @"Asset\Image\white.png";
         public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
-        public static readonly string ITerrainPlane = @"Asset\Image\terrain\Grass0146_5_S.png";
-        public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S 1.png";
+        public static readonly string ITerrainPlane = @"Asset\Image\terrain\NatureForests0038_5_S.png";
+        public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S_1.png";
+
 
 
         // xml
@@ -64,8 +64,6 @@ namespace MyRender.MyEngine
         public static readonly string MHomeGUID = "Home";
         public static readonly string MSkyboxGUID = "Skybox";
         public static readonly string MPlaneGUID = "Plane";
-
-
         //public static readonly string MUISpriteGUID = "UISprite";
 
         public Material CreatePlaneM()
@@ -158,13 +156,9 @@ namespace MyRender.MyEngine
             {
                 m = new Material();
                 m.guid = MHomeGUID;
-                //m.TextureArray.Add(Material.TextureType.Normal, GetTextureID(IHouseNormal));
-                //m.TextureArray.Add(Material.TextureType.Specular, GetTextureID(IHouseSpecular));
                 m.TextureArray.Add(Material.TextureType.Color, GetTextureID(IUIWhite));
 
                 m.ShaderProgram = GetShader(SShadowBlinPhong);
-
-                //m.ShaderProgram = GetShader(SShadowBlinPhong);
 
                 AddMaterial(m);
             }
@@ -190,24 +184,6 @@ namespace MyRender.MyEngine
             return m;
         }
 
-        //public Material CreateDepthRenderM()
-        //{
-        //    var m = GetMaterial(MSkyboxGUID);
-        //    if (m == null)
-        //    {
-        //        m = new Material();
-        //        m.guid = MSkyboxGUID;
-        //        m.TextureArray.Add(Material.TextureType.Cubemap,
-        //            GetCubemapTextureID(ISkybox));
-
-        //        m.ShaderProgram = GetShader(SSkybox);
-
-        //        AddMaterial(m);
-        //    }
-
-        //    return m;
-        //}
-
         public Material CreateUISpriteM(string textureFile)
         {
             var m = GetMaterial(textureFile);
@@ -217,6 +193,24 @@ namespace MyRender.MyEngine
                 m.guid = textureFile;
                 m.TextureArray.Add(Material.TextureType.Color,
                     GetTextureID(textureFile));
+
+                m.ShaderProgram = GetShader(SUISprite);
+
+                AddMaterial(m);
+            }
+
+            return m;
+        }
+
+        public Material CreateUISpriteM(int textureID, string guid)
+        {
+            var m = GetMaterial(guid);
+            if (m == null)
+            {
+                m = new Material();
+                m.guid = guid;
+                m.TextureArray.Add(Material.TextureType.Color,
+                    textureID);
 
                 m.ShaderProgram = GetShader(SUISprite);
 

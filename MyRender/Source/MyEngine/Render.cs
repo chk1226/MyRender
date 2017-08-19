@@ -20,8 +20,11 @@ namespace MyRender.MyEngine
         public Action<Render> ShaderAction;
         public Material MaterialData;
         public Model ModelData;
-
         public WeakReference<Node> WNode;
+        public List<object> Parameter = new List<object>();
+        public Vector2 PreRenderRange = new Vector2(Normal, Normal);
+        public bool PassPreRender = false;
+
         private List<VertexAttribute> vertexAttribute = new List<VertexAttribute>();
         private bool enableBlend = false;
         private bool enableCubemap = false;
@@ -93,7 +96,8 @@ namespace MyRender.MyEngine
         {
             if (ModelData == null) return;
 
-            if(ReplaceRender != null)
+            if(ReplaceRender != null
+                && ReplaceRender.ShaderAction != null)
             {
                 ReplaceRender.ShaderAction?.Invoke(ReplaceRender);
             }

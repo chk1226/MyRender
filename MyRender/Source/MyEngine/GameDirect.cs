@@ -254,12 +254,16 @@ namespace MyRender.MyEngine
 
                 foreach(var render in _renderList)
                 {
-                    if(render.Priority == Render.Normal)
+                    if(!render.PassPreRender)
                     {
-                        render.ReplaceRender = pre;
-                        render.OnRenderBegin(e);
-                        render.OnRender(e);
-                        render.OnRenderFinsh(e);
+                        if( pre.PreRenderRange.X <= render.Priority && 
+                            render.Priority <= pre.PreRenderRange.Y)
+                        {
+                            render.ReplaceRender = pre;
+                            render.OnRenderBegin(e);
+                            render.OnRender(e);
+                            render.OnRenderFinsh(e);
+                        }
                     }
                 }
 

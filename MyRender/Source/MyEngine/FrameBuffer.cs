@@ -14,7 +14,9 @@ namespace MyRender.MyEngine
             GBuffer,
             SSAOFrame,
             GaussianRXFrame,
-            GaussianRYFrame
+            GaussianRYFrame,
+            ReflectionFrame,
+            RefractionFrame
         }
 
 
@@ -202,6 +204,62 @@ namespace MyRender.MyEngine
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
+        }
+
+        public void GenRGBColorDepthFrame()
+        {
+            // color
+            CB_Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, CB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMinFilter,
+                            (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.Repeat);
+
+            var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+            PixelInternalFormat.Rgb,
+            vp.Width,
+            vp.Height,
+            0,
+            PixelFormat.Rgb,
+            PixelType.Byte,
+            IntPtr.Zero);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            // depth
+            DB = GL.GenRenderbuffer();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, DB);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer,
+                RenderbufferStorage.DepthComponent,
+                vp.Width,
+                vp.Height);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+
+            //frame buffer
+            FB = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FB);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+                                        FramebufferAttachment.ColorAttachment0,
+                                        TextureTarget.Texture2D,
+                                        CB_Texture, 0);
+            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer,
+                FramebufferAttachment.DepthAttachment,
+                RenderbufferTarget.Renderbuffer,
+                DB);
+
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                Log.Print("GenGaussianFrame fail...");
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
         public void GenGaussianFrame()
