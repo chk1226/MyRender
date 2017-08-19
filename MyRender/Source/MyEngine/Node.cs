@@ -125,7 +125,7 @@ namespace MyRender.MyEngine
 
         public void Rotation(float x, float y, float z, float w)
         {
-            var q = Matrix4.CreateFromQuaternion(Algorithm.CreateFromAxisAngle(x, y, z, w * Algorithm.Radin));
+            var q = Matrix4.CreateFromQuaternion(Algorithm.CreateFromAxisAngle(x, y, z, MathHelper.DegreesToRadians( w )));
             q.Transpose();
 
             LocalModelMatrix = q * LocalModelMatrix;

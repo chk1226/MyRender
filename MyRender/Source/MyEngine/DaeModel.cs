@@ -100,7 +100,7 @@ namespace MyRender.MyEngine
                     {
                         var value = data.Rotate[i].Value();
                         var wValue = value[3];
-                        var q = Algorithm.CreateFromAxisAngle(value[0], value[1], value[2], wValue * Algorithm.Radin);
+                        var q = Algorithm.CreateFromAxisAngle(value[0], value[1], value[2], MathHelper.DegreesToRadians(wValue));
                         var mat = Matrix4.CreateFromQuaternion(q);
                         mat.Transpose();
 

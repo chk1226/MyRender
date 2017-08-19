@@ -186,9 +186,9 @@ namespace MyRender.MyEngine
         // 1 parameter: focus, 2 parameter: eye_rotation
         private Vector3 eyePosCalculate(Vector3 f, Vector3 p)
         {
-            return new Vector3(f.X + p.Z * (float)Math.Sin(p.Y * Algorithm.Radin) * (float)Math.Cos(p.X * Algorithm.Radin),
-                               f.Y + p.Z * (float)Math.Cos(p.Y * Algorithm.Radin),
-                               f.Z + p.Z * (float)Math.Sin(p.Y * Algorithm.Radin) * (float)Math.Sin(p.X * Algorithm.Radin));
+            return new Vector3(f.X + p.Z * (float)Math.Sin(MathHelper.DegreesToRadians(p.Y)) * (float)Math.Cos(MathHelper.DegreesToRadians(p.X)),
+                               f.Y + p.Z * (float)Math.Cos(MathHelper.DegreesToRadians(p.Y)),
+                               f.Z + p.Z * (float)Math.Sin(MathHelper.DegreesToRadians(p.Y)) * (float)Math.Sin(MathHelper.DegreesToRadians(p.X)));
         }
 
 

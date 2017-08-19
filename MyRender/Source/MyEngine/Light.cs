@@ -58,8 +58,8 @@ namespace MyRender.MyEngine
 
             if(IsMove)
             {
-                double x = radius * Math.Cos(angle * Algorithm.Radin);
-                double y = radius * Math.Sin(angle * Algorithm.Radin);
+                double x = radius * Math.Cos(MathHelper.DegreesToRadians( angle ));
+                double y = radius * Math.Sin(MathHelper.DegreesToRadians(angle ));
                 var pos = LocalPosition;
                 pos.X = (float)x;
                 pos.Z = (float)y;

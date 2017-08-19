@@ -45,7 +45,7 @@ namespace MyRender.MyEngine
         public static readonly string ITTFBitmap = @"Asset\font\Mecha.ttf.png";
         public static readonly string ITerrainPlane = @"Asset\Image\terrain\NatureForests0038_5_S.png";
         public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S_1.png";
-
+        public static readonly string IDudvmap = @"Asset\Image\dudvmap.png";
 
 
         // xml
