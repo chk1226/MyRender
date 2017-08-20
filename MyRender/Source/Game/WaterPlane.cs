@@ -36,6 +36,8 @@ namespace MyRender.Game
                     m.UniformTexture("REFLECTION", TextureUnit.Texture0, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ReflectionFrame).CB_Texture, 0);
                     m.UniformTexture("REFRACTION", TextureUnit.Texture1, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture, 1);
                     m.UniformTexture("DUDVMAP", TextureUnit.Texture2, Resource.Instance.GetTextureID(Resource.IDudvmap), 2);
+                    m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture3, Resource.Instance.GetTextureID(Resource.IWaterNormalmap), 3);
+
                     m.Uniform1("MoveFactor", moveFactor);
                     var camerPos = GameDirect.Instance.MainScene.MainCamera.eye;
                     m.Uniform3("CameraPos", camerPos.X, camerPos.Y, camerPos.Z);
@@ -49,24 +51,12 @@ namespace MyRender.Game
                         m.UniformMatrix4("REFLECTION_PVM", ref rmvp, true);
                     }
 
-
-                    //if (r.ReplaceRender != null && r.ReplaceRender.Parameter.Count != 0)
-                    //{
-                    //    var clipPlane = (Vector4)r.ReplaceRender.Parameter[0];
-                    //    if (clipPlane != null)
-                    //    {
-                    //        m.Uniform4("ClipPlane", clipPlane.X, clipPlane.Y, clipPlane.Z, clipPlane.W);
-                    //    }
-                    //}
-                    //var modelm = WorldModelMatrix * LocalModelMatrix;
-                    //m.UniformMatrix4("ModelMatrix", ref modelm, true);
-
-                    //Light light;
-                    //if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
-                    //{
-                    //    var dir = light.GetDirectVector();
-                    //    m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
-                    //}
+                    Light light;
+                    if (GameDirect.Instance.MainScene.SceneLight.TryGetTarget(out light))
+                    {
+                        var pos = light.LocalPosition;
+                        m.Uniform3("LightPos", pos.X, pos.Y, pos.Z);
+                    }
                 }
             },
             this,
