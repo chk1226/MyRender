@@ -32,7 +32,7 @@ namespace MyRender.Game
             AddChild(t);
 
             // water plane
-            var water = new WaterPlane(50, 50, waterHeight, 1, 1);
+            var water = new WaterPlane(200, 200, waterHeight, 1, 1);
             AddChild(water);
 
             // reflection
@@ -47,12 +47,29 @@ namespace MyRender.Game
             pre.WaterHeight = waterHeight;
             AddChild(pre);
 
-            var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer( FrameBuffer.Type.ReflectionFrame).CB_Texture);
-            AddChild(uisprite);
+            var cube = new Cube();
+            cube.LocalPosition = new Vector3(8, 0, -5);
+            AddChild(cube);
 
-            //uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ReflectionFrame).CB_Texture);
+            cube = new Cube();
+            cube.Rotation(1,1,0,60);
+            cube.LocalPosition = new Vector3(-7, 0, 30);
+            AddChild(cube);
+
+            //var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture);
             //AddChild(uisprite);
 
+            //var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture);
+            //AddChild(uisprite);
+
+
+            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "GoBack");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new MenuScene());
+            };
+            AddChild(a);
         }
 
         public override void OnMouseDown(MouseButtonEventArgs e)

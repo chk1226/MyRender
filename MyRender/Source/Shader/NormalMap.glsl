@@ -3,6 +3,9 @@ varying vec4 posE;
 varying vec3 normalE;	
 varying vec3 t;
 
+uniform mat4 ModelMatrix;
+uniform vec4 ClipPlane;
+
 attribute vec3 tangent;
 
 void main(void)
@@ -16,6 +19,8 @@ void main(void)
 	t = normalize(t-dot(normalE,t)*normalE);	
 
 	gl_Position = ftransform();
+
+	gl_ClipDistance[0] = dot(ModelMatrix * gl_Vertex, ClipPlane);
 }
 
 @fragment shader

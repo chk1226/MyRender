@@ -11,6 +11,7 @@ namespace MyRender.MyEngine
         public static readonly int PrePostrender = 1300;
         public static readonly int Skybox = 1250;
         public static readonly int Normal = 1000;
+        public static readonly int Blend = 800;
         public static readonly int UI = 750;
         public static readonly int Postrender = 500;
         public static int DrawcallCount = 0;

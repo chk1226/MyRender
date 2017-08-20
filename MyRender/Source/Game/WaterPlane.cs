@@ -37,10 +37,15 @@ namespace MyRender.Game
                     m.UniformTexture("REFRACTION", TextureUnit.Texture1, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture, 1);
                     m.UniformTexture("DUDVMAP", TextureUnit.Texture2, Resource.Instance.GetTextureID(Resource.IDudvmap), 2);
                     m.UniformTexture("NORMAL_TEX_COLOR", TextureUnit.Texture3, Resource.Instance.GetTextureID(Resource.IWaterNormalmap), 3);
+                    m.UniformTexture("REFRACTION_DEPTH", TextureUnit.Texture4, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).DB_Texture, 4);
 
                     m.Uniform1("MoveFactor", moveFactor);
-                    var camerPos = GameDirect.Instance.MainScene.MainCamera.eye;
+                    var mainCamera = GameDirect.Instance.MainScene.MainCamera;
+                    var camerPos = mainCamera.eye;
                     m.Uniform3("CameraPos", camerPos.X, camerPos.Y, camerPos.Z);
+                    m.Uniform1("Near", mainCamera.zNear);
+                    m.Uniform1("Far", mainCamera.zFar);
+
                     var modelMatrix = WorldModelMatrix * LocalModelMatrix;
                     m.UniformMatrix4("ModelMatrix", ref modelMatrix, true);
 
@@ -61,9 +66,9 @@ namespace MyRender.Game
             },
             this,
             ModelList[0],
-            Render.Normal);
+            Render.Blend);
             render.PassPreRender = true;
-
+            render.EnableBlend( BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             RenderList.Add(render);
         }
 

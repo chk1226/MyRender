@@ -57,6 +57,17 @@ namespace MyRender.MyEngine
                         m.Uniform3("DIR_LIGHT", dir.X, dir.Y, dir.Z);
                     }
 
+                    if (r.ReplaceRender != null && r.ReplaceRender.Parameter.Count != 0)
+                    {
+                        var clipPlane = (Vector4)r.ReplaceRender.Parameter[0];
+                        if (clipPlane != null)
+                        {
+                            m.Uniform4("ClipPlane", clipPlane.X, clipPlane.Y, clipPlane.Z, clipPlane.W);
+                        }
+                    }
+                    var modelm = WorldModelMatrix * LocalModelMatrix;
+                    m.UniformMatrix4("ModelMatrix", ref modelm, true);
+
                 }
             },
             this,

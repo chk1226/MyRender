@@ -236,13 +236,30 @@ namespace MyRender.MyEngine
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             // depth
-            DB = GL.GenRenderbuffer();
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, DB);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer,
-                RenderbufferStorage.DepthComponent,
+            DB_Texture = GL.GenTexture();
+            GL.BindTexture( TextureTarget.Texture2D, DB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                TextureParameterName.TextureMinFilter,
+                (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.Clamp);
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+                PixelInternalFormat.DepthComponent,
                 vp.Width,
-                vp.Height);
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+                vp.Height,
+                0,
+                PixelFormat.DepthComponent,
+                PixelType.Float,
+                IntPtr.Zero);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
             //frame buffer
             FB = GL.GenFramebuffer();
@@ -251,10 +268,10 @@ namespace MyRender.MyEngine
                                         FramebufferAttachment.ColorAttachment0,
                                         TextureTarget.Texture2D,
                                         CB_Texture, 0);
-            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer,
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
                 FramebufferAttachment.DepthAttachment,
-                RenderbufferTarget.Renderbuffer,
-                DB);
+                TextureTarget.Texture2D,
+                DB_Texture, 0);
 
             if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
                 Log.Print("GenGaussianFrame fail...");
