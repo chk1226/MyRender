@@ -16,9 +16,12 @@ namespace MyRender.MyEngine
             GaussianRXFrame,
             GaussianRYFrame,
             ReflectionFrame,
-            RefractionFrame
-        }
+            RefractionFrame,
+            RGBFColorDepth,
+            RGBFColorDepth2,
+            RGBFColorDepth3,
 
+        }
 
         public int FB = 0;
         public int DB_Texture = 0;
@@ -48,7 +51,7 @@ namespace MyRender.MyEngine
 
             var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
             GL.TexImage2D(TextureTarget.Texture2D, 0,
-            PixelInternalFormat.R32f,
+            PixelInternalFormat.R16f,
             vp.Width,
             vp.Height,
             0,
@@ -91,7 +94,7 @@ namespace MyRender.MyEngine
 
             var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
             GL.TexImage2D(TextureTarget.Texture2D, 0,
-            PixelInternalFormat.R32f,
+            PixelInternalFormat.R16f,
             vp.Width,
             vp.Height,
             0,
@@ -206,6 +209,79 @@ namespace MyRender.MyEngine
 
         }
 
+        public void GenRGBFColorDepthFrame()
+        {
+            // color
+            CB_Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, CB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMinFilter,
+                            (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.ClampToEdge);
+
+            var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+            PixelInternalFormat.Rgb16f,
+            vp.Width,
+            vp.Height,
+            0,
+            PixelFormat.Rgb,
+            PixelType.Float,
+            IntPtr.Zero);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            // depth
+            DB_Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, DB_Texture);
+            GL.TexParameter(TextureTarget.Texture2D,
+                TextureParameterName.TextureMinFilter,
+                (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureMagFilter,
+                            (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapS,
+                            (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D,
+                            TextureParameterName.TextureWrapT,
+                            (int)TextureWrapMode.Clamp);
+            GL.TexImage2D(TextureTarget.Texture2D, 0,
+                PixelInternalFormat.DepthComponent,
+                vp.Width,
+                vp.Height,
+                0,
+                PixelFormat.DepthComponent,
+                PixelType.Float,
+                IntPtr.Zero);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            //frame buffer
+            FB = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FB);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+                                        FramebufferAttachment.ColorAttachment0,
+                                        TextureTarget.Texture2D,
+                                        CB_Texture, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+                FramebufferAttachment.DepthAttachment,
+                TextureTarget.Texture2D,
+                DB_Texture, 0);
+
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                Log.Print("GenGaussianFrame fail...");
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
         public void GenRGBColorDepthFrame()
         {
             // color
@@ -303,7 +379,7 @@ namespace MyRender.MyEngine
 
             var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
             GL.TexImage2D(TextureTarget.Texture2D, 0,
-            PixelInternalFormat.Rg32f,
+            PixelInternalFormat.Rg16f,
             vp.Width,
             vp.Height,
             0,
@@ -352,7 +428,7 @@ namespace MyRender.MyEngine
 
             var vp = GameDirect.Instance.MainScene.MainCamera.Viewport;
             GL.TexImage2D(TextureTarget.Texture2D, 0,
-            PixelInternalFormat.Rg32f,
+            PixelInternalFormat.Rg16f,
             vp.Width,
             vp.Height,
             0,

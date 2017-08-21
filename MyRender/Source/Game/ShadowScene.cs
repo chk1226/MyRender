@@ -67,31 +67,31 @@ namespace MyRender.Game
             AddChild(plane);
 
             var vp = MainCamera.Viewport;
-            var gaussian = new ScreenEffect(vp.Width, vp.Height);
+            var gaussian = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender + 1);
             gaussian.EnableGaussian(true);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ShadowmapFrame),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame));
             AddChild(gaussian);
 
-            gaussian = new ScreenEffect(vp.Width, vp.Height);
+            gaussian = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender);
             gaussian.EnableGaussian(false);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianXFrame),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianYFrame));
             AddChild(gaussian);
 
-            var ssao = new ScreenEffect(vp.Width, vp.Height);
+            var ssao = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender + 2);
             ssao.EnableSSAO();
             ssao.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBuffer),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame));
             AddChild(ssao);
 
-            gaussian = new ScreenEffect(vp.Width, vp.Height);
+            gaussian = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender + 1);
             gaussian.EnableGaussian(true);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianRXFrame));
             AddChild(gaussian);
 
-            gaussian = new ScreenEffect(vp.Width, vp.Height);
+            gaussian = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender);
             gaussian.EnableGaussian(false);
             gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianRXFrame),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GaussianRYFrame));

@@ -56,12 +56,39 @@ namespace MyRender.Game
             cube.LocalPosition = new Vector3(-7, 0, 30);
             AddChild(cube);
 
-            //var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture);
-            //AddChild(uisprite);
+            // post render;
+            GameDirect.Instance.ChangeRenderFrame(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).FB);
+            var vp = MainCamera.Viewport;
+            var filter = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
+            filter.EnableBrightFilter();
+            filter.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
+            AddChild(filter);
+
+            ScreenEffect gaussian;
+            for (int i = 1; i < 5; i++)
+            {
+                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2 - 1));
+                gaussian.EnableGaussian(true);
+                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2),
+                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3));
+                AddChild(gaussian);
+
+                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2));
+                gaussian.EnableGaussian(false);
+                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3),
+                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
+                AddChild(gaussian);
+            }
+
+            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 50);
+            result.EnableCombineBright(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2).CB_Texture);
+            AddChild(result);
+
 
             //var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture);
             //AddChild(uisprite);
-
 
             UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
                 "GoBack");

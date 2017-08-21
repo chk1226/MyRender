@@ -61,40 +61,39 @@ namespace MyRender.MyEngine
             {
                 case FrameBuffer.Type.ShadowmapFrame:
                     f.GenShadowmapFrame();
-                    f.type = FrameBuffer.Type.ShadowmapFrame;
                     break;
                 case FrameBuffer.Type.GaussianXFrame:
                     f.GenGaussianFrame();
-                    f.type = FrameBuffer.Type.GaussianXFrame;
                     break;
                 case FrameBuffer.Type.GaussianYFrame:
                     f.GenGaussianFrame();
-                    f.type = FrameBuffer.Type.GaussianYFrame;
                     break;
                 case FrameBuffer.Type.GBuffer:
                     f.GenGBuffer();
-                    f.type = FrameBuffer.Type.GBuffer;
                     break;
                 case FrameBuffer.Type.SSAOFrame:
                     f.GenSSAOFrame();
-                    f.type = FrameBuffer.Type.SSAOFrame;
                     break;
                 case FrameBuffer.Type.GaussianRXFrame:
                     f.GenGaussianFrame();
-                    f.type = FrameBuffer.Type.GaussianRXFrame;
                     break;
                 case FrameBuffer.Type.GaussianRYFrame:
                     f.GenGaussianFrame();
-                    f.type = FrameBuffer.Type.GaussianRYFrame;
                     break;
-
                 case FrameBuffer.Type.ReflectionFrame:
                     f.GenRGBColorDepthFrame();
-                    f.type = FrameBuffer.Type.ReflectionFrame;
                     break;
                 case FrameBuffer.Type.RefractionFrame:
                     f.GenRGBColorDepthFrame();
-                    f.type = FrameBuffer.Type.RefractionFrame;
+                    break;
+                case FrameBuffer.Type.RGBFColorDepth:
+                    f.GenRGBFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBFColorDepth2:
+                    f.GenRGBFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBFColorDepth3:
+                    f.GenRGBFColorDepthFrame();
                     break;
                 default:
                     f = null;
@@ -103,6 +102,7 @@ namespace MyRender.MyEngine
 
             if( f != null)
             {
+                f.type = type;
                 _frameBuffer.Add(f.type, f);
             }
 

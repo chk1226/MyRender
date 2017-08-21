@@ -13,14 +13,16 @@ namespace MyRender.MyEngine
         {
             None,
             Gaussian,
-            SSAO
+            SSAO,
+            BrightFilter,
+            CombineBright
         }
 
         private EffectType type = EffectType.None;
-        //private Vector2 rect;
         static private readonly string screenEffectID = "ScreenEffect";
-        private FrameBuffer useFrame;
-        private FrameBuffer bindFrame;
+        private FrameBuffer useFrame = null;
+        private FrameBuffer bindFrame = null;
+        private int renderPriority;
 
         // Gaussian
         private bool isHorizontal;
@@ -30,6 +32,9 @@ namespace MyRender.MyEngine
         private Vector3[] rotationNoise;
         private string rotationNoiseTextureID = "SSAO_RotationNoise";
 
+        //CombineBright
+        private int colorTexture;
+        private int blurTexture;
 
         public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
         {
@@ -43,6 +48,18 @@ namespace MyRender.MyEngine
             isHorizontal = horizontal;
         }
 
+        public void EnableBrightFilter()
+        {
+            type = EffectType.BrightFilter;
+        }
+
+        public void EnableCombineBright(int color, int blur)
+        {
+            type = EffectType.CombineBright;
+            colorTexture = color;
+            blurTexture = blur;
+        }
+
         public void EnableSSAO()
         {
             type = EffectType.SSAO;
@@ -53,9 +70,9 @@ namespace MyRender.MyEngine
             genRotationNoise();
         }
 
-        public ScreenEffect(float width, float height) : base(width, height, 1, 1, screenEffectID)
+        public ScreenEffect(float width, float height, int priority) : base(width, height, 1, 1, screenEffectID)
         {
-
+            renderPriority = priority;
             LocalPosition = new Vector3(-rect.X / 2.0f, 0, -rect.Y / 2.0f);
             Rotation(1, 0, 0, -90);
 
@@ -66,9 +83,9 @@ namespace MyRender.MyEngine
             base.OnStart();
             var modelData = ModelList[0];
 
+            var material = new Material();
             if (type == EffectType.Gaussian)
             {
-                var material = new Material();
                 material.ShaderProgram = Resource.Instance.GetShader(Resource.SGaussianBlur);
                 Render render = Render.CreateRender(material, delegate (Render r)
                 {
@@ -92,13 +109,12 @@ namespace MyRender.MyEngine
                 },
                 this,
                 modelData,
-                (isHorizontal) ? Render.PrePostrender + 1 : Render.PrePostrender);
+                renderPriority);
 
                 RenderList.Add(render);
             }
             else if(type == EffectType.SSAO)
             {
-                var material = new Material();
                 material.ShaderProgram = Resource.Instance.GetShader(Resource.SSSAO);
                 Render render = Render.CreateRender(material, delegate (Render r)
                 {
@@ -126,7 +142,47 @@ namespace MyRender.MyEngine
                 },
                 this,
                 modelData,
-                Render.PrePostrender + 2);
+                renderPriority);
+
+                RenderList.Add(render);
+            }
+            else if(type == EffectType.BrightFilter)
+            {
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SBrightFilter);
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
+                    var m = r.MaterialData;
+
+                    if (m.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(m.ShaderProgram);
+
+                        if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
+                    }
+                },
+                this,
+                modelData,
+                renderPriority);
+
+                RenderList.Add(render);
+            }
+            else if(type == EffectType.CombineBright)
+            {
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SCombineBright);
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
+                    var m = r.MaterialData;
+
+                    if (m.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(m.ShaderProgram);
+                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, colorTexture, 0);
+                        m.UniformTexture("BLUR", TextureUnit.Texture1, blurTexture, 1);
+                    }
+                },
+                this,
+                modelData,
+                renderPriority);
 
                 RenderList.Add(render);
             }
@@ -134,9 +190,15 @@ namespace MyRender.MyEngine
 
         public override void OnRenderBegin(FrameEventArgs e)
         {
-
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindFrame.FB);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            if(bindFrame == null)
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            }
+            else
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindFrame.FB);
+            }
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.PushMatrix();

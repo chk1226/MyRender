@@ -29,6 +29,8 @@ namespace MyRender.MyEngine
             private set { _mainScene = value; }
         }
 
+        private int renderFrame = 0;
+
         private List<Render> _prerenderList = new List<Render>(50);
         private List<Render> _prepostrenderList = new List<Render>(10);
         private List<Render> _renderList = new List<Render>(100);
@@ -46,6 +48,7 @@ namespace MyRender.MyEngine
 
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
+            GL.ClearColor(Color4.Gray);
 
         }
 
@@ -75,6 +78,7 @@ namespace MyRender.MyEngine
                     Resource.Instance.ReleaseFont();
                     Resource.Instance.ReleaseFrameBuffer();
 
+                    renderFrame = 0;
                 }
 
                 MainScene = scene;
@@ -235,7 +239,20 @@ namespace MyRender.MyEngine
 
 
             // postrender sort
-            //TODO
+            _postrenderList.Sort(delegate (Render x, Render y)
+            {
+                if (x.Priority > y.Priority)
+                {
+                    return -1;
+                }
+                else if (x.Priority < y.Priority)
+                {
+                    return 1;
+                }
+
+                return 0;
+
+            });
 
             // for debug
             //Log.Print("***sortSceneGraph****");
@@ -286,10 +303,22 @@ namespace MyRender.MyEngine
             }
         }
 
+        private void doPostrender(FrameEventArgs e)
+        {
+            foreach (var post in _postrenderList)
+            {
+                post.OnRenderBegin(e);
+                post.OnRender(e);
+                post.OnRenderFinsh(e);
+
+            }
+        }
 
         private void doRender(FrameEventArgs e)
         {
-            GL.ClearColor(Color4.Gray);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, renderFrame);
+
+            //GL.ClearColor(Color4.Gray);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             foreach(var render in _renderList)
@@ -298,6 +327,9 @@ namespace MyRender.MyEngine
                 render.OnRender(e);
                 render.OnRenderFinsh(e);
             }
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
         }
 
         public void OnWindowResize()
@@ -323,8 +355,12 @@ namespace MyRender.MyEngine
             doRender(e);
 
             // postrender
-            //TODO
+            doPostrender(e);
         }
 
+        public void ChangeRenderFrame(int frameID)
+        {
+            renderFrame = frameID;
+        }
     }
 }
