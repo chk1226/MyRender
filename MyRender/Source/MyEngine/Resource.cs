@@ -95,6 +95,12 @@ namespace MyRender.MyEngine
                 case FrameBuffer.Type.RGBFColorDepth3:
                     f.GenRGBFColorDepthFrame();
                     break;
+                case FrameBuffer.Type.RGBFColorDepth4:
+                    f.GenRGBFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBFColorDepth5:
+                    f.GenRGBFColorDepthFrame();
+                    break;
                 default:
                     f = null;
                     break;

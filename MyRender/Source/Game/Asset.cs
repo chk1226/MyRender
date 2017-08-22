@@ -25,7 +25,7 @@ namespace MyRender.MyEngine
         public static readonly string SWater = @"Source\Shader\Water.glsl";
         public static readonly string SBrightFilter = @"Source\Shader\BrightFilter.glsl";
         public static readonly string SCombineBright = @"Source\Shader\CombineBright.glsl";
-
+        public static readonly string SDOF = @"Source\Shader\DepthOfField.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";

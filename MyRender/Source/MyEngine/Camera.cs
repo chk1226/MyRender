@@ -70,6 +70,7 @@ namespace MyRender.MyEngine
         public Vector3 focus { get; private set; }
         public Vector3 vUp { get; private set; }
         private Vector3 eye_rotation;
+        public Vector3 EyeRotation { get { return eye_rotation; } }
 
         private Matrix4 _projectMatrix;
         public Matrix4 ProjectMatix
@@ -173,6 +174,8 @@ namespace MyRender.MyEngine
         {
             eye_rotation.Z += delta_z;
             applyZoomInOut(min, max);
+
+            Log.Print(eye_rotation.Z.ToString());
         }
 
         public void ResetZoomInOut(float z, float min, float max)

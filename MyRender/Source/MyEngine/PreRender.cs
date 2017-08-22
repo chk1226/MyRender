@@ -144,7 +144,7 @@ namespace MyRender.MyEngine
                 aspect = (float)c.Viewport.Width / c.Viewport.Height;
             }
 
-            reflectionProjectMatrix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(c.fovy * 2f), aspect, c.zNear, c.zFar));
+            reflectionProjectMatrix = Matrix4.Transpose(Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(c.fovy * 2.5f), aspect, c.zNear, c.zFar));
         }
 
         public override void OnUpdate(FrameEventArgs e)

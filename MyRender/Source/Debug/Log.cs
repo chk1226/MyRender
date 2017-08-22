@@ -10,12 +10,17 @@ namespace MyRender.Debug
     {
         public static void Print(string str)
         {
+#if DEBUG
             Console.WriteLine(str);
+#endif
         }
 
         public static void Assert(string str)
         {
+#if DEBUG
             System.Diagnostics.Debug.Assert(false, str);
+#endif
+
         }
     }
 }

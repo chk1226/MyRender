@@ -27,10 +27,18 @@ namespace MyRender.Game
             AddChild(a);
 
             a = new UIButton(new Rectangle(winRect.Width / 2, spaceY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
-                "SoftShadowMap, SSAO");
+                "VSM ShadowMap, SSAO");
             a.OnClick += delegate ()
             {
                 GameDirect.Instance.RunWithScene(new ShadowScene());
+            };
+            AddChild(a);
+
+            a = new UIButton(new Rectangle(spaceX, spaceY*2 + hY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "Terrain, Water, HDR, Bloom, DOF");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new TerrainScene());
             };
             AddChild(a);
 

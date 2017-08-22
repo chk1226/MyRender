@@ -35,7 +35,7 @@ namespace MyRender
             720,
             OpenTK.Graphics.GraphicsMode.Default,
             "openGL",
-            GameWindowFlags.Default,
+            GameWindowFlags.FixedWindow,
             DisplayDevice.Default
             )
         {
@@ -51,9 +51,9 @@ namespace MyRender
         {
             base.OnLoad(e);
             GameDirect.Instance.Initial();
-            //GameDirect.Instance.RunWithScene(new Game.BaseRenderScene());
-            GameDirect.Instance.RunWithScene(new Game.ShadowScene());
-            //GameDirect.Instance.RunWithScene(new Game.MenuScene());
+            //GameDirect.Instance.RunWithScene(new Game.ShadowScene());
+            //GameDirect.Instance.RunWithScene(new Game.TerrainScene());
+            GameDirect.Instance.RunWithScene(new Game.MenuScene());
 
 
             Mouse.WheelChanged += delegate (object sender, OpenTK.Input.MouseWheelEventArgs _e)

@@ -15,7 +15,8 @@ namespace MyRender.MyEngine
             Gaussian,
             SSAO,
             BrightFilter,
-            CombineBright
+            CombineBright,
+            DepthOfField
         }
 
         private EffectType type = EffectType.None;
@@ -35,6 +36,10 @@ namespace MyRender.MyEngine
         //CombineBright
         private int colorTexture;
         private int blurTexture;
+        private float scaleValue;
+
+        // dof
+        private int depthTexture;
 
         public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
         {
@@ -42,10 +47,11 @@ namespace MyRender.MyEngine
             bindFrame = bind;
         }
 
-        public void EnableGaussian(bool horizontal)
+        public void EnableGaussian(bool horizontal, float scale = 1)
         {
             type = EffectType.Gaussian;
             isHorizontal = horizontal;
+            scaleValue = scale;
         }
 
         public void EnableBrightFilter()
@@ -58,6 +64,14 @@ namespace MyRender.MyEngine
             type = EffectType.CombineBright;
             colorTexture = color;
             blurTexture = blur;
+        }
+
+        public void EnableDepthOfField(int color, int blur, int depth)
+        {
+            type = EffectType.DepthOfField;
+            colorTexture = color;
+            blurTexture = blur;
+            depthTexture = depth;
         }
 
         public void EnableSSAO()
@@ -98,11 +112,11 @@ namespace MyRender.MyEngine
                         if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
                         if (!isHorizontal)
                         {
-                            m.Uniform2("Offset", 0, 1.0f / rect.Y);
+                            m.Uniform2("Offset", 0, 1.0f / rect.Y * scaleValue);
                         }
                         else
                         {
-                            m.Uniform2("Offset", 1.0f / rect.X, 0);
+                            m.Uniform2("Offset", 1.0f / rect.X * scaleValue, 0);
                         }
 
                     }
@@ -178,6 +192,32 @@ namespace MyRender.MyEngine
                         GL.UseProgram(m.ShaderProgram);
                         m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, colorTexture, 0);
                         m.UniformTexture("BLUR", TextureUnit.Texture1, blurTexture, 1);
+                    }
+                },
+                this,
+                modelData,
+                renderPriority);
+
+                RenderList.Add(render);
+            }
+            else if(type == EffectType.DepthOfField)
+            {
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SDOF);
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
+                    var m = r.MaterialData;
+
+                    if (m.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(m.ShaderProgram);
+                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, colorTexture, 0);
+                        m.UniformTexture("BLUR", TextureUnit.Texture1, blurTexture, 1);
+                        m.UniformTexture("DEPTH", TextureUnit.Texture2, depthTexture, 2);
+
+                        var mainCamera = GameDirect.Instance.MainScene.MainCamera;
+                        m.Uniform1("Near", mainCamera.zNear);
+                        m.Uniform1("Far", mainCamera.zFar);
+                        m.Uniform1("Zoom", mainCamera.EyeRotation.Z);
                     }
                 },
                 this,

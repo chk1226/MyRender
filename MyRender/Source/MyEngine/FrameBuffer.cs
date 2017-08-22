@@ -20,6 +20,8 @@ namespace MyRender.MyEngine
             RGBFColorDepth,
             RGBFColorDepth2,
             RGBFColorDepth3,
+            RGBFColorDepth4,
+            RGBFColorDepth5
 
         }
 
@@ -277,7 +279,7 @@ namespace MyRender.MyEngine
                 DB_Texture, 0);
 
             if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
-                Log.Print("GenGaussianFrame fail...");
+                Log.Print("GenRGBFColorDepthFrame fail...");
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
@@ -350,7 +352,7 @@ namespace MyRender.MyEngine
                 DB_Texture, 0);
 
             if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
-                Log.Print("GenGaussianFrame fail...");
+                Log.Print("GenRGBColorDepthFrame fail...");
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }

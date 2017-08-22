@@ -14,6 +14,8 @@ namespace MyRender.Game
         private float min_camerz = 5;
         private float skyboxSize = 80;
         private float waterHeight = 0;
+
+        private float limitY = 83;
         public override void OnStart()
         {
             base.OnStart();
@@ -21,7 +23,9 @@ namespace MyRender.Game
             var light = new Light();
             AddChild(light);
 
-            MainCamera.ResetZoomInOut(25, min_camerz, max_camerz);
+            MainCamera.ResetZoomInOut(17, min_camerz, max_camerz);
+            MainCamera.ResetRotation(-93, limitY);
+            GameDirect.Instance.ChangeRenderFrame(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).FB);
 
             var skybox = new Skybox();
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
@@ -48,7 +52,7 @@ namespace MyRender.Game
             AddChild(pre);
 
             var cube = new Cube();
-            cube.LocalPosition = new Vector3(8, 0, -5);
+            cube.LocalPosition = new Vector3(5, 0, -5);
             AddChild(cube);
 
             cube = new Cube();
@@ -56,38 +60,9 @@ namespace MyRender.Game
             cube.LocalPosition = new Vector3(-7, 0, 30);
             AddChild(cube);
 
-            // post render;
-            GameDirect.Instance.ChangeRenderFrame(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).FB);
-            var vp = MainCamera.Viewport;
-            var filter = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
-            filter.EnableBrightFilter();
-            filter.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth),
-                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
-            AddChild(filter);
+            postRender();
 
-            ScreenEffect gaussian;
-            for (int i = 1; i < 5; i++)
-            {
-                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2 - 1));
-                gaussian.EnableGaussian(true);
-                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2),
-                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3));
-                AddChild(gaussian);
-
-                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2));
-                gaussian.EnableGaussian(false);
-                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3),
-                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
-                AddChild(gaussian);
-            }
-
-            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 50);
-            result.EnableCombineBright(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).CB_Texture,
-                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2).CB_Texture);
-            AddChild(result);
-
-
-            //var uisprite = new UISprite(new Rectangle(25, 25, 300, 300), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).CB_Texture);
+            //var uisprite = new UISprite(new Rectangle(25, 25, 700, 500), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth5).CB_Texture);
             //AddChild(uisprite);
 
             UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
@@ -97,6 +72,75 @@ namespace MyRender.Game
                 GameDirect.Instance.RunWithScene(new MenuScene());
             };
             AddChild(a);
+        }
+
+        private void postRender()
+        {
+            ScreenEffect gaussian;
+            var vp = MainCamera.Viewport;
+
+            // origin color texture do blur
+            gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
+            gaussian.EnableGaussian(true, 2);
+            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4));
+            AddChild(gaussian);
+
+            gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 1);
+            gaussian.EnableGaussian(false, 2);
+            gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth5));
+            AddChild(gaussian);
+            //for (int i = 1; i < 2; i++)
+            //{
+            //    gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2));
+            //    gaussian.EnableGaussian(true, 2);
+            //    gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth5),
+            //        Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4));
+            //    AddChild(gaussian);
+
+            //    gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2 + 1));
+            //    gaussian.EnableGaussian(false, 2);
+            //    gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4),
+            //        Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth5));
+            //    AddChild(gaussian);
+            //}
+
+            // bright filter
+            var filter = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
+            filter.EnableBrightFilter();
+            filter.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
+            AddChild(filter);
+
+            // bright gaussian
+            for (int i = 1; i < 3; i++)
+            {
+                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2 - 1));
+                gaussian.EnableGaussian(true, 2);
+                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2),
+                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3));
+                AddChild(gaussian);
+
+                gaussian = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - (i * 2));
+                gaussian.EnableGaussian(false, 2);
+                gaussian.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth3),
+                    Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
+                AddChild(gaussian);
+            }
+
+            // dof
+            var dof = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 49);
+            dof.EnableDepthOfField(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth5).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth).DB_Texture);
+            dof.SetFrameBuffer(null, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4));
+            AddChild(dof);
+
+            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 50);
+            result.EnableCombineBright(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth4).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2).CB_Texture);
+            AddChild(result);
         }
 
         public override void OnMouseDown(MouseButtonEventArgs e)
@@ -118,9 +162,15 @@ namespace MyRender.Game
 
             if (e.Mouse.RightButton == ButtonState.Pressed)
             {
+
                 var dX = e.X - _regMousePos.X;
                 var dY = e.Y - _regMousePos.Y;
 
+                if(MainCamera.EyeRotation.Y > limitY &&
+                    dY > 0)
+                {
+                    dY = 0;
+                }
                 MainCamera.RotationScreen(dX, dY);
 
                 _regMousePos.X = e.X;
