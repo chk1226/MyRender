@@ -91,7 +91,11 @@ namespace MyRender.MyEngine
 
         private static readonly int octaves = 4;
         private static readonly float persistence = 0.3f;
-        private static float noiseScale =10;
+#if DEBUG
+        private static float noiseScale = 10;
+#else
+        private static float noiseScale = 18;
+#endif
 
         //reference 
         // https://www.shadertoy.com/view/Mls3RS
@@ -99,7 +103,11 @@ namespace MyRender.MyEngine
         static float noise(int x, int y)
         {
             float dot = Vector2.Dot(new Vector2(x, y), new Vector2(12.9898f, 78.233f));
+#if DEBUG
             dot = (float)Math.Sin(dot) * 36875.5453f;
+#else
+            dot = (float)Math.Sin(dot) * 46500.5453f;
+#endif
             dot -= (int)dot;
 
             return dot;
@@ -152,7 +160,7 @@ namespace MyRender.MyEngine
             return sum;
         }
 
-        #endregion
+#endregion
 
 
 

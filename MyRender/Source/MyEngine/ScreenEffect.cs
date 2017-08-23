@@ -7,6 +7,8 @@ namespace MyRender.MyEngine
 {
     // ssao reference
     // https://learnopengl.com/#!Advanced-Lighting/SSAO
+    // dfo reference
+    // http://encelo.netsons.org/2008/04/15/depth-of-field-reloaded/
     class ScreenEffect : Plane
     {
         public enum EffectType

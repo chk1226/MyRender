@@ -64,7 +64,7 @@ void main(void)
 	// Fresnel Effect
 	float refractionFactor = dot(normalize(ToCamera), vec3(0, 1, 0));
 	// pow is tweak value
-	vec4 color = mix(reflection, refraction, pow(refractionFactor, 2));
+	vec4 color = mix(reflection, refraction, refractionFactor);
 	color = mix(color, vec4(0, 0.3, 0.5, 1), 0.1);
 
 	// specular
@@ -77,7 +77,7 @@ void main(void)
 	vec4 Ls = gl_LightSource[0].specular * dot_value * 0.7 * clamp(floorToSurface / 5, 0.0, 1.0);
 
 	vec4 result = color + Ls;
-	result.a = clamp(floorToSurface / 2, 0.0, 1.0);
+	result.a = clamp(floorToSurface / 5, 0.0, 1.0);
     gl_FragColor = result;
 
 }
