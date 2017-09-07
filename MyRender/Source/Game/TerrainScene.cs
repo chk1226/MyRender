@@ -11,7 +11,7 @@ namespace MyRender.Game
     {
         private Vector2 _regMousePos = Vector2.Zero;
         private float max_camerz = 70;
-        private float min_camerz = 5;
+        private float min_camerz = 17;
         private float skyboxSize = 80;
         private float waterHeight = 0;
 
@@ -166,12 +166,14 @@ namespace MyRender.Game
                 var dX = e.X - _regMousePos.X;
                 var dY = e.Y - _regMousePos.Y;
 
-                if(MainCamera.EyeRotation.Y > limitY &&
-                    dY > 0)
+                if(MainCamera.EyeRotation.Y + dY > limitY)
                 {
-                    dY = 0;
+                    MainCamera.ResetRotation(MainCamera.EyeRotation.X + dX, limitY);
                 }
-                MainCamera.RotationScreen(dX, dY);
+                else
+                {
+                    MainCamera.RotationScreen(dX, dY);
+                }
 
                 _regMousePos.X = e.X;
                 _regMousePos.Y = e.Y;
