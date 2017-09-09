@@ -1,4 +1,5 @@
 ﻿@vertex shader
+#version 120 
 varying vec4 posE;	
 
 void main(void)
@@ -10,6 +11,8 @@ void main(void)
 }
 
 @fragment shader
+#version 120 
+
 uniform sampler2D TEX_COLOR;
 //uniform vec4 BASE_COLOR;
 
@@ -20,7 +23,7 @@ void main(void)
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
 
 	color.a = (color.r + color.g + color.b) / 3;
-
+	
 	//if(color.r < 0.3 && color.g < 0.3 && color.b < 0.3)
 	//{
 	//	color.a = 0;

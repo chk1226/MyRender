@@ -421,6 +421,7 @@ namespace MyRender.MyEngine
                         while (s != @"@fragment shader")
                         {
                             v_s += s;
+                            v_s += "\n";
                             s = reader.ReadLine();
                         }
                     }

@@ -26,6 +26,7 @@ namespace MyRender.MyEngine
         public static readonly string SBrightFilter = @"Source\Shader\BrightFilter.glsl";
         public static readonly string SCombineBright = @"Source\Shader\CombineBright.glsl";
         public static readonly string SDOF = @"Source\Shader\DepthOfField.glsl";
+        public static readonly string SParticle = @"Source\Shader\Particle.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";
@@ -65,6 +66,7 @@ namespace MyRender.MyEngine
         public static readonly string MHomeGUID = "Home";
         public static readonly string MSkyboxGUID = "Skybox";
         public static readonly string MPlaneGUID = "Plane";
+
         //public static readonly string MUISpriteGUID = "UISprite";
 
         public Material CreatePlaneM()
