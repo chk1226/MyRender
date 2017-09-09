@@ -14,6 +14,8 @@ namespace MyRender.MyEngine
         public static readonly int Blend = 800;
         public static readonly int UI = 750;
         public static readonly int Postrender = 500;
+        public static readonly int OPENGL_120 = 120;
+        public static readonly int OPENGL_330 = 330;
         public static int DrawcallCount = 0;
 
         public int Priority;
@@ -25,6 +27,7 @@ namespace MyRender.MyEngine
         public List<object> Parameter = new List<object>();
         public Vector2 PreRenderRange = new Vector2(Normal, Normal);
         public bool PassPreRender = false;
+        public int ShaderVersion = OPENGL_120;
 
         private List<VertexAttribute> vertexAttribute = new List<VertexAttribute>();
         private bool enableBlend = false;
@@ -62,6 +65,19 @@ namespace MyRender.MyEngine
             va.size = size;
             va.normalize = normalize;
             va.shader = MaterialData.ShaderProgram;
+
+            vertexAttribute.Add(va);
+        }
+
+        public void AddVertexAttribute330(string name, int bufferID, int size, bool normalize, int locID)
+        {
+            var va = new VertexAttribute();
+            va.name = name;
+            va.bufferID = bufferID;
+            va.size = size;
+            va.normalize = normalize;
+            va.shader = MaterialData.ShaderProgram;
+            va.LocationID = locID;
 
             vertexAttribute.Add(va);
         }
@@ -118,52 +134,66 @@ namespace MyRender.MyEngine
                 GL.Enable(EnableCap.Blend);
             }
 
-            // bind vertex buffer 
-            if (ModelData.VBO != 0)
+            if(ShaderVersion == OPENGL_120)
             {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
-                GL.EnableClientState(ArrayCap.VertexArray);
-                GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-            }
+                // bind vertex buffer 
+                if (ModelData.VBO != 0)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
+                    GL.EnableClientState(ArrayCap.VertexArray);
+                    GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
+                }
 
-            // bind normal buffer
-            if(ModelData.NBO != 0)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.NBO);
-                GL.EnableClientState(ArrayCap.NormalArray);
-                GL.NormalPointer(NormalPointerType.Float, 0, 0);
-            }
+                // bind normal buffer
+                if(ModelData.NBO != 0)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.NBO);
+                    GL.EnableClientState(ArrayCap.NormalArray);
+                    GL.NormalPointer(NormalPointerType.Float, 0, 0);
+                }
 
-            // bind texture coord buffer
-            if(ModelData.TBO != 0)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
-                GL.EnableClientState(ArrayCap.TextureCoordArray);
-                GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
+                // bind texture coord buffer
+                if(ModelData.TBO != 0)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
+                    GL.EnableClientState(ArrayCap.TextureCoordArray);
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
+                }
             }
 
             // bind Vertex Attribute Array
             foreach (var va in vertexAttribute)
             {
-                va.BindVertexAttribute();
+                if(ShaderVersion == OPENGL_120)
+                {
+                    va.BindVertexAttribute();
+                }
+                else if(ShaderVersion == OPENGL_330)
+                {
+                    va.BindVertexAttribute330();
+                }
             }
 
             DrawCall(ModelData.DrawType, ModelData.Vertices.Length);
 
-            if(ModelData.VBO != 0)
+            if(ShaderVersion == OPENGL_120)
             {
-                GL.DisableClientState(ArrayCap.VertexArray);
+                if(ModelData.VBO != 0)
+                {
+                    GL.DisableClientState(ArrayCap.VertexArray);
+                }
+
+                if(ModelData.NBO != 0)
+                {
+                    GL.DisableClientState(ArrayCap.NormalArray);
+                }
+
+                if(ModelData.TBO != 0)
+                {
+                    GL.DisableClientState(ArrayCap.TextureCoordArray);
+                }
             }
 
-            if(ModelData.NBO != 0)
-            {
-                GL.DisableClientState(ArrayCap.NormalArray);
-            }
-
-            if(ModelData.TBO != 0)
-            {
-                GL.DisableClientState(ArrayCap.TextureCoordArray);
-            }
 
             //Disable Vertex AttribArray
             foreach (var va in vertexAttribute)
@@ -232,6 +262,13 @@ namespace MyRender.MyEngine
             public void BindVertexAttribute()
             {
                 LocationID = GL.GetAttribLocation(shader, name);
+                GL.EnableVertexAttribArray(LocationID);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, bufferID);
+                GL.VertexAttribPointer(LocationID, size, VertexAttribPointerType.Float, normalize, 0, 0);
+            }
+
+            public void BindVertexAttribute330()
+            {
                 GL.EnableVertexAttribArray(LocationID);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, bufferID);
                 GL.VertexAttribPointer(LocationID, size, VertexAttribPointerType.Float, normalize, 0, 0);

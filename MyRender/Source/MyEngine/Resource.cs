@@ -361,13 +361,13 @@ namespace MyRender.MyEngine
 
         public int SetUpShader(string filename)
         {
-            int vert, frag;
-            string v_s = "", f_s = "";
+            int vert, frag, geom = 0;
+            string v_s = "", f_s = "", g_s = "";
             vert = GL.CreateShader(ShaderType.VertexShader);
             frag = GL.CreateShader(ShaderType.FragmentShader);
             int program = GL.CreateProgram();
 
-            loadShaderFile(filename, ref v_s, ref f_s);
+            loadShaderFile(filename, ref v_s, ref f_s, ref g_s);
             GL.ShaderSource(vert, v_s);
             GL.ShaderSource(frag, f_s);
             GL.CompileShader(vert);
@@ -390,6 +390,22 @@ namespace MyRender.MyEngine
 
             GL.AttachShader(program, vert);
             GL.AttachShader(program, frag);
+
+            if (g_s != "")
+            {
+                geom = GL.CreateShader(ShaderType.GeometryShader);
+                GL.ShaderSource(geom, g_s);
+                GL.CompileShader(geom);
+                GL.GetShader(geom, ShaderParameter.CompileStatus, out result);
+                if (result == 0)
+                {
+                    Log.Print("[SetUpShader][GeometryShader)] :" + GL.GetShaderInfoLog(geom));
+                    return 0;
+                }
+                GL.AttachShader(program, geom);
+
+            }
+
             GL.LinkProgram(program);
 
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out result);
@@ -401,10 +417,15 @@ namespace MyRender.MyEngine
             GL.DeleteShader(vert);
             GL.DeleteShader(frag);
 
+            if(geom != 0)
+            {
+                GL.DeleteShader(geom);
+            }
+
             return program;
         }
 
-        private void loadShaderFile(string file, ref string v_s, ref string f_s)
+        private void loadShaderFile(string file, ref string v_s, ref string f_s, ref string g_s)
         {
             string s;
 
@@ -418,11 +439,24 @@ namespace MyRender.MyEngine
                     if (s == @"@vertex shader")
                     {
                         s = reader.ReadLine();
-                        while (s != @"@fragment shader")
+
+                        while (s != @"@fragment shader" && s != @"@geometry shader")
                         {
                             v_s += s;
                             v_s += "\n";
                             s = reader.ReadLine();
+                        }
+
+                        if(s == @"@geometry shader")
+                        {
+                            s = reader.ReadLine();
+
+                            while (s != @"@fragment shader")
+                            {
+                                g_s += s;
+                                g_s += "\n";
+                                s = reader.ReadLine();
+                            }
                         }
                     }
 

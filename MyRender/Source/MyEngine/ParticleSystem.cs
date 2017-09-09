@@ -49,8 +49,11 @@ namespace MyRender.MyEngine
                 {
                     GL.UseProgram(m.ShaderProgram);
 
-                    //m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Resource.Instance.GetTextureID(Resource.ITerrainPlane), 0);
-                    //m.UniformTexture("TEX2_COLOR", TextureUnit.Texture1, Resource.Instance.GetTextureID(Resource.ITerrain2Plane), 1);
+                    var vw = GameDirect.Instance.MainScene.MainCamera.ViewMatrix * WorldModelMatrix * LocalModelMatrix;
+                    m.UniformMatrix4("MODELVIEW", ref vw, true);
+
+                    var project = GameDirect.Instance.MainScene.MainCamera.ProjectMatix;
+                    m.UniformMatrix4("PROJECTION", ref project, true);
 
                     //if (r.ReplaceRender != null && r.ReplaceRender.Parameter.Count != 0)
                     //{
@@ -74,12 +77,10 @@ namespace MyRender.MyEngine
             this,
             ModelList[0],
             Render.Blend);
+            render.ShaderVersion = Render.OPENGL_330;
+            render.AddVertexAttribute330("position", ModelList[0].VBO, 3, false, 0);
 
             RenderList.Add(render);
-
-            // test
-            GL.PointSize(15);
-
         }
 
         private void createParticleModel()
