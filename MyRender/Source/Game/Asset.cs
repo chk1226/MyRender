@@ -50,6 +50,11 @@ namespace MyRender.MyEngine
         public static readonly string ITerrain2Plane = @"Asset\Image\terrain\SoilMud0006_3_S_1.png";
         public static readonly string IDudvmap = @"Asset\Image\dudvmap.png";
         public static readonly string IWaterNormalmap = @"Asset\Image\normalMap.png";
+        public static readonly string IStart = @"Asset\Image\particleStar.png";
+        public static readonly string ICosmic = @"Asset\Image\cosmic.png";
+        public static readonly string IFire = @"Asset\Image\fire.png";
+
+
 
         // xml
         public static readonly string XTTFBitmap = @"Asset\font\Mecha.ttf.xml";

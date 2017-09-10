@@ -16,6 +16,8 @@ namespace MyRender.MyEngine
         private Vector3 direction = Vector3.Zero;
         private float directionDeviation = 0;
         private float recordTime = 0;
+        private string textureName;
+        private Vector2 textureInfo;
 
         // margin variable
         private float speedMargin = 0;
@@ -25,14 +27,17 @@ namespace MyRender.MyEngine
         private List<Particle> particleList = new List<Particle>(150);
         private Matrix4 boardModelMatrix = Matrix4.Identity;
         private bool randomRotation = false;
+        private BlendingFactorDest blendDest = BlendingFactorDest.OneMinusSrcAlpha;
 
-        public ParticleSystem(float pps, float speed, float gravity, float lifeLength, float scale) : base()
+        public ParticleSystem(float pps, float speed, float gravity, float lifeLength, float scale, string textureName, Vector2 textureInfo) : base()
         {
             this.pps = Math.Max(pps, 0.01f);
             this.speed = speed;
             this.gravity = gravity;
             this.lifeLength = lifeLength;
             this.scale = scale;
+            this.textureName = textureName;
+            this.textureInfo = textureInfo;
             createParticleModel();
 
         }
@@ -50,9 +55,11 @@ namespace MyRender.MyEngine
                 if (m.ShaderProgram != 0)
                 {
                     GL.UseProgram(m.ShaderProgram);
+                    
+                    m.Uniform2("Offset", 1 / textureInfo.X, 1 / textureInfo.Y);
 
-                    var world = WorldModelMatrix * LocalModelMatrix;
-                    m.UniformMatrix4("MODEL", ref world, true);
+                    var model = WorldModelMatrix * LocalModelMatrix;
+                    m.UniformMatrix4("MODEL", ref model, true);
 
                     var view = GameDirect.Instance.MainScene.MainCamera.ViewMatrix;
                     m.UniformMatrix4("VIEW", ref view, true);
@@ -62,7 +69,8 @@ namespace MyRender.MyEngine
 
                     updateBoardModelMatrix();
                     m.UniformMatrix4("BoardMatrix", ref boardModelMatrix, true);
-                    
+
+                    m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, Resource.Instance.GetTextureID(textureName), 0);
 
                 }
             },
@@ -73,8 +81,16 @@ namespace MyRender.MyEngine
             render.AddVertexAttribute330("position", ModelList[0].VBO, 3, false, 0);
             render.AddVertexAttribute330("scale", ModelList[0].ScaleBuffer, 1, false, 1);
             render.AddVertexAttribute330("rotation", ModelList[0].RotationBuffer, 1, false, 2);
+            render.AddVertexAttribute330("blendFactor", ModelList[0].BlendFactorBuffer, 1, false, 3);
+            render.AddVertexAttribute330("texCoord", ModelList[0].WeightBuffer, 4, false, 4);
+            render.EnableBlend(BlendingFactorSrc.SrcAlpha, blendDest);
             RenderList.Add(render);
 
+        }
+
+        public void SetBlendFuc(BlendingFactorDest dest)
+        {
+            blendDest = dest;
         }
 
         private void updateBoardModelMatrix()
@@ -109,6 +125,14 @@ namespace MyRender.MyEngine
             // gen rotation buffer
             modelData.Rotation = new float[0];
             modelData.GenRotationBuffer();
+
+            // gen blend factor buffer
+            modelData.BlendFactor = new float[0];
+            modelData.GenBlendFactorBuffer();
+
+            // gen texture coordinate
+            modelData.Weights = new Vector4[0];
+            modelData.GenWeightBuffer();
 
             Resource.Instance.AddModel(modelData);
             ModelList = new Model[1];
@@ -148,6 +172,7 @@ namespace MyRender.MyEngine
             this.direction = direction;
             directionDeviation = (float)(deviation * Math.PI);
         }
+        
 
         public void SetRandomRotation(bool enable)
         {
@@ -161,15 +186,19 @@ namespace MyRender.MyEngine
 
         }
 
-        //public override void OnRenderBegin(FrameEventArgs e)
-        //{
-        //    base.OnRenderBegin(e);
-        //}
+        public override void OnRenderBegin(FrameEventArgs e)
+        {
+            base.OnRenderBegin(e);
+            GL.Disable(EnableCap.DepthTest);
 
-        //public override void OnRenderFinsh(FrameEventArgs e)
-        //{
-        //    base.OnRenderFinsh(e);
-        //}
+        }
+
+        public override void OnRenderFinsh(FrameEventArgs e)
+        {
+            base.OnRenderFinsh(e);
+            GL.Enable(EnableCap.DepthTest);
+
+        }
 
         public override void OnUpdate(FrameEventArgs e)
         {
@@ -181,12 +210,14 @@ namespace MyRender.MyEngine
 
         private void updateParticle(float deltaTime)
         {
+            var model = WorldModelMatrix * LocalModelMatrix;
+
             int count = 0;
             foreach (var p in particleList)
             {
                 if (p != null && p.IsLife)
                 {
-                    p.Update(deltaTime);
+                    p.Update(deltaTime, ref model);
                     count++;
                 }
             }
@@ -199,6 +230,9 @@ namespace MyRender.MyEngine
             var vertices = new Vector3[count];
             var scales = new float[count];
             var rotation = new float[count];
+            var blendFactor = new float[count];
+            var texCoord = new Vector4[count];
+
             int index = 0;
             foreach (var p in particleList)
             {
@@ -207,6 +241,8 @@ namespace MyRender.MyEngine
                     vertices[index] = p.Position;
                     scales[index] = p.Scale;
                     rotation[index] = p.Rotation;
+                    blendFactor[index] = p.BlendAnimationFactor;
+                    texCoord[index] = p.GetTextureCoord();
                     index++;
                 }
             }
@@ -220,6 +256,11 @@ namespace MyRender.MyEngine
             ModelList[0].Rotation = rotation;
             ModelList[0].ReloadRotationBuffer();
 
+            ModelList[0].BlendFactor = blendFactor;
+            ModelList[0].ReloadBlenderFactorBuffer();
+
+            ModelList[0].Weights = texCoord;
+            ModelList[0].ReloadWeightBuffer();
         }
 
         private void generateParticles(float deltaTime)
@@ -236,6 +277,22 @@ namespace MyRender.MyEngine
                 }
 
                 recordTime -= genNum * pps;
+
+                // do order by elapsed time
+                particleList.Sort(delegate (Particle x, Particle y)
+                {
+                    if (x.Distance > y.Distance)
+                    {
+                        return -1;
+                    }
+                    else if (x.Distance < y.Distance)
+                    {
+                        return 1;
+                    }
+
+                    return 0;
+
+                });
             }
 
         }
@@ -261,7 +318,7 @@ namespace MyRender.MyEngine
                 var p = particleList[i];
                 if (p == null)
                 {
-                    p = new Particle(Vector3.Zero, velocity, lifeLength, gravity, generateRotation(), scale);
+                    p = new Particle(Vector3.Zero, velocity, lifeLength, gravity, generateRotation(), scale, textureInfo);
                     emitSuccess = true;
                     break;
                 }
@@ -276,7 +333,7 @@ namespace MyRender.MyEngine
             
             if(!emitSuccess)
             {
-                particleList.Add(new Particle(Vector3.Zero, velocity, lifeLength, gravity, generateRotation(), scale));
+                particleList.Add(new Particle(Vector3.Zero, velocity, lifeLength, gravity, generateRotation(), scale, textureInfo));
             }
         }
 

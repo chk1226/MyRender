@@ -4,7 +4,8 @@ using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
+// TODO
+// will modify
 namespace MyRender.MyEngine
 {
     class Model
@@ -21,6 +22,7 @@ namespace MyRender.MyEngine
         //public Matrix4[] Matrix;
         public float[] Rotation;
         public float[] Scale;
+        public float[] BlendFactor;
         //private readonly string vbo = "vbo";
         public int VBO = 0; // vertex array
         public int EBO = 0; // elementes array
@@ -31,6 +33,8 @@ namespace MyRender.MyEngine
         public int WeightBuffer = 0;
         public int RotationBuffer = 0;
         public int ScaleBuffer = 0;
+        public int BlendFactorBuffer = 0;
+
         //public int MatrixBuffer = 0;
 
         //public Dictionary<string, int> BufferList = new Dictionary<string, int>();
@@ -48,6 +52,8 @@ namespace MyRender.MyEngine
             if (WeightBuffer != 0) GL.DeleteBuffer(WeightBuffer);
             if (ScaleBuffer != 0) GL.DeleteBuffer(ScaleBuffer);
             if (RotationBuffer != 0) GL.DeleteBuffer(RotationBuffer);
+            if (BlendFactorBuffer != 0) GL.DeleteBuffer(BlendFactorBuffer);
+
 
             //if (MatrixBuffer != 0) GL.DeleteBuffer(MatrixBuffer);
 
@@ -191,12 +197,17 @@ namespace MyRender.MyEngine
             return JointBuffer;
         }
 
-        public int GenWeightBuffer()
+        public void ReloadWeightBuffer()
         {
-            WeightBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, WeightBuffer);
             int size = Weights.Length * Marshal.SizeOf(default(Vector4));
             GL.BufferData(BufferTarget.ArrayBuffer, size, Weights, BufferUsageHint.StaticDraw);
+        }
+
+        public int GenWeightBuffer()
+        {
+            WeightBuffer = GL.GenBuffer();
+            ReloadWeightBuffer();
 
             return WeightBuffer;
         }
@@ -242,6 +253,20 @@ namespace MyRender.MyEngine
             RotationBuffer = GL.GenBuffer();
             ReloadRotationBuffer();
             return RotationBuffer;
+        }
+
+        public void ReloadBlenderFactorBuffer()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, BlendFactorBuffer);
+            int size = Rotation.Length * Marshal.SizeOf(default(float));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, BlendFactor, BufferUsageHint.StaticDraw);
+        }
+
+        public int GenBlendFactorBuffer()
+        {
+            BlendFactorBuffer = GL.GenBuffer();
+            ReloadBlenderFactorBuffer();
+            return BlendFactorBuffer;
         }
 
         //public void ReloadMatrixBuffer()

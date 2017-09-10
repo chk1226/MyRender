@@ -27,7 +27,29 @@ namespace MyRender.Game
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
             AddChild(skybox);
 
-            var particle = new ParticleSystem(0.1f, 10f, -9.8f, 2, 0.5f);
+            var particle = new ParticleSystem(0.01f, 3f, -9.8f, 2, 0.5f, Resource.ICosmic, new Vector2(4, 4));
+            particle.SetBlendFuc( BlendingFactorDest.One);
+            particle.SetLifeMargin(0.5f);
+            particle.SetSpeedMargin(0.8f);
+            particle.SetScaleMargin(0.9f);
+            particle.SetRandomRotation(true);
+            particle.SetDirection(-Vector3.UnitY, 0.3f);
+            AddChild(particle);
+
+
+            particle = new ParticleSystem(0.01f, 5f, -5f, 3, 0.5f, Resource.IStart, new Vector2(1, 1));
+            particle.LocalPosition = new Vector3(5,0,-15);
+            particle.SetBlendFuc(BlendingFactorDest.One);
+            particle.SetLifeMargin(0.5f);
+            particle.SetSpeedMargin(0.8f);
+            particle.SetScaleMargin(0.9f);
+            particle.SetRandomRotation(true);
+            particle.SetDirection(Vector3.UnitY, 0.2f);
+            AddChild(particle);
+
+            particle = new ParticleSystem(0.01f, 2.5f, 0, 3, 2.5f, Resource.IFire, new Vector2(8, 8));
+            particle.LocalPosition = new Vector3(-10, 0, 5);
+            particle.SetBlendFuc(BlendingFactorDest.One);
             particle.SetLifeMargin(0.5f);
             particle.SetSpeedMargin(0.8f);
             particle.SetScaleMargin(0.9f);
@@ -35,9 +57,13 @@ namespace MyRender.Game
             particle.SetDirection(Vector3.UnitY, 0.1f);
             AddChild(particle);
 
-            //var testCube = new Cube();
-            //testCube.LocalPosition = new Vector3(0, 0, 0);
-            //AddChild(testCube);
+            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "GoBack");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new MenuScene());
+            };
+            AddChild(a);
 
         }
 
