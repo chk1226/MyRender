@@ -2,6 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MyRender.MyEngine
@@ -17,6 +18,10 @@ namespace MyRender.MyEngine
         public Vector3[] Tangent;
         public Vector4[] JointsIndex;    // joint index
         public Vector4[] Weights;
+        //public Matrix4[] Matrix;
+        public float[] Rotation;
+        public float[] Scale;
+        //private readonly string vbo = "vbo";
         public int VBO = 0; // vertex array
         public int EBO = 0; // elementes array
         public int TBO = 0; // texture coord
@@ -24,7 +29,13 @@ namespace MyRender.MyEngine
         public int TangentBuffer = 0;
         public int JointBuffer = 0;
         public int WeightBuffer = 0;
-        
+        public int RotationBuffer = 0;
+        public int ScaleBuffer = 0;
+        //public int MatrixBuffer = 0;
+
+        //public Dictionary<string, int> BufferList = new Dictionary<string, int>();
+        //public Dictionary<string, int> BufferDataList = new Dictionary<string, int>();
+
 
         public void Release()
         {
@@ -35,6 +46,16 @@ namespace MyRender.MyEngine
             if (TangentBuffer != 0) GL.DeleteBuffer(TangentBuffer);
             if (JointBuffer != 0) GL.DeleteBuffer(JointBuffer);
             if (WeightBuffer != 0) GL.DeleteBuffer(WeightBuffer);
+            if (ScaleBuffer != 0) GL.DeleteBuffer(ScaleBuffer);
+            if (RotationBuffer != 0) GL.DeleteBuffer(RotationBuffer);
+
+            //if (MatrixBuffer != 0) GL.DeleteBuffer(MatrixBuffer);
+
+            //foreach (var buf in BufferList)
+            //{
+            //    GL.DeleteTexture(buf.Value);
+            //}
+            //BufferList.Clear();
         }
 
         public void ComputeTangentBasis()
@@ -93,6 +114,33 @@ namespace MyRender.MyEngine
 
 
         }
+
+        //public bool GenBuffer(string key)
+        //{
+        //    if(BufferList.ContainsKey(key))
+        //    {
+        //        return false;
+        //    }
+
+        //    BufferList.Add(key, GL.GenBuffer());
+        //    return true;
+        //}
+
+        //public bool ReloadBuffer(string key, )
+        //{
+        //    if (!BufferList.ContainsKey(key))
+        //    {
+        //        return false;
+        //    }
+        //    var id = BufferList[key];
+
+        //    GL.BindBuffer(BufferTarget.ArrayBuffer, id);
+        //    int size = Vertices.Length * Marshal.SizeOf(default(Vector3));
+        //    GL.BufferData(BufferTarget.ArrayBuffer, size, Vertices, BufferUsageHint.StaticDraw);
+
+
+        //    return true;
+        //}
 
         public void ReloadVerticesBuffer()
         {
@@ -167,6 +215,48 @@ namespace MyRender.MyEngine
             ReloadTexcoordsBuffer();
             return TBO;
         }
+
+        public void ReloadScaleBuffer()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ScaleBuffer);
+            int size = Scale.Length * Marshal.SizeOf(default(float));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Scale, BufferUsageHint.StaticDraw);
+        }
+
+        public int GenScaleBuffer()
+        {
+            ScaleBuffer = GL.GenBuffer();
+            ReloadScaleBuffer();
+            return ScaleBuffer;
+        }
+
+        public void ReloadRotationBuffer()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, RotationBuffer);
+            int size = Rotation.Length * Marshal.SizeOf(default(float));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, Rotation, BufferUsageHint.StaticDraw);
+        }
+
+        public int GenRotationBuffer()
+        {
+            RotationBuffer = GL.GenBuffer();
+            ReloadRotationBuffer();
+            return RotationBuffer;
+        }
+
+        //public void ReloadMatrixBuffer()
+        //{
+        //    GL.BindBuffer(BufferTarget.ArrayBuffer, MatrixBuffer);
+        //    int size = Matrix.Length * Marshal.SizeOf(default(Matrix4));
+        //    GL.BufferData(BufferTarget.ArrayBuffer, size, Matrix, BufferUsageHint.StaticDraw);
+        //}
+
+        //public int GenMatrixBuffer()
+        //{
+        //    MatrixBuffer = GL.GenBuffer();
+        //    ReloadScaleBuffer();
+        //    return MatrixBuffer;
+        //}
 
         public static Model CreateCubeData()
         {

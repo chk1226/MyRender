@@ -27,9 +27,11 @@ namespace MyRender.Game
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
             AddChild(skybox);
 
-            var particle = new ParticleSystem(0.1f, 10f, -9.8f, 2, 1);
+            var particle = new ParticleSystem(0.1f, 10f, -9.8f, 2, 0.5f);
             particle.SetLifeMargin(0.5f);
             particle.SetSpeedMargin(0.8f);
+            particle.SetScaleMargin(0.9f);
+            particle.SetRandomRotation(true);
             particle.SetDirection(Vector3.UnitY, 0.1f);
             AddChild(particle);
 

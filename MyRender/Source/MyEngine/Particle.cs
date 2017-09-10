@@ -35,6 +35,32 @@ namespace MyRender.MyEngine
             }
         }
 
+        public float Scale
+        {
+            get
+            {
+                return scale;
+            }
+
+            private set
+            {
+                scale = value;
+            }
+        }
+
+        public float Rotation
+        {
+            get
+            {
+                return rotation;
+            }
+
+            private set
+            {
+                rotation = value;
+            }
+        }
+
         public Particle(Vector3 pos, Vector3 velocity, float life, float gravity, float rotation, float scale)
         {
             ResetParticle(pos, velocity, life, gravity, rotation, scale);
@@ -59,8 +85,8 @@ namespace MyRender.MyEngine
             this.velocity = velocity;
             this.life = life;
             this.gravity = gravity;
-            this.rotation = rotation;
-            this.scale = scale;
+            Rotation = rotation;
+            Scale = scale;
 
             isLife = true;
             elapsedTime = 0;
