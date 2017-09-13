@@ -39,19 +39,13 @@ namespace MyRender.MyEngine
             {
                 modelData = Model.CreateUIData();
                 modelData.guid = guid;
-
-                // gen vertex buffer
-                modelData.GenVerticesBuffer();
-
-                // gen texture cood buffer
-                modelData.GenTexcoordsBuffer();
                 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 Resource.Instance.AddModel(modelData);
             }
             ModelList[0] = modelData;
             updateModelData();
-            modelData.ReloadVerticesBuffer();
+            modelData.ReloadBufferVec3Data(Model.BufferType.Vertices);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
 
@@ -84,22 +78,22 @@ namespace MyRender.MyEngine
                 return;
             }
 
-            var m = ModelList[0];
-            m.Vertices[0].X = 0;
-            m.Vertices[0].Y = 0;
-            m.Vertices[0].Z = depth;
+            var m = ModelList[0].GetBufferData(Model.BufferType.Vertices);
+            m.vec3Data[0].X = 0;
+            m.vec3Data[0].Y = 0;
+            m.vec3Data[0].Z = depth;
 
-            m.Vertices[1].X = 0;
-            m.Vertices[1].Y = rect.Height;
-            m.Vertices[1].Z = depth;
+            m.vec3Data[1].X = 0;
+            m.vec3Data[1].Y = rect.Height;
+            m.vec3Data[1].Z = depth;
 
-            m.Vertices[2].X = rect.Width;
-            m.Vertices[2].Y = rect.Height;
-            m.Vertices[2].Z = depth;
+            m.vec3Data[2].X = rect.Width;
+            m.vec3Data[2].Y = rect.Height;
+            m.vec3Data[2].Z = depth;
 
-            m.Vertices[3].X = rect.Width;
-            m.Vertices[3].Y = 0;
-            m.Vertices[3].Z = depth;
+            m.vec3Data[3].X = rect.Width;
+            m.vec3Data[3].Y = 0;
+            m.vec3Data[3].Z = depth;
 
         }
 

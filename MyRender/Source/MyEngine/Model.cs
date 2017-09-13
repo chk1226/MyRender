@@ -10,70 +10,78 @@ namespace MyRender.MyEngine
 {
     class Model
     {
+        public enum BufferType
+        {
+            Rotation,
+            Scale,
+            BlendFactor,
+            JointsIndex,
+            Weights,
+            ParticleTextureCoord,
+            Vertices,
+            Normals,
+            Tangent,
+            Texcoords
+        }
+
+        public class BufferData
+        {
+            public int BufferID = 0;
+            public float[] floatData;
+            public Vector4[] vec4Data;
+            public Vector3[] vec3Data;
+            public Vector2[] vec2Data;
+        }
+
         public PrimitiveType DrawType;
         public string guid;
         public string id;
-        public Vector3[] Vertices;
-        public Vector3[] Normals;
-        public Vector2[] Texcoords;
-        public Vector3[] Tangent;
-        public Vector4[] JointsIndex;    // joint index
-        public Vector4[] Weights;
-        //public Matrix4[] Matrix;
-        public float[] Rotation;
-        public float[] Scale;
-        public float[] BlendFactor;
-        //private readonly string vbo = "vbo";
-        public int VBO = 0; // vertex array
-        public int EBO = 0; // elementes array
-        public int TBO = 0; // texture coord
-        public int NBO = 0; // normal array
-        public int TangentBuffer = 0;
-        public int JointBuffer = 0;
-        public int WeightBuffer = 0;
-        public int RotationBuffer = 0;
-        public int ScaleBuffer = 0;
-        public int BlendFactorBuffer = 0;
 
-        //public int MatrixBuffer = 0;
 
-        //public Dictionary<string, int> BufferList = new Dictionary<string, int>();
-        //public Dictionary<string, int> BufferDataList = new Dictionary<string, int>();
+        private Dictionary<BufferType, BufferData> modelBuffer = new Dictionary<BufferType, BufferData>();
+        
+        public BufferData GetBufferData(BufferType key)
+        {
+            if(!modelBuffer.ContainsKey(key))
+            {
+                return null;
+            }
 
+            return modelBuffer[key];
+        }
 
         public void Release()
         {
-            if (VBO != 0) GL.DeleteBuffer(VBO);
-            if (EBO != 0) GL.DeleteBuffer(EBO);
-            if (TBO != 0) GL.DeleteBuffer(TBO);
-            if (NBO != 0) GL.DeleteBuffer(NBO);
-            if (TangentBuffer != 0) GL.DeleteBuffer(TangentBuffer);
-            if (JointBuffer != 0) GL.DeleteBuffer(JointBuffer);
-            if (WeightBuffer != 0) GL.DeleteBuffer(WeightBuffer);
-            if (ScaleBuffer != 0) GL.DeleteBuffer(ScaleBuffer);
-            if (RotationBuffer != 0) GL.DeleteBuffer(RotationBuffer);
-            if (BlendFactorBuffer != 0) GL.DeleteBuffer(BlendFactorBuffer);
-
-
-            //if (MatrixBuffer != 0) GL.DeleteBuffer(MatrixBuffer);
-
-            //foreach (var buf in BufferList)
-            //{
-            //    GL.DeleteTexture(buf.Value);
-            //}
-            //BufferList.Clear();
+            foreach (var buf in modelBuffer)
+            {
+                if(buf.Value.BufferID != 0)
+                {
+                    GL.DeleteTexture(buf.Value.BufferID);
+                }
+            }
+            modelBuffer.Clear();
         }
 
-        public void ComputeTangentBasis()
+        public Vector3[] ComputeTangentBasis()
         {
-            if( Vertices == null || Texcoords == null || 
-                this.Vertices.Length != Texcoords.Length )
+                 
+            if(GetBufferData(BufferType.Vertices) == null ||
+                GetBufferData(BufferType.Texcoords) == null)
             {
                 Log.Print("[ComputeTangentBasis] Tangent Gen Fail");
-                return;
+                return null;
             }
 
-            Tangent = new Vector3[Vertices.Length];
+            var Vertices = GetBufferData(BufferType.Vertices).vec3Data;
+            var Texcoords = GetBufferData(BufferType.Texcoords).vec2Data;
+
+            if(Vertices.Length != Texcoords.Length)
+            {
+                Log.Print("[ComputeTangentBasis] Tangent Gen Fail");
+                return null;
+            }
+
+            var Tangent = new Vector3[Vertices.Length];
             int offset = 0;
             switch (DrawType)
             {
@@ -86,7 +94,7 @@ namespace MyRender.MyEngine
 
                 default:
                     Log.Print("[ComputeTangentBasis] Tangent Gen Fail");
-                    return;
+                    return null;
             }
 
             try
@@ -111,184 +119,123 @@ namespace MyRender.MyEngine
                     }
 
                 }
+
+                return Tangent;
             }
             catch (Exception e)
             {
                 Log.Print("[ComputeTangentBasis][Exception] " + e.Message);
+                return null;
+            }
+            
+        }
+
+        public void ReloadBufferVec2Data(BufferType key)
+        {
+            if (!modelBuffer.ContainsKey(key))
+            {
+                Log.Print("[ReloadBufferFloatData] not contain key : " + key.ToString());
                 return;
             }
 
-
+            var data = modelBuffer[key];
+            GL.BindBuffer(BufferTarget.ArrayBuffer, data.BufferID);
+            int size = data.vec2Data.Length * Marshal.SizeOf(default(Vector2));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, data.vec2Data, BufferUsageHint.StaticDraw);
         }
 
-        //public bool GenBuffer(string key)
-        //{
-        //    if(BufferList.ContainsKey(key))
-        //    {
-        //        return false;
-        //    }
-
-        //    BufferList.Add(key, GL.GenBuffer());
-        //    return true;
-        //}
-
-        //public bool ReloadBuffer(string key, )
-        //{
-        //    if (!BufferList.ContainsKey(key))
-        //    {
-        //        return false;
-        //    }
-        //    var id = BufferList[key];
-
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, id);
-        //    int size = Vertices.Length * Marshal.SizeOf(default(Vector3));
-        //    GL.BufferData(BufferTarget.ArrayBuffer, size, Vertices, BufferUsageHint.StaticDraw);
-
-
-        //    return true;
-        //}
-
-        public void ReloadVerticesBuffer()
+        public int GenVec2Buffer(BufferType key, Vector2[] data)
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            int size = Vertices.Length * Marshal.SizeOf(default(Vector3));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Vertices, BufferUsageHint.StaticDraw);
+            var d = new BufferData();
+            d.BufferID = GL.GenBuffer();
+            d.vec2Data = data;
+            modelBuffer.Add(key, d);
+            ReloadBufferVec2Data(key);
+
+            return d.BufferID;
         }
 
-        public int GenVerticesBuffer()
+        public void ReloadBufferVec3Data(BufferType key)
         {
-            VBO = GL.GenBuffer();
-            ReloadVerticesBuffer();
+            if (!modelBuffer.ContainsKey(key))
+            {
+                Log.Print("[ReloadBufferFloatData] not contain key : " + key.ToString());
+                return;
+            }
 
-            return VBO;
+            var data = modelBuffer[key];
+            GL.BindBuffer(BufferTarget.ArrayBuffer, data.BufferID);
+            int size = data.vec3Data.Length * Marshal.SizeOf(default(Vector3));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, data.vec3Data, BufferUsageHint.StaticDraw);
         }
 
-        public int GenNormalBuffer()
+        public int GenVec3Buffer(BufferType key, Vector3[] data)
         {
-            NBO = GL.GenBuffer();
-            ReloadNormalBuffer();
-            return NBO;
+            var d = new BufferData();
+            d.BufferID = GL.GenBuffer();
+            d.vec3Data = data;
+            modelBuffer.Add(key, d);
+            ReloadBufferVec3Data(key);
+
+            return d.BufferID;
         }
 
-        public void ReloadNormalBuffer()
+        public void ReloadBufferVec4Data(BufferType key)
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, NBO);
-            int size = Normals.Length * Marshal.SizeOf(default(Vector3));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Normals, BufferUsageHint.StaticDraw);
+            if (!modelBuffer.ContainsKey(key))
+            {
+                Log.Print("[ReloadBufferFloatData] not contain key : " + key.ToString());
+                return;
+            }
+
+            var data = modelBuffer[key];
+            GL.BindBuffer(BufferTarget.ArrayBuffer, data.BufferID);
+            int size = data.vec4Data.Length * Marshal.SizeOf(default(Vector4));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, data.vec4Data, BufferUsageHint.StaticDraw);
         }
 
-        public int GenTangentBuffer()
+        public int GenVec4Buffer(BufferType key, Vector4[] data)
         {
-            TangentBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, TangentBuffer);
-            int size = Tangent.Length * Marshal.SizeOf(default(Vector3));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Tangent, BufferUsageHint.StaticDraw);
+            var d = new BufferData();
+            d.BufferID = GL.GenBuffer();
+            d.vec4Data = data;
+            modelBuffer.Add(key, d);
+            ReloadBufferVec4Data(key);
 
-            return TangentBuffer;
+            return d.BufferID;
         }
 
-        public int GenJointBuffer()
+        public void ReloadBufferFloatData(BufferType key)
         {
-            JointBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, JointBuffer);
-            int size = JointsIndex.Length * Marshal.SizeOf(default(Vector4));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, JointsIndex, BufferUsageHint.StaticDraw);
+            if(!modelBuffer.ContainsKey(key))
+            {
+                Log.Print("[ReloadBufferFloatData] not contain key : " + key.ToString());
+                return;
+            }
 
-            return JointBuffer;
+            var data = modelBuffer[key];
+            GL.BindBuffer(BufferTarget.ArrayBuffer, data.BufferID);
+            int size = data.floatData.Length * Marshal.SizeOf(default(float));
+            GL.BufferData(BufferTarget.ArrayBuffer, size, data.floatData, BufferUsageHint.StaticDraw);
         }
 
-        public void ReloadWeightBuffer()
+        public int GenFloatBuffer(BufferType key, float[] data)
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, WeightBuffer);
-            int size = Weights.Length * Marshal.SizeOf(default(Vector4));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Weights, BufferUsageHint.StaticDraw);
+            var d = new BufferData();
+            d.BufferID = GL.GenBuffer();
+            d.floatData = data;
+            modelBuffer.Add(key, d);
+            ReloadBufferFloatData(key);
+
+            return d.BufferID;
         }
-
-        public int GenWeightBuffer()
-        {
-            WeightBuffer = GL.GenBuffer();
-            ReloadWeightBuffer();
-
-            return WeightBuffer;
-        }
-
-        public void ReloadTexcoordsBuffer()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, TBO);
-            int size = Texcoords.Length * Marshal.SizeOf(default(Vector2));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Texcoords, BufferUsageHint.StaticDraw);
-
-        }
-
-        public int GenTexcoordsBuffer()
-        {
-            TBO = GL.GenBuffer();
-            ReloadTexcoordsBuffer();
-            return TBO;
-        }
-
-        public void ReloadScaleBuffer()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ScaleBuffer);
-            int size = Scale.Length * Marshal.SizeOf(default(float));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Scale, BufferUsageHint.StaticDraw);
-        }
-
-        public int GenScaleBuffer()
-        {
-            ScaleBuffer = GL.GenBuffer();
-            ReloadScaleBuffer();
-            return ScaleBuffer;
-        }
-
-        public void ReloadRotationBuffer()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, RotationBuffer);
-            int size = Rotation.Length * Marshal.SizeOf(default(float));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, Rotation, BufferUsageHint.StaticDraw);
-        }
-
-        public int GenRotationBuffer()
-        {
-            RotationBuffer = GL.GenBuffer();
-            ReloadRotationBuffer();
-            return RotationBuffer;
-        }
-
-        public void ReloadBlenderFactorBuffer()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, BlendFactorBuffer);
-            int size = Rotation.Length * Marshal.SizeOf(default(float));
-            GL.BufferData(BufferTarget.ArrayBuffer, size, BlendFactor, BufferUsageHint.StaticDraw);
-        }
-
-        public int GenBlendFactorBuffer()
-        {
-            BlendFactorBuffer = GL.GenBuffer();
-            ReloadBlenderFactorBuffer();
-            return BlendFactorBuffer;
-        }
-
-        //public void ReloadMatrixBuffer()
-        //{
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, MatrixBuffer);
-        //    int size = Matrix.Length * Marshal.SizeOf(default(Matrix4));
-        //    GL.BufferData(BufferTarget.ArrayBuffer, size, Matrix, BufferUsageHint.StaticDraw);
-        //}
-
-        //public int GenMatrixBuffer()
-        //{
-        //    MatrixBuffer = GL.GenBuffer();
-        //    ReloadScaleBuffer();
-        //    return MatrixBuffer;
-        //}
 
         public static Model CreateCubeData()
         {
             var modelData = new Model();
             modelData.DrawType = PrimitiveType.Quads;
 
-            modelData.Vertices = new[]
+            modelData.GenVec3Buffer(BufferType.Vertices, new[]
                 {
                     // front face
                     new Vector3(-1.0f, -1.0f,  1.0f),
@@ -320,9 +267,9 @@ namespace MyRender.MyEngine
                     new Vector3( -1.0f, -1.0f, -1.0f),
                     new Vector3( -1.0f,  1.0f, -1.0f),
                     new Vector3(-1.0f,  1.0f, 1.0f)
-                };
+                });
 
-            modelData.Normals = new[]
+            modelData.GenVec3Buffer(BufferType.Normals, new[]
             {
                     new Vector3( 0.0f, 0.0f, 1.0f),
                     new Vector3( 0.0f, 0.0f, 1.0f),
@@ -353,9 +300,9 @@ namespace MyRender.MyEngine
                     new Vector3( -1.0f, 0.0f, 0.0f),
                     new Vector3( -1.0f, 0.0f, 0.0f),
                     new Vector3( -1.0f, 0.0f, 0.0f),
-                };
+                });
 
-            modelData.Texcoords = new[]
+            modelData.GenVec2Buffer(BufferType.Texcoords, new[]
             {
                     new Vector2( 0.0f, 0.0f),
                     new Vector2( 0.0f, 1.0f),
@@ -386,7 +333,7 @@ namespace MyRender.MyEngine
                     new Vector2( 0.0f, 1.0f),
                     new Vector2( 1.0f, 1.0f),
                     new Vector2( 1.0f, 0.0f),
-                };
+                });
             return modelData;
         }
 
@@ -395,19 +342,20 @@ namespace MyRender.MyEngine
             var modelData = new Model();
             modelData.DrawType = PrimitiveType.Quads;
 
-            modelData.Vertices = new[]{
+            modelData.GenVec3Buffer(BufferType.Vertices, new[]
+            {
                     new Vector3(0, 1,  0.0f),
                     new Vector3(0, 0,  0.0f),
                     new Vector3(1, 0,  0.0f),
                     new Vector3(1, 1,  0.0f),
-            };
+            });
 
-            modelData.Texcoords = new[] {
+            modelData.GenVec2Buffer( BufferType.Texcoords, new[] {
                     new Vector2( 0.0f, 1.0f),
                     new Vector2( 0.0f, 0.0f),
                     new Vector2( 1.0f, 0.0f),
                     new Vector2( 1.0f, 1.0f),
-            };
+            });
 
             return modelData;
         }

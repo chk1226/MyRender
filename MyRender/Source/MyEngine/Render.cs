@@ -137,25 +137,25 @@ namespace MyRender.MyEngine
             if(ShaderVersion == OPENGL_120)
             {
                 // bind vertex buffer 
-                if (ModelData.VBO != 0)
+                if (ModelData.GetBufferData( Model.BufferType.Vertices) != null)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.VBO);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.GetBufferData( Model.BufferType.Vertices).BufferID);
                     GL.EnableClientState(ArrayCap.VertexArray);
                     GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
                 }
 
                 // bind normal buffer
-                if(ModelData.NBO != 0)
+                if(ModelData.GetBufferData(Model.BufferType.Normals) != null)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.NBO);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.GetBufferData( Model.BufferType.Normals).BufferID);
                     GL.EnableClientState(ArrayCap.NormalArray);
                     GL.NormalPointer(NormalPointerType.Float, 0, 0);
                 }
 
                 // bind texture coord buffer
-                if(ModelData.TBO != 0)
+                if(ModelData.GetBufferData( Model.BufferType.Texcoords) != null)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.TBO);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelData.GetBufferData( Model.BufferType.Texcoords).BufferID);
                     GL.EnableClientState(ArrayCap.TextureCoordArray);
                     GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
                 }
@@ -174,21 +174,24 @@ namespace MyRender.MyEngine
                 }
             }
 
-            DrawCall(ModelData.DrawType, ModelData.Vertices.Length);
+            if (ModelData.GetBufferData(Model.BufferType.Vertices) != null)
+            {
+                DrawCall(ModelData.DrawType, ModelData.GetBufferData( Model.BufferType.Vertices).vec3Data.Length);
+            }
 
             if(ShaderVersion == OPENGL_120)
             {
-                if(ModelData.VBO != 0)
+                if(ModelData.GetBufferData( Model.BufferType.Vertices) != null)
                 {
                     GL.DisableClientState(ArrayCap.VertexArray);
                 }
 
-                if(ModelData.NBO != 0)
+                if(ModelData.GetBufferData(Model.BufferType.Normals) != null)
                 {
                     GL.DisableClientState(ArrayCap.NormalArray);
                 }
 
-                if(ModelData.TBO != 0)
+                if(ModelData.GetBufferData(Model.BufferType.Texcoords) != null)
                 {
                     GL.DisableClientState(ArrayCap.TextureCoordArray);
                 }

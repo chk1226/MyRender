@@ -83,6 +83,9 @@ namespace MyRender.Game
             Vector2 offset = new Vector2(rect.X / sliceX, rect.Y / sliceY);
 
             Vector2 current = Vector2.Zero;
+            var Vertices = model.GetBufferData(Model.BufferType.Vertices).vec3Data;
+            var Normals = model.GetBufferData(Model.BufferType.Normals).vec3Data;
+
             for (int i = 0; i < sliceY; i++)
             {
                 current.X = 0;
@@ -91,45 +94,46 @@ namespace MyRender.Game
                 {
                     current.X = j * offset.X;
 
-                    model.Vertices[i * (sliceX * 4) + j * 4] = new Vector3(current.X, Algorithm.PerlinNoise2D(j, i), current.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 1] = new Vector3(current.X, Algorithm.PerlinNoise2D(j, i+ 1), current.Y + offset.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 2] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i+1), current.Y + offset.Y);
-                    model.Vertices[i * (sliceX * 4) + j * 4 + 3] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i), current.Y);
+                    Vertices[i * (sliceX * 4) + j * 4] = new Vector3(current.X, Algorithm.PerlinNoise2D(j, i), current.Y);
+                    Vertices[i * (sliceX * 4) + j * 4 + 1] = new Vector3(current.X, Algorithm.PerlinNoise2D(j, i+ 1), current.Y + offset.Y);
+                    Vertices[i * (sliceX * 4) + j * 4 + 2] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i+1), current.Y + offset.Y);
+                    Vertices[i * (sliceX * 4) + j * 4 + 3] = new Vector3(current.X + offset.X, Algorithm.PerlinNoise2D(j+1, i), current.Y);
                     
                 }
 
             }
 
-            model.ReloadVerticesBuffer();
+            model.ReloadBufferVec3Data(Model.BufferType.Vertices);
 
             for (int i = 0; i < sliceY; i++)
             {
                 for (int j = 0; j < sliceX; j++)
                 {
-                    var h1 = model.Vertices[i * (sliceX * 4) + j * 4].Y;
-                    var h2 = model.Vertices[i * (sliceX * 4) + j * 4 + 1].Y;
-                    var h3 = model.Vertices[i * (sliceX * 4) + j * 4 + 2].Y;
-                    var h4 = model.Vertices[i * (sliceX * 4) + j * 4 + 3].Y;
+                    var h1 = Vertices[i * (sliceX * 4) + j * 4].Y;
+                    var h2 = Vertices[i * (sliceX * 4) + j * 4 + 1].Y;
+                    var h3 = Vertices[i * (sliceX * 4) + j * 4 + 2].Y;
+                    var h4 = Vertices[i * (sliceX * 4) + j * 4 + 3].Y;
 
-                    model.Normals[i * (sliceX * 4) + j * 4] = computeNormal((j - 1 < 0) ? 0 : model.Vertices[i * (sliceX * 4) + (j - 1) * 4].Y,
+                    Normals[i * (sliceX * 4) + j * 4] = computeNormal((j - 1 < 0) ? 0 : Vertices[i * (sliceX * 4) + (j - 1) * 4].Y,
                         h4, h2,
-                        (i - 1 < 0) ? 0 : model.Vertices[(i - 1) * (sliceX * 4) + j * 4].Y);
-                    model.Normals[i * (sliceX * 4) + j * 4 + 1] = computeNormal((j - 1 < 0) ? 0 : model.Vertices[i * (sliceX * 4) + (j - 1) * 4 + 1].Y,
+                        (i - 1 < 0) ? 0 : Vertices[(i - 1) * (sliceX * 4) + j * 4].Y);
+                    Normals[i * (sliceX * 4) + j * 4 + 1] = computeNormal((j - 1 < 0) ? 0 : Vertices[i * (sliceX * 4) + (j - 1) * 4 + 1].Y,
                         h3,
-                        (i + 1 >= sliceY) ? 0 : model.Vertices[(i + 1) * (sliceX * 4) + j * 4 + 1].Y,
+                        (i + 1 >= sliceY) ? 0 : Vertices[(i + 1) * (sliceX * 4) + j * 4 + 1].Y,
                         h1);
-                    model.Normals[i * (sliceX * 4) + j * 4 + 2] = computeNormal(h2,
-                        (j + 1 >= sliceX) ? 0 : model.Vertices[i * (sliceX * 4) + (j + 1) * 4 + 2].Y,
-                        (i + 1 >= sliceY) ? 0 : model.Vertices[(i + 1) * (sliceX * 4) + j * 4 + 2].Y,
+                    Normals[i * (sliceX * 4) + j * 4 + 2] = computeNormal(h2,
+                        (j + 1 >= sliceX) ? 0 : Vertices[i * (sliceX * 4) + (j + 1) * 4 + 2].Y,
+                        (i + 1 >= sliceY) ? 0 : Vertices[(i + 1) * (sliceX * 4) + j * 4 + 2].Y,
                         h4);
-                    model.Normals[i * (sliceX * 4) + j * 4 + 3] = computeNormal(h1,
-                        (j + 1 >= sliceX) ? 0 : model.Vertices[i * (sliceX * 4) + (j + 1) * 4 + 3].Y,
+                    Normals[i * (sliceX * 4) + j * 4 + 3] = computeNormal(h1,
+                        (j + 1 >= sliceX) ? 0 : Vertices[i * (sliceX * 4) + (j + 1) * 4 + 3].Y,
                         h3,
-                        (i - 1 < 0) ? 0 : model.Vertices[(i - 1) * (sliceX * 4) + j * 4 + 3].Y);
+                        (i - 1 < 0) ? 0 : Vertices[(i - 1) * (sliceX * 4) + j * 4 + 3].Y);
                 }
 
             }
-            model.ReloadNormalBuffer();
+            model.ReloadBufferVec3Data(Model.BufferType.Normals);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
         }

@@ -64,9 +64,9 @@ namespace MyRender.Game
                 this,
                 model,
                 Render.Normal);
-                render.AddVertexAttribute("tangent", model.TangentBuffer, 3, false);
-                render.AddVertexAttribute("jointIndices", model.JointBuffer, 4, false);
-                render.AddVertexAttribute("weight", model.WeightBuffer, 4, false);
+                render.AddVertexAttribute("tangent", model.GetBufferData( Model.BufferType.Tangent).BufferID, 3, false);
+                render.AddVertexAttribute("jointIndices", model.GetBufferData(Model.BufferType.JointsIndex).BufferID, 4, false);
+                render.AddVertexAttribute("weight", model.GetBufferData(Model.BufferType.Weights).BufferID, 4, false);
 
                 RenderList.Add(render);
 

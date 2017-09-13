@@ -129,12 +129,6 @@ namespace MyRender.MyEngine
                 modelData = Model.CreateUIData();
                 modelData.guid = GUID;
 
-                // gen vertex buffer
-                modelData.GenVerticesBuffer();
-
-                // gen texture cood buffer
-                modelData.GenTexcoordsBuffer();
-
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 Resource.Instance.AddModel(modelData);
             }
@@ -148,8 +142,8 @@ namespace MyRender.MyEngine
                 // reload vertex
                 if (reloadBufferArray)
                 {
-                    modelData.ReloadVerticesBuffer();
-                    modelData.ReloadTexcoordsBuffer();
+                    modelData.ReloadBufferVec3Data( Model.BufferType.Vertices);
+                    modelData.ReloadBufferVec2Data( Model.BufferType.Texcoords);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                     reloadBufferArray = false;
                 }
@@ -206,8 +200,8 @@ namespace MyRender.MyEngine
         
             var modelData = ModelList[0];
             var newStr = Regex.Replace(Label, " ", "");
-            modelData.Vertices = new Vector3[newStr.Length * 4];
-            modelData.Texcoords = new Vector2[newStr.Length * 4];
+            var Vertices = new Vector3[newStr.Length * 4];
+            var Texcoords = new Vector2[newStr.Length * 4];
 
             float currentX = 0;
             float currentY = glyphes.BitmapRect.Y;
@@ -231,18 +225,20 @@ namespace MyRender.MyEngine
 
                 var info = glyphes.GlyphesHash[label[i]];
 
-                modelData.Vertices[arrayIndex * 4] = new Vector3(currentX, currentY, depth);
-                modelData.Vertices[arrayIndex * 4 + 1] = new Vector3(currentX, 0, depth);
-                modelData.Vertices[arrayIndex * 4 + 2] = new Vector3(currentX + info.Width, 0, depth);
-                modelData.Vertices[arrayIndex * 4 + 3] = new Vector3(currentX + info.Width, currentY, depth);
+                Vertices[arrayIndex * 4] = new Vector3(currentX, currentY, depth);
+                Vertices[arrayIndex * 4 + 1] = new Vector3(currentX, 0, depth);
+                Vertices[arrayIndex * 4 + 2] = new Vector3(currentX + info.Width, 0, depth);
+                Vertices[arrayIndex * 4 + 3] = new Vector3(currentX + info.Width, currentY, depth);
                 currentX += info.Width + space;
 
-                modelData.Texcoords[arrayIndex * 4] = new Vector2(info.SOffset, 1);
-                modelData.Texcoords[arrayIndex * 4 + 1] = new Vector2(info.SOffset, 0);
-                modelData.Texcoords[arrayIndex * 4 + 2] = new Vector2(info.SOffset + info.SWidth, 0);
-                modelData.Texcoords[arrayIndex * 4 + 3] = new Vector2(info.SOffset + info.SWidth, 1);
+                Texcoords[arrayIndex * 4] = new Vector2(info.SOffset, 1);
+                Texcoords[arrayIndex * 4 + 1] = new Vector2(info.SOffset, 0);
+                Texcoords[arrayIndex * 4 + 2] = new Vector2(info.SOffset + info.SWidth, 0);
+                Texcoords[arrayIndex * 4 + 3] = new Vector2(info.SOffset + info.SWidth, 1);
                 arrayIndex++;
             }
+            modelData.GetBufferData(Model.BufferType.Vertices).vec3Data = Vertices;
+            modelData.GetBufferData(Model.BufferType.Texcoords).vec2Data = Texcoords;
 
 
         }

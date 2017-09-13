@@ -364,60 +364,60 @@ namespace MyRender.MyEngine
                 modelData.id = l_g.Geometry[i].ID;
 
 
-                modelData.Vertices = new Vector3[mesh_num * mesh_vertex_num];
-                modelData.Normals = new Vector3[mesh_num * mesh_vertex_num];
-                modelData.Texcoords = new Vector2[mesh_num * mesh_vertex_num];
+                var Vertices = new Vector3[mesh_num * mesh_vertex_num];
+                var Normals = new Vector3[mesh_num * mesh_vertex_num];
+                var Texcoords = new Vector2[mesh_num * mesh_vertex_num];
+                Vector4[] jointIndex = new Vector4[0];
+                Vector4[] weight = new Vector4[0];
 
-                if(meshSkinData != null)
+                if (meshSkinData != null)
                 {
-                    modelData.JointsIndex = new Vector4[mesh_num * mesh_vertex_num];
-                    modelData.Weights = new Vector4[mesh_num * mesh_vertex_num];
+                    jointIndex = new Vector4[mesh_num * mesh_vertex_num];
+                    weight = new Vector4[mesh_num * mesh_vertex_num];
                 }
 
                 int reg;
                 for (int num_2 = 0; num_2 < mesh_num * mesh_vertex_num; num_2++)
                 {
                     reg = index[num_2 * stride];
-                    modelData.Vertices[num_2] =
+                    Vertices[num_2] =
                         new Vector3(pos[reg * 3], pos[reg * 3 + 1], pos[reg * 3 + 2]);
 
                     if(meshSkinData != null)
                     {
-                        modelData.JointsIndex[num_2] = meshSkinData[i].VertexData[reg].Jointsindex;
-                        modelData.Weights[num_2] = meshSkinData[i].VertexData[reg].Weights;
+                        jointIndex[num_2] = meshSkinData[i].VertexData[reg].Jointsindex;
+                        weight[num_2] = meshSkinData[i].VertexData[reg].Weights;
                     }
 
                     reg = index[num_2 * stride + 1];
-                    modelData.Normals[num_2] =
+                    Normals[num_2] =
                         new Vector3(nor[reg * 3], nor[reg * 3 + 1], nor[reg * 3 + 2]);
 
                     reg = index[num_2 * stride + 2];
-                    modelData.Texcoords[num_2] =
+                    Texcoords[num_2] =
                         new Vector2(tex[reg * tex_stride], tex[reg * tex_stride + 1]);
 
                 }
 
-                modelData.ComputeTangentBasis();
-
                 // gen vertex buffer
-                modelData.GenVerticesBuffer();
+                modelData.GenVec3Buffer( Model.BufferType.Vertices, Vertices);
 
                 // gen texture cood buffer
-                modelData.GenTexcoordsBuffer();
+                modelData.GenVec2Buffer(Model.BufferType.Texcoords, Texcoords);
 
                 // gen texture cood buffer
-                modelData.GenNormalBuffer();
+                modelData.GenVec3Buffer(Model.BufferType.Normals, Normals);
 
                 // gen tangent buffer 
-                modelData.GenTangentBuffer();
+                modelData.GenVec3Buffer(Model.BufferType.Tangent, modelData.ComputeTangentBasis());
 
                 if(meshSkinData != null)
                 {
                     // gen jointIndices
-                    modelData.GenJointBuffer();
+                    modelData.GenVec4Buffer(Model.BufferType.JointsIndex, jointIndex);
 
                     // gen weight
-                    modelData.GenWeightBuffer();
+                    modelData.GenVec4Buffer(Model.BufferType.Weights, weight);
                 }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

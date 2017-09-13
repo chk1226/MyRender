@@ -18,21 +18,9 @@ namespace MyRender.MyEngine
             {
                 modelData = Model.CreateCubeData();
                 modelData.guid = cubeGUID;
-                
-                // because normal map 
-                modelData.ComputeTangentBasis();
-
-                // gen vertex buffer
-                modelData.GenVerticesBuffer();
-
-                // gen texture cood buffer
-                modelData.GenTexcoordsBuffer();
-
-                // gen normal texture cood buffer
-                modelData.GenNormalBuffer();
 
                 // gen tangent buffer 
-                modelData.GenTangentBuffer();
+                modelData.GenVec3Buffer(Model.BufferType.Tangent, modelData.ComputeTangentBasis());
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
@@ -73,7 +61,7 @@ namespace MyRender.MyEngine
             this,
             modelData,
             Render.Normal);
-            render.AddVertexAttribute("tangent", ModelList[0].TangentBuffer, 3, false);
+            render.AddVertexAttribute("tangent", ModelList[0].GetBufferData(Model.BufferType.Tangent).BufferID, 3, false);
 
             RenderList.Add(render);
         }

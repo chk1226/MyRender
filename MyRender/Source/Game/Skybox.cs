@@ -21,9 +21,7 @@ namespace MyRender.Game
             {
                 modelData = Model.CreateCubeData();
                 modelData.guid = skyboxGUID;
-
-                // gen vertex buffer
-                modelData.GenVerticesBuffer();
+               
   
                 Resource.Instance.AddModel(modelData);
             }

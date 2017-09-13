@@ -78,11 +78,11 @@ namespace MyRender.MyEngine
             ModelList[0],
             Render.Blend);
             render.ShaderVersion = Render.OPENGL_330;
-            render.AddVertexAttribute330("position", ModelList[0].VBO, 3, false, 0);
-            render.AddVertexAttribute330("scale", ModelList[0].ScaleBuffer, 1, false, 1);
-            render.AddVertexAttribute330("rotation", ModelList[0].RotationBuffer, 1, false, 2);
-            render.AddVertexAttribute330("blendFactor", ModelList[0].BlendFactorBuffer, 1, false, 3);
-            render.AddVertexAttribute330("texCoord", ModelList[0].WeightBuffer, 4, false, 4);
+            render.AddVertexAttribute330("position", ModelList[0].GetBufferData( Model.BufferType.Vertices).BufferID, 3, false, 0);
+            render.AddVertexAttribute330("scale", ModelList[0].GetBufferData(Model.BufferType.Scale).BufferID, 1, false, 1);
+            render.AddVertexAttribute330("rotation", ModelList[0].GetBufferData(Model.BufferType.Rotation).BufferID, 1, false, 2);
+            render.AddVertexAttribute330("blendFactor", ModelList[0].GetBufferData(Model.BufferType.BlendFactor).BufferID, 1, false, 3);
+            render.AddVertexAttribute330("texCoord", ModelList[0].GetBufferData(Model.BufferType.ParticleTextureCoord).BufferID, 4, false, 4);
             render.EnableBlend(BlendingFactorSrc.SrcAlpha, blendDest);
             RenderList.Add(render);
 
@@ -115,24 +115,19 @@ namespace MyRender.MyEngine
             modelData.guid = this.GUID;
 
             // gen vertex buffer
-            modelData.Vertices = new Vector3[0];
-            modelData.GenVerticesBuffer();
+            modelData.GenVec3Buffer(Model.BufferType.Vertices, new Vector3[0]);
 
             // gen scale buffer
-            modelData.Scale = new float[0];
-            modelData.GenScaleBuffer();
+            modelData.GenFloatBuffer(Model.BufferType.Scale, new float[0]);
 
             // gen rotation buffer
-            modelData.Rotation = new float[0];
-            modelData.GenRotationBuffer();
+            modelData.GenFloatBuffer(Model.BufferType.Rotation, new float[0]);
 
             // gen blend factor buffer
-            modelData.BlendFactor = new float[0];
-            modelData.GenBlendFactorBuffer();
+            modelData.GenFloatBuffer(Model.BufferType.BlendFactor, new float[0]);
 
             // gen texture coordinate
-            modelData.Weights = new Vector4[0];
-            modelData.GenWeightBuffer();
+            modelData.GenVec4Buffer(Model.BufferType.ParticleTextureCoord, new Vector4[0]);
 
             Resource.Instance.AddModel(modelData);
             ModelList = new Model[1];
@@ -247,20 +242,21 @@ namespace MyRender.MyEngine
                 }
             }
 
-            ModelList[0].Vertices = vertices;
-            ModelList[0].ReloadVerticesBuffer();
+            ModelList[0].GetBufferData( Model.BufferType.Vertices).vec3Data = vertices;
+            ModelList[0].ReloadBufferVec3Data(Model.BufferType.Vertices);
 
-            ModelList[0].Scale = scales;
-            ModelList[0].ReloadScaleBuffer();
+            ModelList[0].GetBufferData(Model.BufferType.Scale).floatData = scales;
+            ModelList[0].ReloadBufferFloatData(Model.BufferType.Scale);
 
-            ModelList[0].Rotation = rotation;
-            ModelList[0].ReloadRotationBuffer();
+            ModelList[0].GetBufferData(Model.BufferType.Rotation).floatData = rotation;
+            ModelList[0].ReloadBufferFloatData(Model.BufferType.Rotation);
 
-            ModelList[0].BlendFactor = blendFactor;
-            ModelList[0].ReloadBlenderFactorBuffer();
+            ModelList[0].GetBufferData(Model.BufferType.BlendFactor).floatData = blendFactor;
+            ModelList[0].ReloadBufferFloatData(Model.BufferType.BlendFactor);
 
-            ModelList[0].Weights = texCoord;
-            ModelList[0].ReloadWeightBuffer();
+            ModelList[0].GetBufferData(Model.BufferType.ParticleTextureCoord).vec4Data = texCoord;
+            ModelList[0].ReloadBufferVec4Data(Model.BufferType.ParticleTextureCoord);
+            
         }
 
         private void generateParticles(float deltaTime)
