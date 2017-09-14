@@ -85,6 +85,13 @@ namespace MyRender.MyEngine
             return from + progression * (to - from);
         }
 
+        public static float SmootherStep(float edge0, float edge1, float x)
+        {
+            // Scale, and clamp x to 0..1 range
+            x = MathHelper.Clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+            // Evaluate polynomial
+            return x * x * x * (x * (x * 6 - 15) + 10);
+        }
 
 
         #region perlin noise

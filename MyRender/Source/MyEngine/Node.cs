@@ -64,6 +64,8 @@ namespace MyRender.MyEngine
         public delegate void Action();
         public List<Render> RenderList = new List<Render>();
 
+        private List<BaseComponent> componentList = new List<BaseComponent>();
+
         public Node()
         {
             GameDirect.Instance.OnSatrt += OnStart;
@@ -103,6 +105,11 @@ namespace MyRender.MyEngine
 
             Children.Clear();
 
+        }
+
+        public void AddComponent(BaseComponent cmp)
+        {
+            componentList.Add(cmp);
         }
 
         public virtual void SetParent(Node target)
@@ -145,7 +152,14 @@ namespace MyRender.MyEngine
         {
             GameDirect.Instance.OnSatrt -= OnStart;
         }
-        public virtual void OnUpdate(FrameEventArgs e) { }
+        public virtual void OnUpdate(FrameEventArgs e)
+        {
+            foreach(var c in componentList)
+            {
+                c.OnUpdate(e);
+            }
+        }
+
         public virtual void OnRenderBegin(FrameEventArgs e)
         {
             GL.MatrixMode(MatrixMode.Modelview);
@@ -173,6 +187,12 @@ namespace MyRender.MyEngine
             }
 
             RenderList.Clear();
+
+            foreach(var c in componentList)
+            {
+                c.Release();
+            }
+            componentList.Clear();
         }
 
         private void effectChildWorldModelMatrix(Matrix4 effect)

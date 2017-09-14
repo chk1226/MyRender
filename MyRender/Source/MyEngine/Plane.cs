@@ -31,6 +31,7 @@ namespace MyRender.MyEngine
                 modelData.guid = id;
 
                 createPlaneData(modelData, rect, this.sliceX, this.sliceY);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
                 Resource.Instance.AddModel(modelData);
             }
