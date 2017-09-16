@@ -40,7 +40,8 @@ namespace MyRender.Game
             AddChild(a);
 
             var mrt = new PreRender();
-            mrt.SetType( PreRender.PreRenderType.MRT);
+            mrt.SetType( PreRender.PreRenderType.MRT_PN);
+            mrt.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPN).FB);
             AddChild(mrt);
 
             var skybox = new Skybox();
@@ -81,7 +82,7 @@ namespace MyRender.Game
 
             var ssao = new ScreenEffect(vp.Width, vp.Height, Render.PrePostrender + 2);
             ssao.EnableSSAO();
-            ssao.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBuffer),
+            ssao.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPN),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.SSAOFrame));
             AddChild(ssao);
 

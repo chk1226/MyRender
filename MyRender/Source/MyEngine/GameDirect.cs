@@ -136,21 +136,26 @@ namespace MyRender.MyEngine
 
                 foreach(var render in child.RenderList)
                 {
+                    // prerender stage
                     if(render.Priority >= Render.Prerender)
                     {
                         _prerenderList.Add(render);
                     }
+                    // pre post render stage
                     else if(render.Priority >= Render.PrePostrender)
                     {
                         _prepostrenderList.Add(render);
                     }
+                    // post render stage
                     else if(render.Priority <= Render.Postrender)
                     {
                         _postrenderList.Add(render);
                     }
+                    // render stage
                     else
                     {
                         _renderList.Add(render);
+
                     }
                 }
 
@@ -323,9 +328,12 @@ namespace MyRender.MyEngine
 
             foreach(var render in _renderList)
             {
-                render.OnRenderBegin(e);
-                render.OnRender(e);
-                render.OnRenderFinsh(e);
+                if(!render.PassRender)
+                {
+                    render.OnRenderBegin(e);
+                    render.OnRender(e);
+                    render.OnRenderFinsh(e);
+                }
             }
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);

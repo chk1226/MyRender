@@ -1,7 +1,8 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using MyRender.MyEngine;
 
-namespace MyRender.MyEngine
+namespace MyRender.Game
 {
     class ColorPlane : Plane
     {
@@ -17,7 +18,7 @@ namespace MyRender.MyEngine
             var modelData = ModelList[0];
 
             var material = new Material();
-            material.ShaderProgram = Resource.Instance.GetShader(Resource.SColor);
+            material.ShaderProgram = Resource.Instance.GetShader(Resource.SMRT_PNC);
 
             Render render = Render.CreateRender(material, delegate (Render r) {
                 var m = r.MaterialData;
@@ -33,10 +34,10 @@ namespace MyRender.MyEngine
             this,
             modelData,
             Render.Normal);
-
+            render.PassRender = true;
             RenderList.Add(render);
-
         }
+
 
     }
 }

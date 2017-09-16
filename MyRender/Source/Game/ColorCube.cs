@@ -1,7 +1,8 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using MyRender.MyEngine;
 
-namespace MyRender.MyEngine
+namespace MyRender.Game
 {
     class ColorCube : Node
     {
@@ -33,7 +34,7 @@ namespace MyRender.MyEngine
             {
                 material = new Material();
                 material.guid = cubeGUID;
-                material.ShaderProgram = Resource.Instance.GetShader(Resource.SColor);
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SMRT_PNC);
 
                 Resource.Instance.AddMaterial(material);
             }
@@ -53,7 +54,7 @@ namespace MyRender.MyEngine
             this,
             modelData,
             Render.Normal);
-
+            render.PassRender = true;
             RenderList.Add(render);
 
         }

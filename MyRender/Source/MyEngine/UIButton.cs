@@ -17,7 +17,7 @@ namespace MyRender.MyEngine
         private Color4 enterColor;
         private Color4 nowColor;
         private bool clickState = false;
-
+        private string textureName;
         private UIFont text;
         public event Action OnClick;
 
@@ -48,6 +48,13 @@ namespace MyRender.MyEngine
             modelData.ReloadBufferVec3Data(Model.BufferType.Vertices);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
+            this.textureName = textureName;
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+            this.text.PassRender = PassRender;
 
             // generate render object
             Render render = Render.CreateRender(Resource.Instance.CreateUISpriteM(textureName), delegate (Render r) {
@@ -63,10 +70,10 @@ namespace MyRender.MyEngine
                 }
             },
             this,
-            modelData,
+            ModelList[0],
             Render.UI);
+            render.PassRender = PassRender;
             RenderList.Add(render);
-
         }
 
         protected override void updateModelData()

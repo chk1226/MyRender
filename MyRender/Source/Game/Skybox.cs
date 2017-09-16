@@ -44,6 +44,7 @@ namespace MyRender.Game
             Render.Skybox);
             render.EnableCubemap();
             render.EnableDepthFunc(DepthFunction.Lequal);
+            render.PassRender = PassRender;
             RenderList.Add(render);
 
         }

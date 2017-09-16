@@ -20,6 +20,7 @@ namespace MyRender.MyEngine
         public static readonly string SVSM = @"Source\Shader\VarianceShadowMap.glsl";
         public static readonly string SGaussianBlur = @"Source\Shader\GaussianBlur.glsl";
         public static readonly string SMRT = @"Source\Shader\MRT.glsl";
+        public static readonly string SMRT_PNC = @"Source\Shader\MRT_PNC.glsl";
         public static readonly string SSSAO = @"Source\Shader\SSAO.glsl";
         public static readonly string STerrian = @"Source\Shader\Terrain.glsl";
         public static readonly string SWater = @"Source\Shader\Water.glsl";
@@ -28,7 +29,7 @@ namespace MyRender.MyEngine
         public static readonly string SDOF = @"Source\Shader\DepthOfField.glsl";
         public static readonly string SParticle = @"Source\Shader\Particle.glsl";
         public static readonly string SColor = @"Source\Shader\Color.glsl";
-
+        public static readonly string SCombineDeferred = @"Source\Shader\CombineDeferred.glsl";
 
         // image
         public static readonly string IBricks = @"Asset\Image\DiagonalHerringbone-ColorMap.bmp";

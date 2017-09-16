@@ -21,11 +21,14 @@ namespace MyRender.Game
 
             //var light = new Light();
             //AddChild(light);
+            setting();
 
-            MainCamera.ResetZoomInOut(30, min_camerz, max_camerz);
+
+            preRender();
 
             var skybox = new Skybox();
             skybox.Scale(skyboxSize, skyboxSize, skyboxSize);
+            skybox.PassRender = true;
             AddChild(skybox);
 
 
@@ -50,6 +53,60 @@ namespace MyRender.Game
             plane.LocalPosition = pos;
             AddChild(plane);
 
+
+            //var uisprite = new UISprite(new Rectangle(25, 25, 700, 500), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture);
+            //AddChild(uisprite);
+
+
+            UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "GoBack");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new MenuScene());
+            };
+            a.PassRender = true;
+            AddChild(a);
+
+            postRender();
+        }
+
+        private void preRender()
+        {
+            var mrt = new PreRender();
+            mrt.SetType(PreRender.PreRenderType.MRT_PNC);
+            mrt.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).FB);
+            AddChild(mrt);
+
+            var onlyRender = new PreRender();
+            onlyRender.SetType(PreRender.PreRenderType.OnlyRender);
+            onlyRender.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth).FB);
+            onlyRender.SetRanderRange(Render.Skybox, Render.Skybox);
+            AddChild(onlyRender);
+
+            onlyRender = new PreRender();
+            onlyRender.SetType(PreRender.PreRenderType.OnlyRender);
+            onlyRender.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth2).FB);
+            onlyRender.SetRanderRange(Render.UI, Render.UI);
+            AddChild(onlyRender);
+        }
+
+        private void setting()
+        {
+            GL.ClearColor(0, 0, 0, 0);
+            MainCamera.ResetZoomInOut(30, min_camerz, max_camerz);
+        }
+
+        private void postRender()
+        {
+            var vp = MainCamera.Viewport;
+            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 50);
+            result.EnableCombineDeferred(
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth2).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth).CB_Texture
+            );
+            AddChild(result);
+            
         }
 
         // reference
@@ -67,7 +124,7 @@ namespace MyRender.Game
         }
 
 
-    public override void OnMouseDown(MouseButtonEventArgs e)
+        public override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
 
@@ -103,6 +160,13 @@ namespace MyRender.Game
             base.OnMouseWheel(e);
 
             MainCamera.ZoomInOut(e.Delta, min_camerz, max_camerz);
+
+        }
+
+        public override void OnRelease()
+        {
+            base.OnRelease();
+            GL.ClearColor( Color4.Gray);
 
         }
     }

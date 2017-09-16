@@ -27,6 +27,7 @@ namespace MyRender.MyEngine
         public List<object> Parameter = new List<object>();
         public Vector2 PreRenderRange = new Vector2(Normal, Normal);
         public bool PassPreRender = false;
+        public bool PassRender = false;
         public int ShaderVersion = OPENGL_120;
 
         private List<VertexAttribute> vertexAttribute = new List<VertexAttribute>();

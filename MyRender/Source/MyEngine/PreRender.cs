@@ -11,9 +11,11 @@ namespace MyRender.MyEngine
         public enum PreRenderType
         {
             None,
-            MRT,
+            MRT_PNC,
+            MRT_PN,
             Reflection,
-            Refraction
+            Refraction,
+            OnlyRender
         }
         private PreRenderType type = PreRenderType.None;
         private Matrix4 regViewMatrix = Matrix4.Identity;
@@ -26,21 +28,57 @@ namespace MyRender.MyEngine
 
         public float WaterHeight = 0;
 
+        private int bindBuffer = 0;
+        private Vector2 preRenderRange = new Vector2(Render.Normal, Render.Normal);
+
         public void SetType(PreRenderType type)
         {
             this.type = type;
         }
 
+        public void SetBuffer(int bindBuffer)
+        {
+            this.bindBuffer = bindBuffer;
+        }
+
+        public void SetRanderRange(int start, int end)
+        {
+            preRenderRange.X = start;
+            preRenderRange.Y = end;
+        }
+
         public override void OnStart()
         {
             base.OnStart();
-
-            if(type == PreRenderType.MRT)
+            if (type == PreRenderType.OnlyRender)
+            {               
+                var material = new Material();
+                Render render = Render.CreateRender(material, null,
+                this,
+                null,
+                Render.Prerender);
+                render.PreRenderRange = preRenderRange;
+                RenderList.Add(render);
+            }
+            else if(type == PreRenderType.MRT_PNC)
+            {
+                // gen render
+                var material = new Material();
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SMRT_PNC);
+                Render render = Render.CreateRender(material, null,
+                this,
+                null,
+                Render.Prerender);
+                //render.PreRenderRange = new Vector2(Render.Normal, Render.Normal);
+                RenderList.Add(render);
+            }
+            else if (type == PreRenderType.MRT_PN)
             {
                 // gen render
                 var material = new Material();
                 material.ShaderProgram = Resource.Instance.GetShader(Resource.SMRT);
-                Render render = Render.CreateRender(material, delegate (Render r) {
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
                     var m = r.MaterialData;
 
                     if (m.ShaderProgram != 0)
@@ -53,22 +91,22 @@ namespace MyRender.MyEngine
                 Render.Prerender);
                 RenderList.Add(render);
             }
-            else if(type == PreRenderType.Reflection)
+            else if (type == PreRenderType.Reflection)
             {
                 // gen render
                 var material = new Material();
-                Render render = Render.CreateRender(material, 
+                Render render = Render.CreateRender(material,
                 null,
                 this,
                 null,
                 Render.Prerender);
                 render.Parameter.Add(new Vector4(0, 1, 0, -WaterHeight));
-                render.PreRenderRange = new Vector2(Render.Normal, Render.Skybox);
+                render.PreRenderRange = preRenderRange;
                 updateReflectionMatrix();
 
                 RenderList.Add(render);
             }
-            else if(type == PreRenderType.Refraction)
+            else if (type == PreRenderType.Refraction)
             {
                 // gen render
                 var material = new Material();
@@ -78,7 +116,7 @@ namespace MyRender.MyEngine
                 null,
                 Render.Prerender);
                 render.Parameter.Add(new Vector4(0, -1, 0, WaterHeight));
-                render.PreRenderRange = new Vector2(Render.Normal, Render.Skybox);
+                render.PreRenderRange = preRenderRange;
 
                 RenderList.Add(render);
             }
@@ -86,10 +124,11 @@ namespace MyRender.MyEngine
 
         public override void OnRenderBegin(FrameEventArgs e)
         {
-            if(type == PreRenderType.MRT)
+            if(type == PreRenderType.MRT_PN || type == PreRenderType.MRT_PNC || type == PreRenderType.OnlyRender)
             {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBuffer).FB);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindBuffer);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
             }
             else if(type == PreRenderType.Reflection)
             {
@@ -99,14 +138,14 @@ namespace MyRender.MyEngine
                 regProjectMatrix = GameDirect.Instance.MainScene.MainCamera.ProjectMatix;
                 GameDirect.Instance.MainScene.MainCamera.ProjectMatix = reflectionProjectMatrix;
 
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ReflectionFrame).FB);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindBuffer);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
                 GL.Enable(EnableCap.ClipDistance0);
             }
             else if(type == PreRenderType.Refraction)
             {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).FB);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, bindBuffer);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
                 GL.Enable(EnableCap.ClipDistance0);

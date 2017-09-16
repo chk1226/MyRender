@@ -42,12 +42,17 @@ namespace MyRender.Game
             // reflection
             var pre = new PreRender();
             pre.SetType(PreRender.PreRenderType.Reflection);
+            pre.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.ReflectionFrame).FB);
+            pre.SetRanderRange(Render.Normal, Render.Skybox);
             pre.WaterHeight = waterHeight;
             AddChild(pre);
             water.ReflectionNode = new System.WeakReference<PreRender>(pre);
+
             // refraction
             pre = new PreRender();
             pre.SetType(PreRender.PreRenderType.Refraction);
+            pre.SetBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RefractionFrame).FB);
+            pre.SetRanderRange(Render.Normal, Render.Skybox);
             pre.WaterHeight = waterHeight;
             AddChild(pre);
 

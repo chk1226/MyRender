@@ -97,6 +97,7 @@ namespace MyRender.MyEngine
 
         private Glyphes glyphes;
         private bool reloadBufferArray = false;
+        private string ttfBmpPath;
 
         public Glyphes GetGlyphes
         {
@@ -135,6 +136,15 @@ namespace MyRender.MyEngine
             ModelList[0] = modelData;
             Label = str;
 
+            this.ttfBmpPath = ttfBmpPath;
+
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+            var modelData = ModelList[0];
+
             // generate render object
             Render render = Render.CreateRender(Resource.Instance.CreateUIFontM(ttfBmpPath), delegate (Render r) {
                 var m = r.MaterialData;
@@ -142,8 +152,8 @@ namespace MyRender.MyEngine
                 // reload vertex
                 if (reloadBufferArray)
                 {
-                    modelData.ReloadBufferVec3Data( Model.BufferType.Vertices);
-                    modelData.ReloadBufferVec2Data( Model.BufferType.Texcoords);
+                    modelData.ReloadBufferVec3Data(Model.BufferType.Vertices);
+                    modelData.ReloadBufferVec2Data(Model.BufferType.Texcoords);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                     reloadBufferArray = false;
                 }
@@ -159,40 +169,10 @@ namespace MyRender.MyEngine
             modelData,
             Render.UI);
             render.EnableBlend(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            render.PassRender = PassRender;
             RenderList.Add(render);
 
         }
-
-        //public override void OnRender(FrameEventArgs e)
-        //{
-        //    base.OnRender(e);
-
-        //    if (MaterialData == null) return;
-        //    if (SetUpShaderAction.ContainsKey(GUID)) SetUpShaderAction[GUID]();
-
-        //    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-        //    GL.Enable(EnableCap.Blend);
-
-        //    // bind vertex buffer 
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].VBO);
-        //    GL.EnableClientState(ArrayCap.VertexArray);
-        //    GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
-
-        //    // bind texture coord buffer
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, ModelList[0].TBO);
-        //    GL.EnableClientState(ArrayCap.TextureCoordArray);
-        //    GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, 0);
-
-        //    GameDirect.Instance.DrawCall(ModelList[0].DrawType, ModelList[0].Vertices.Length);
-
-        //    GL.DisableClientState(ArrayCap.VertexArray);
-        //    GL.DisableClientState(ArrayCap.TextureCoordArray);
-
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-        //    GL.BindTexture(TextureTarget.Texture2D, 0);
-
-        //    GL.Disable(EnableCap.Blend);
-        //}
 
         protected override void updateModelData()
         {

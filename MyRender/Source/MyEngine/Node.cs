@@ -59,10 +59,10 @@ namespace MyRender.MyEngine
 
         public Matrix4 LocalModelMatrix = Matrix4.Identity;
         public Matrix4 WorldModelMatrix = Matrix4.Identity;
-        
         public Model[] ModelList;
         public delegate void Action();
         public List<Render> RenderList = new List<Render>();
+        public bool PassRender = false;
 
         private List<BaseComponent> componentList = new List<BaseComponent>();
 

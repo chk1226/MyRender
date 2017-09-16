@@ -18,7 +18,8 @@ namespace MyRender.MyEngine
             SSAO,
             BrightFilter,
             CombineBright,
-            DepthOfField
+            DepthOfField,
+            CombineDeferred,
         }
 
         private EffectType type = EffectType.None;
@@ -43,10 +44,23 @@ namespace MyRender.MyEngine
         // dof
         private int depthTexture;
 
+        // combine deferred
+        private int frontID;
+        private int midID;
+        private int backID;
+
         public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
         {
             useFrame = use;
             bindFrame = bind;
+        }
+
+        public void EnableCombineDeferred(int front, int mid, int back)
+        {
+            type = EffectType.CombineDeferred;
+            frontID = front;
+            backID = back;
+            midID = mid;
         }
 
         public void EnableGaussian(bool horizontal, float scale = 1)
@@ -220,6 +234,28 @@ namespace MyRender.MyEngine
                         m.Uniform1("Near", mainCamera.zNear);
                         m.Uniform1("Far", mainCamera.zFar);
                         m.Uniform1("Zoom", mainCamera.EyeRotation.Z);
+                    }
+                },
+                this,
+                modelData,
+                renderPriority);
+
+                RenderList.Add(render);
+            }
+            else if (type == EffectType.CombineDeferred)
+            {
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SCombineDeferred);
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
+                    var m = r.MaterialData;
+
+                    if (m.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(m.ShaderProgram);
+
+                        m.UniformTexture("BACK", TextureUnit.Texture0, backID, 0);
+                        m.UniformTexture("MID", TextureUnit.Texture1, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture, 1);
+                        m.UniformTexture("FRONT", TextureUnit.Texture2, frontID, 2);
                     }
                 },
                 this,

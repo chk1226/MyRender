@@ -18,9 +18,12 @@ void main(void)
 varying vec4 posE;	
 varying vec3 normalE;	
 
+uniform vec3 Color;
+
+
 void main(void)
 {				
 	gl_FragData[0] = posE;
 	gl_FragData[1] = vec4(normalize(normalE), 0);
-	
+	gl_FragData[2] = vec4(Color, 1);
 }

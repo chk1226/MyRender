@@ -68,8 +68,11 @@ namespace MyRender.MyEngine
                 case FrameBuffer.Type.GaussianYFrame:
                     f.GenGaussianFrame();
                     break;
-                case FrameBuffer.Type.GBuffer:
-                    f.GenGBuffer();
+                case FrameBuffer.Type.GBufferPN:
+                    f.GenGBufferPN();
+                    break;
+                case FrameBuffer.Type.GBufferPNC:
+                    f.GenGBufferPNC();
                     break;
                 case FrameBuffer.Type.SSAOFrame:
                     f.GenSSAOFrame();
@@ -100,6 +103,15 @@ namespace MyRender.MyEngine
                     break;
                 case FrameBuffer.Type.RGBFColorDepth5:
                     f.GenRGBFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBAFColorDepth:
+                    f.GenRGBAFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBAFColorDepth2:
+                    f.GenRGBAFColorDepthFrame();
+                    break;
+                case FrameBuffer.Type.RGBAFColorDepth3:
+                    f.GenRGBAFColorDepthFrame();
                     break;
                 default:
                     f = null;
