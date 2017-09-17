@@ -15,14 +15,16 @@ namespace MyRender.Game
         private float min_camerz = 20;
         private float skyboxSize = 100;
 
+        private Vector4 att; 
+
         public override void OnStart()
         {
             base.OnStart();
 
-            //var light = new Light();
-            //AddChild(light);
             setting();
 
+            var light = new Light();
+            AddChild(light);
 
             preRender();
 
@@ -31,32 +33,62 @@ namespace MyRender.Game
             skybox.PassRender = true;
             AddChild(skybox);
 
-
+            // set 1
             float radius = 10;
             float num = 12;
             float angle = MathHelper.Pi*2 / num;
-
             for (int i = 0; i < num; i++)
             {
-                var cube = new ColorCube();
+                var cube = new LightCube();
                 cube.Rotation(0, 1, 0, -MathHelper.RadiansToDegrees(i * angle));
-                cube.Color = genColor(i);
+                cube.Color = genColor(i*3);
                 cube.LocalPosition = new Vector3(radius * (float)Math.Cos(angle * i), 0, radius * (float)Math.Sin(angle * i));
                 cube.AddComponent(new MoveComponent(i * 1f, 3, new Vector3(cube.LocalPosition.X, 3, cube.LocalPosition.Z), cube));
+                cube.LightCaculation();
+                att = cube.GetAttenuationInfo();
+                AddChild(cube);
+
+            }
+
+            // set 2
+            radius = 20;
+            num = 50;
+            angle = MathHelper.Pi * 2 / num;
+            for (int i = 0; i < num; i++)
+            {
+                var cube = new LightCube();
+                cube.Rotation(0, 1, 0, -MathHelper.RadiansToDegrees(i * angle));
+                cube.Color = genColor(i + 3);
+                cube.LocalPosition = new Vector3(radius * (float)Math.Cos(angle * i), 0, radius * (float)Math.Sin(angle * i));
+                cube.AddComponent(new MoveComponent(i * 0.1f, 2, new Vector3(cube.LocalPosition.X, 3, cube.LocalPosition.Z), cube));
+                cube.LightCaculation();
+                att = cube.GetAttenuationInfo();
+                AddChild(cube);
+
+            }
+
+            // set 3
+            radius = 0;
+            num = 1;
+            angle = MathHelper.Pi * 2 / num;
+            for (int i = 0; i < num; i++)
+            {
+                var cube = new LightCube();
+                cube.Rotation(0, 1, 0, -MathHelper.RadiansToDegrees(i * angle));
+                cube.Color = genColor(7);
+                cube.LocalPosition = new Vector3(radius * (float)Math.Cos(angle * i), 2, radius * (float)Math.Sin(angle * i));
+                cube.AddComponent(new MoveComponent(i * 0.1f, 5, new Vector3(cube.LocalPosition.X, 3, cube.LocalPosition.Z), cube));
+                cube.LightCaculation();
+                att = cube.GetAttenuationInfo();
                 AddChild(cube);
 
             }
 
             var plane = new ColorPlane(50, 50);
             var pos = plane.LocalPosition;
-            pos.Y = -1.5f;
+            //pos.Y = -1.5f;
             plane.LocalPosition = pos;
             AddChild(plane);
-
-
-            //var uisprite = new UISprite(new Rectangle(25, 25, 700, 500), Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture);
-            //AddChild(uisprite);
-
 
             UIButton a = new UIButton(new Rectangle(25, 25, 120, 70), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
                 "GoBack");
@@ -99,14 +131,26 @@ namespace MyRender.Game
         private void postRender()
         {
             var vp = MainCamera.Viewport;
-            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 50);
+
+            var deferred = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
+            deferred.EnableDeferredLight(att);
+            deferred.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC),
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth3));
+            AddChild(deferred);
+
+
+            var result = new ScreenEffect(vp.Width, vp.Height, Render.Postrender - 6);
             result.EnableCombineDeferred(
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth2).CB_Texture,
-                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture,
+                Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth3).CB_Texture,
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBAFColorDepth).CB_Texture
             );
             AddChild(result);
-            
+
+
+
+
+
         }
 
         // reference

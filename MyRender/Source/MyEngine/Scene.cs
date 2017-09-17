@@ -1,5 +1,7 @@
-﻿using OpenTK;
+﻿using MyRender.Game;
+using OpenTK;
 using System;
+using System.Collections.Generic;
 
 namespace MyRender.MyEngine
 {
@@ -19,6 +21,7 @@ namespace MyRender.MyEngine
         }
 
         public WeakReference<Light> SceneLight;
+        public List<WeakReference<LightCube>> SceneLightCube = new List<WeakReference<LightCube>>();
 
         public Scene()
         {

@@ -27,7 +27,7 @@ namespace MyRender.Game
                 {
                     GL.UseProgram(m.ShaderProgram);
 
-                    m.Uniform3("Color", 0.5f, 0.5f, 0.5f);
+                    m.Uniform3("Color", 0.1f, 0.1f, 0.1f);
 
                 }
             },

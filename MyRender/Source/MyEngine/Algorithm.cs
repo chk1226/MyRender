@@ -17,8 +17,8 @@ namespace MyRender.MyEngine
             get { return _random; }
         }
 
-        //private static float radin = MathHelper.Pi / 180.0f;
-        //public static float Radin { get { return radin; } }
+        private static readonly Vector4 zeroVector = new Vector4(0, 0, 0, 1);
+        public static Vector4 ZeroVector { get { return zeroVector; } }
 
         // reference https://stackoverflow.com/questions/4436764/rotating-a-quaternion-on-1-axis
         public static Quaternion CreateFromAxisAngle(float x, float y, float z, float a)

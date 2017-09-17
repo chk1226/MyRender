@@ -50,6 +50,14 @@ namespace MyRender.Game
             };
             AddChild(a);
 
+            a = new UIButton(new Rectangle(spaceX, (spaceY + hY)*2 + spaceY, wX, hY), Resource.IUIBlack, Color4.Orange, new Color4(0.34f, 0.6f, 0.67f, 1f),
+                "DeferredLight");
+            a.OnClick += delegate ()
+            {
+                GameDirect.Instance.RunWithScene(new DeferredLightScene());
+            };
+            AddChild(a);
+
         }
     }
 }

@@ -8,13 +8,14 @@ void main(void)
 
 @fragment shader
 uniform sampler2D TEX_COLOR;
+uniform float Brightness;
 
 void main(void)
 {
 	vec4 color = texture2D(TEX_COLOR, gl_TexCoord[0].st);	
 	float brightness = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
 
-    if(brightness > 0.8)
+    if(brightness > Brightness)
         gl_FragColor = color;
 	else
 		gl_FragColor = vec4(0,0,0,0);

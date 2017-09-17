@@ -113,7 +113,7 @@ namespace MyRender.Game
 
             // bright filter
             var filter = new ScreenEffect(vp.Width, vp.Height, Render.Postrender);
-            filter.EnableBrightFilter();
+            filter.EnableBrightFilter(0.8f);
             filter.SetFrameBuffer(Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth),
                 Resource.Instance.GetFrameBuffer(FrameBuffer.Type.RGBFColorDepth2));
             AddChild(filter);

@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using MyRender.Game;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -20,6 +21,7 @@ namespace MyRender.MyEngine
             CombineBright,
             DepthOfField,
             CombineDeferred,
+            DeferredLight
         }
 
         private EffectType type = EffectType.None;
@@ -49,6 +51,12 @@ namespace MyRender.MyEngine
         private int midID;
         private int backID;
 
+        // deferred loght
+        private Vector4 attenuationInfo;
+
+        // BrightFilter
+        float brightness;
+
         public void SetFrameBuffer(FrameBuffer use, FrameBuffer bind)
         {
             useFrame = use;
@@ -70,9 +78,16 @@ namespace MyRender.MyEngine
             scaleValue = scale;
         }
 
-        public void EnableBrightFilter()
+        public void EnableBrightFilter(float brightness)
         {
             type = EffectType.BrightFilter;
+            this.brightness = brightness;
+        }
+
+        public void EnableDeferredLight(Vector4 att)
+        {
+            type = EffectType.DeferredLight;
+            attenuationInfo = att;
         }
 
         public void EnableCombineBright(int color, int blur)
@@ -188,6 +203,7 @@ namespace MyRender.MyEngine
                         GL.UseProgram(m.ShaderProgram);
 
                         if (useFrame != null) m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
+                        m.Uniform1("Brightness", brightness);
                     }
                 },
                 this,
@@ -254,8 +270,43 @@ namespace MyRender.MyEngine
                         GL.UseProgram(m.ShaderProgram);
 
                         m.UniformTexture("BACK", TextureUnit.Texture0, backID, 0);
-                        m.UniformTexture("MID", TextureUnit.Texture1, Resource.Instance.GetFrameBuffer(FrameBuffer.Type.GBufferPNC).CB_Texture, 1);
+                        m.UniformTexture("MID", TextureUnit.Texture1, midID, 1);
                         m.UniformTexture("FRONT", TextureUnit.Texture2, frontID, 2);
+                    }
+                },
+                this,
+                modelData,
+                renderPriority);
+
+                RenderList.Add(render);
+            }
+            else if(type == EffectType.DeferredLight)
+            {
+                material.ShaderProgram = Resource.Instance.GetShader(Resource.SDeferredLight);
+                Render render = Render.CreateRender(material, delegate (Render r)
+                {
+                    var m = r.MaterialData;
+
+                    if (m.ShaderProgram != 0)
+                    {
+                        GL.UseProgram(m.ShaderProgram);
+
+                        m.UniformTexture("TEX_COLOR", TextureUnit.Texture0, useFrame.CB_Texture, 0);
+                        m.UniformTexture("POSITION", TextureUnit.Texture1, useFrame.Position, 1);
+                        m.UniformTexture("NORMAL", TextureUnit.Texture2, useFrame.Normal, 2);
+
+                        m.Uniform4("AttenuationInfo", attenuationInfo.X, attenuationInfo.Y, attenuationInfo.Z, attenuationInfo.W);
+                        var lights = GameDirect.Instance.MainScene.SceneLightCube;
+                        for (int i = 0; i < lights.Count; i++)
+                        {
+                            LightCube lCube;
+                            if (lights[i].TryGetTarget(out lCube))
+                            {
+                                var data = lCube.GetLightInfo();
+                                m.Uniform4("LightInfo[" + i.ToString() + "]", data.X, data.Y, data.Z, data.W);
+                                m.Uniform3("LightColor[" + i.ToString() + "]", lCube.Color.X, lCube.Color.Y, lCube.Color.Z);
+                            }
+                        }
                     }
                 },
                 this,

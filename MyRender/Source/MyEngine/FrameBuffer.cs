@@ -26,6 +26,7 @@ namespace MyRender.MyEngine
             RGBAFColorDepth,
             RGBAFColorDepth2,
             RGBAFColorDepth3,
+            RGBAFColorDepth4,
 
         }
 
