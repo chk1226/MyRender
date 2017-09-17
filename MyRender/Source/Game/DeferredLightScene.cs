@@ -125,7 +125,7 @@ namespace MyRender.Game
         private void setting()
         {
             GL.ClearColor(0, 0, 0, 0);
-            MainCamera.ResetZoomInOut(30, min_camerz, max_camerz);
+            MainCamera.ResetZoomInOut(46, min_camerz, max_camerz);
         }
 
         private void postRender()
